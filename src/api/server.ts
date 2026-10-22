@@ -8,6 +8,7 @@ import { AnythingDown } from '../core/downloader.js';
 import { detectPlatform, isValidUrl } from '../utils/url-detector.js';
 import { sanitizeFilename, removeFileSafe, generateId } from '../utils/file.js';
 import { Logger } from '../utils/logger.js';
+import { createTelegramBot } from '../bot/telegram.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,8 +22,11 @@ export function createServer() {
 
   // Serve static files from public directory
   const publicDir = path.join(__dirname, 'public');
+  const srcPublicDir = path.join(process.cwd(), 'src', 'api', 'public');
   if (fs.existsSync(publicDir)) {
     app.use(express.static(publicDir));
+  } else if (fs.existsSync(srcPublicDir)) {
+    app.use(express.static(srcPublicDir));
   }
 
   // Health check
@@ -149,26 +153,46 @@ export function createServer() {
   return app;
 }
 
-export function startApiServer(port = 3000) {
+export function startApiServer(port = 3000, host = '0.0.0.0') {
   const app = createServer();
-  const server = app.listen(port, (err?: Error) => {
-    if (err) {
-      const code = (err as NodeJS.ErrnoException).code;
-      if (code === 'EADDRINUSE') {
-        Logger.error(`Porta ${port} já está em uso. Use outra porta: PORT=3001 npm run start:api`);
-      } else {
-        Logger.error(`Falha ao iniciar servidor: ${err.message}`);
-      }
-      process.exit(1);
-    }
-    Logger.info(`🚀 AnythingDown REST API running at http://localhost:${port}`);
-    Logger.info(`📊 Health check: http://localhost:${port}/api/health`);
+  const server = app.listen(port, host, () => {
+    Logger.info(`🚀 AnythingDown REST API running at http://${host}:${port}`);
+    Logger.info(`📊 Health check: http://${host}:${port}/api/health`);
   });
+
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      Logger.error(`Porta ${port} já está em uso. Use outra porta: PORT=3001 npm run start:api`);
+    } else {
+      Logger.error(`Falha ao iniciar servidor: ${err.message}`);
+    }
+    process.exit(1);
+  });
+
+  // Automatically start Telegram Bot if token is present in environment
+  const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (telegramToken) {
+    try {
+      Logger.info('🤖 Variável TELEGRAM_BOT_TOKEN detectada. Iniciando bot do Telegram integrado...');
+      const bot = createTelegramBot(telegramToken);
+      bot.start({
+        onStart: (botInfo) => {
+          Logger.info(`✅ AnythingDown Telegram Bot online como @${botInfo.username}`);
+        },
+      }).catch((botErr: any) => {
+        Logger.error(`Erro no loop do Telegram Bot: ${botErr.message}`);
+      });
+    } catch (err: any) {
+      Logger.error(`Falha ao inicializar o Telegram Bot: ${err.message}`);
+    }
+  }
+
   return server;
 }
 
 // Auto start if executed directly
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const port = parseInt(process.env.PORT || '3000', 10);
-  startApiServer(port);
+  const host = process.env.HOST || '0.0.0.0';
+  startApiServer(port, host);
 }

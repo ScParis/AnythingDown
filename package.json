@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node ./node_modules/typescript/bin/tsc",
+    "build": "node ./node_modules/typescript/bin/tsc && node -e \"import('fs').then(fs => fs.cpSync('src/api/public', 'dist/api/public', { recursive: true }))\"",
     "test": "node test/test.js",
     "start:api": "node dist/api/server.js",
     "start:bot": "node dist/bot/index.js",

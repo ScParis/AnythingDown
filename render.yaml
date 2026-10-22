@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: anythingdown
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_ENV
+        value: production
+      # Opcional: Descomente para ativar o Bot do Telegram no mesmo container
+      # - key: TELEGRAM_BOT_TOKEN
+      #   sync: false
