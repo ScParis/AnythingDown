@@ -21,12 +21,13 @@ Includes:
 - 🎵 **FFmpeg Integration**: High-definition video (1080p, 2K, 4K) stream merging and direct MP3 audio extraction with metadata.
 - 📊 **Real-time Progress Events**: `onProgress` callbacks providing exact percentage, download speed, and ETA.
 - 🍪 **Cookies & Proxy Support**: Bypass rate limits, age restrictions, and access private Instagram/Facebook posts.
-- 🎮 **5 Interactive Canvas Universe Themes**:
+- 🎮 **6 Interactive Canvas Universe Themes**:
   - 🌀 **TRON '82**: 3D neon vector grid, Lightcycles with solid light trails, Recognizer ship, 90° turns.
   - 🏙️ **CYBERPUNK 2077**: Night City neon skyline, acid rain, Trauma Team flying AVs, Kiroshi Optics HUD & Netrunner Cyberdeck RAM.
   - 🏎️ **TOP GEAR '92 (SNES)**: Pseudo-3D Mode 7 speedway, iconic Red Cannibal car, interactive Nitro flames boost & 16-bit arcade audio.
   - 💣 **COUNTER-STRIKE (DE_DUST2)**: Dust II sandstone bombsite A, interactive AK-47 viewmodel with recoil & muzzle flash, live C4 beeping countdown, headshot SFX & real-time kill feed.
   - 🌴 **GRAND THEFT AUTO VI (VICE CITY / LEONIDA)**: Miami sunset sky, synthwave sun, palm silhouettes, Grotti Cheetah supercar with neon underglow, VCPD police helicopter with rotating searchlight & Wanted Level stars system.
+  - 🕷️ **SPIDER-MAN NOIR (1933 NEW YORK)**: Monochromatic film noir 1930s Manhattan, rainstorm with wind, steam vents, dark skyscrapers, flapping detective trenchcoat, glowing aviator goggles, gargoyle perch, and vintage camera shutter & web zip audio.
 - 🌐 **REST API & Web UI**: Streaming downloads, JSON metadata endpoints, and interactive Web Audio sound synthesizer (zero external sound assets).
 - 🤖 **Telegram & WhatsApp Bots**: Turnkey bots ready to receive links and reply with media attachments.
 
@@ -34,33 +35,37 @@ Includes:
 
 ## 🎨 Visual Themes Showcase
 
-Experience 5 fully animated, responsive worlds powered by HTML5 Canvas & Web Audio API (zero external image/sound assets):
+Experience 6 fully animated, responsive worlds powered by HTML5 Canvas & Web Audio API (zero external image/sound assets):
 
-### 1. 🌴 GTA VI // Vice City & Leonida
+### 1. 🕷️ Spider-Man Noir // 1933 New York City
+> *"Wherever I go, the wind follows. And the wind smells like rain..."*
+> *Monochromatic 1930s noir aesthetic, heavy rain and wind streaks, steam vents, gargoyle pedestal, leather trenchcoat blowing in the wind, glowing aviator goggles, web lines, film grain, and Rubik's cube easter egg!*
+
+### 2. 🌴 GTA VI // Vice City & Leonida
 > *Iconic Miami tropical sunset, synthwave sun, palms, Grotti Cheetah supercar with pink underglow, and VCPD police chopper with searchlight & Wanted stars!*
 <p align="center">
   <img src="docs/screenshots/theme_gta6.png" alt="GTA VI Theme" width="850">
 </p>
 
-### 2. 💣 Counter-Strike // de_dust2
+### 3. 💣 Counter-Strike // de_dust2
 > *First-person AK-47 viewmodel with recoil & muzzle flash, planted C4 with live ticking audio, bombsite A graffiti, tactical smoke, and real-time kill feed!*
 <p align="center">
   <img src="docs/screenshots/theme_counterstrike.png" alt="Counter-Strike Theme" width="850">
 </p>
 
-### 3. 🏎️ Top Gear '92 // SNES Speedway
+### 4. 🏎️ Top Gear '92 // SNES Speedway
 > *Mode 7 pseudo-3D curved speedway, the legendary Red Cannibal supercar, interactive Nitro turbo flames, rivals, and 16-bit arcade tachometer!*
 <p align="center">
   <img src="docs/screenshots/theme_topgear.png" alt="Top Gear 1992 Theme" width="850">
 </p>
 
-### 4. 🏙️ Cyberpunk 2077 // Night City
+### 5. 🏙️ Cyberpunk 2077 // Night City
 > *Night City skyscrapers, Trauma Team flying Aerodynes (AVs), holographic neon ads, acid rain, and Netrunner Cyberdeck RAM HUD!*
 <p align="center">
   <img src="docs/screenshots/theme_cyberpunk.png" alt="Cyberpunk 2077 Theme" width="850">
 </p>
 
-### 5. 🌀 TRON '82 // The Grid
+### 6. 🌀 TRON '82 // The Grid
 > *3D perspective vector grid, Lightcycles with solid trails turning at 90°, identity disc, and ENCOM Recognizer ship patrolling overhead!*
 <p align="center">
   <img src="docs/screenshots/theme_tron.png" alt="TRON 1982 Theme" width="850">
