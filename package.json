@@ -1,0 +1,58 @@
+{
+  "name": "anythingdown",
+  "version": "1.0.0",
+  "description": "Powerful, modern and lightweight downloader for Instagram, TikTok, Facebook, YouTube, Twitter/X and 1000+ platforms with TypeScript, streaming, REST API and multi-platform Bot support.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node ./node_modules/typescript/bin/tsc",
+    "test": "node test/test.js",
+    "start:api": "node dist/api/server.js",
+    "start:bot": "node dist/bot/index.js",
+    "start:bot:telegram": "node dist/bot/index.js --telegram",
+    "start:bot:whatsapp": "node dist/bot/index.js --whatsapp"
+  },
+  "keywords": [
+    "downloader",
+    "video-downloader",
+    "audio-downloader",
+    "instagram-downloader",
+    "tiktok-downloader",
+    "facebook-downloader",
+    "youtube-downloader",
+    "telegram-bot",
+    "whatsapp-bot",
+    "reels",
+    "yt-dlp",
+    "media"
+  ],
+  "author": "AnythingDown Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.12",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "grammy": "^1.35.0",
+    "pino": "^9.6.0",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "@types/qrcode-terminal": "^0.12.2",
+    "typescript": "^5.7.3"
+  }
+}
