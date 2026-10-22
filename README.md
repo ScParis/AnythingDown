@@ -32,6 +32,42 @@ Includes:
 
 ---
 
+## 🎨 Visual Themes Showcase
+
+Experience 5 fully animated, responsive worlds powered by HTML5 Canvas & Web Audio API (zero external image/sound assets):
+
+### 1. 🌴 GTA VI // Vice City & Leonida
+> *Iconic Miami tropical sunset, synthwave sun, palms, Grotti Cheetah supercar with pink underglow, and VCPD police chopper with searchlight & Wanted stars!*
+<p align="center">
+  <img src="docs/screenshots/theme_gta6.png" alt="GTA VI Theme" width="850">
+</p>
+
+### 2. 💣 Counter-Strike // de_dust2
+> *First-person AK-47 viewmodel with recoil & muzzle flash, planted C4 with live ticking audio, bombsite A graffiti, tactical smoke, and real-time kill feed!*
+<p align="center">
+  <img src="docs/screenshots/theme_counterstrike.png" alt="Counter-Strike Theme" width="850">
+</p>
+
+### 3. 🏎️ Top Gear '92 // SNES Speedway
+> *Mode 7 pseudo-3D curved speedway, the legendary Red Cannibal supercar, interactive Nitro turbo flames, rivals, and 16-bit arcade tachometer!*
+<p align="center">
+  <img src="docs/screenshots/theme_topgear.png" alt="Top Gear 1992 Theme" width="850">
+</p>
+
+### 4. 🏙️ Cyberpunk 2077 // Night City
+> *Night City skyscrapers, Trauma Team flying Aerodynes (AVs), holographic neon ads, acid rain, and Netrunner Cyberdeck RAM HUD!*
+<p align="center">
+  <img src="docs/screenshots/theme_cyberpunk.png" alt="Cyberpunk 2077 Theme" width="850">
+</p>
+
+### 5. 🌀 TRON '82 // The Grid
+> *3D perspective vector grid, Lightcycles with solid trails turning at 90°, identity disc, and ENCOM Recognizer ship patrolling overhead!*
+<p align="center">
+  <img src="docs/screenshots/theme_tron.png" alt="TRON 1982 Theme" width="850">
+</p>
+
+---
+
 ## 📦 Installation & Build
 
 ```bash
