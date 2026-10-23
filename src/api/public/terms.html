@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termos de Uso // AnythingDown</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #02040c;
+      color: #e0f2fe;
+      font-family: 'Rajdhani', sans-serif;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Background Cyber Grid */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(0, 243, 255, 0.08), transparent 70%),
+                  linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 820px;
+      width: 100%;
+    }
+
+    /* Top Nav */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+      padding-bottom: 1rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #00f3ff;
+      text-decoration: none;
+      padding: 8px 16px;
+      border: 1px solid #00f3ff;
+      background: rgba(0, 243, 255, 0.1);
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .back-btn:hover {
+      background: #00f3ff;
+      color: #000;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      color: #00f3ff;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+    }
+
+    /* Content Card */
+    .card {
+      background: rgba(4, 12, 30, 0.92);
+      border: 1.5px solid rgba(0, 243, 255, 0.35);
+      border-radius: 8px;
+      padding: 2.2rem;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
+      backdrop-filter: blur(10px);
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 2rem;
+      color: #ffffff;
+      margin-bottom: 0.4rem;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+    }
+
+    .updated-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: #00f3ff;
+      opacity: 0.8;
+      margin-bottom: 1.8rem;
+      display: inline-block;
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.15rem;
+      color: #38bdf8;
+      margin-top: 1.6rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 3px solid #00f3ff;
+      padding-left: 10px;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      font-size: 1.05rem;
+      color: #cbd5e1;
+    }
+
+    ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1.2rem;
+      color: #cbd5e1;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .highlight-box {
+      background: rgba(0, 243, 255, 0.08);
+      border: 1px dashed #00f3ff;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin: 1.2rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.85;
+      font-family: 'Share Tech Mono', monospace;
+      width: 100%;
+    }
+
+    footer a {
+      color: #00f3ff;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+      color: #fff;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Navigation -->
+    <div class="nav-bar">
+      <a href="/" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Início</a>
+      <div class="brand-title"><i class="fa-solid fa-bolt"></i> ANYTHING // DOWN</div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <h1><i class="fa-solid fa-scale-balanced" style="color: #00f3ff;"></i> Termos de Uso</h1>
+      <div class="updated-tag">ÚLTIMA ATUALIZAÇÃO: OUTUBRO DE 2026 // VERSÃO 1.0.0</div>
+
+      <p>
+        Bem-vindo ao <b>AnythingDown</b>. Ao acessar e utilizar este site, nossa API ou qualquer um dos nossos robôs integrados (Telegram e WhatsApp), você concorda expressamente em cumprir e vincular-se aos presentes <b>Termos e Condições de Uso</b>. Caso não concorde com qualquer termo aqui descrito, solicitamos que não utilize a ferramenta.
+      </p>
+
+      <h2><i class="fa-solid fa-1"></i> Finalidade e Natureza da Ferramenta</h2>
+      <p>
+        O <b>AnythingDown</b> é uma aplicação utilitária open-source (código aberto) criada para fins educacionais, de pesquisa e arquivamento pessoal. A ferramenta funciona como um extrator de streams de URLs públicas disponíveis na internet através de bibliotecas consagradas como <code>yt-dlp</code> e <code>ffmpeg</code>.
+      </p>
+
+      <h2><i class="fa-solid fa-2"></i> Uso Permitido e Responsabilidade do Usuário</h2>
+      <p>
+        O usuário é o único e exclusivo responsável pelo uso que faz do serviço e pelos links inseridos na aplicação. Você concorda expressamente em:
+      </p>
+      <ul>
+        <li>Utilizar a ferramenta exclusivamente para conteúdos de domínio público, de sua própria autoria, sob licenças Creative Commons abertas, ou quando expressamente autorizado pelos titulares dos direitos autorais.</li>
+        <li>Não utilizar o serviço para download ou redistribuição ilegal de materiais protegidos por copyright para fins comerciais ou monetários.</li>
+        <li>Não utilizar a ferramenta de maneira abusiva ou automatizada que possa sobrecarregar os servidores, caracterizar ataque de negação de serviço (DoS/DDoS) ou violar os termos de serviço das plataformas de origem.</li>
+      </ul>
+
+      <div class="highlight-box">
+        <i class="fa-solid fa-shield-halved" style="color: #00f3ff; margin-right: 6px;"></i>
+        <b>Aviso de Direitos Autorais:</b> O AnythingDown <b>não armazena nem hospeda</b> nenhum conteúdo de áudio ou vídeo em servidores permanentes. Toda conversão é efêmera e o fluxo de dados provém diretamente dos servidores originais das plataformas. Respeite sempre os direitos autorais e as diretrizes de cada criador de conteúdo.
+      </div>
+
+      <h2><i class="fa-solid fa-3"></i> Propriedade Intelectual das Plataformas Terceiras</h2>
+      <p>
+        Todas as marcas, logotipos, nomes comerciais e recursos visuais citados (incluindo Instagram, TikTok, Facebook, YouTube, Twitter/X, Reddit e SoundCloud) são de propriedade exclusiva de suas respectivas empresas proprietárias (Meta Platforms, ByteDance, Google LLC, X Corp., etc.). O AnythingDown não possui nenhuma afiliação, parceria, patrocínio ou endosso por parte dessas organizações.
+      </p>
+
+      <h2><i class="fa-solid fa-4"></i> Isenção de Garantias e Limitação de Responsabilidade</h2>
+      <p>
+        O serviço é disponibilizado <b>"no estado em que se encontra" (AS IS)</b>, sem garantias de qualquer natureza, expressas ou implícitas. Os desenvolvedores e mantenedores do AnythingDown não se responsabilizam por:
+      </p>
+      <ul>
+        <li>Interrupções, instabilidades temporárias ou incompatibilidades decorrentes de alterações técnicas nas APIs das plataformas terceiras.</li>
+        <li>Perda de dados, indisponibilidade ou eventuais danos diretos ou indiretos oriundos da utilização do software.</li>
+        <li>Mau uso ou violação das leis de direitos autorais praticada por terceiros com base no software.</li>
+      </ul>
+
+      <h2><i class="fa-solid fa-5"></i> Código Aberto e Autoria</h2>
+      <p>
+        O código-fonte completo deste projeto é livre e está licenciado sob a <b>Licença MIT</b>. Você tem total liberdade para inspecionar, clonar e contribuir através do repositório oficial no GitHub.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="/"><i class="fa-solid fa-house"></i> Início</a>
+        <a href="/terms.html"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
+        <a href="/privacy.html"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
+        <a href="/license.html"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
+        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Repositório</a>
+      </div>
+      <div>
+        Desenvolvido com ⚡ por <a href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer"><b>ScParis</b></a> &bull; AnythingDown &copy; 2026
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
