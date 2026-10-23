@@ -3,6 +3,10 @@ FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
+# Install git (required by npm ci for git-based dependencies)
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy dependency manifests
 COPY package*.json tsconfig.json ./
 
@@ -20,11 +24,12 @@ FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Install system dependencies: python3 (required for yt-dlp), ffmpeg, curl, ca-certificates
+# Install system dependencies: python3 (required for yt-dlp), ffmpeg, curl, git, ca-certificates
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     ffmpeg \
     curl \
+    git \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
