@@ -1,0 +1,912 @@
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+      background: #02020a;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Fullscreen Scene Canvas */
+    #worldCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Scanlines / CRT Overlay */
+    .crt-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Common App Shell */
+    .app-container {
+      position: relative;
+      z-index: 100;
+      max-width: 730px;
+      width: 100%;
+    }
+
+    /* ==========================================================================
+       THEME 1: TRON '82 / THE GRID
+       ========================================================================== */
+    body.theme-retro {
+      background: #01040f;
+      color: #00f3ff;
+      font-family: 'Share Tech Mono', 'VT323', monospace;
+      letter-spacing: 1px;
+    }
+
+    body.theme-retro .crt-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 3px, 4px 100%;
+    }
+
+    body.theme-retro .main-card {
+      background: rgba(1, 10, 28, 0.85);
+      border: 2px solid #00f3ff;
+      border-radius: 6px;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.4), inset 0 0 25px rgba(0, 243, 255, 0.15);
+      backdrop-filter: blur(8px);
+      position: relative;
+    }
+
+    body.theme-retro .main-card::before {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border: 1px dashed rgba(0, 243, 255, 0.35);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    body.theme-retro .title-glow {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 2.1rem;
+      letter-spacing: 4px;
+      background: linear-gradient(180deg, #ffffff 0%, #00f3ff 60%, #0066ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+    }
+
+    body.theme-retro .theme-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      background: rgba(0, 243, 255, 0.12);
+      color: #00f3ff;
+      border: 1.5px solid #00f3ff;
+      box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    body.theme-retro .theme-btn:hover {
+      background: #00f3ff;
+      color: #000;
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.9);
+      transform: translateY(-1px);
+    }
+
+    body.theme-retro .theme-btn-accent {
+      background: rgba(255, 102, 0, 0.12);
+      color: #ff6600;
+      border: 1.5px solid #ff6600;
+      box-shadow: 0 0 12px rgba(255, 102, 0, 0.4);
+    }
+    body.theme-retro .theme-btn-accent:hover {
+      background: #ff6600;
+      color: #000;
+      box-shadow: 0 0 25px rgba(255, 102, 0, 0.9);
+    }
+
+    body.theme-retro .input-box {
+      background: #000814;
+      border: 1.5px solid #00f3ff;
+      color: #00f3ff;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.05rem;
+      box-shadow: inset 0 0 12px rgba(0, 243, 255, 0.3);
+    }
+    body.theme-retro .input-box:focus {
+      outline: none;
+      border-color: #ff6600;
+      box-shadow: 0 0 18px rgba(255, 102, 0, 0.7), inset 0 0 8px rgba(255, 102, 0, 0.4);
+      color: #fff;
+    }
+
+    body.theme-retro .badge-tag {
+      background: rgba(0, 243, 255, 0.12);
+      border: 1px solid #00f3ff;
+      color: #00f3ff;
+      text-shadow: 0 0 8px #00f3ff;
+    }
+
+    .identity-disc {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid #00f3ff;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px #00f3ff, inset 0 0 10px #00f3ff;
+      animation: spinDisc 6s linear infinite;
+    }
+    .identity-disc::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #00f3ff;
+      box-shadow: 0 0 8px #00f3ff;
+    }
+    @keyframes spinDisc {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ==========================================================================
+       THEME 2: CYBERPUNK 2077
+       ========================================================================== */
+    body.theme-cyber {
+      background: #06070a;
+      color: #fcee0a;
+      font-family: 'Rajdhani', 'Share Tech Mono', sans-serif;
+    }
+
+    body.theme-cyber .crt-overlay {
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25) 1px, transparent 1px, transparent 2px);
+      opacity: 0.7;
+    }
+
+    body.theme-cyber .main-card {
+      background: rgba(12, 14, 20, 0.92);
+      border: 2px solid #00f0ff;
+      border-left: 6px solid #fcee0a;
+      clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.2), 0 0 50px rgba(252, 238, 10, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    body.theme-cyber .main-card::after {
+      content: 'KIROSHI OPTICS // SCANNING';
+      position: absolute;
+      top: 6px;
+      right: 35px;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: #00f0ff;
+      opacity: 0.8;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    body.theme-cyber .hazard-bar {
+      height: 10px;
+      width: 100%;
+      background: repeating-linear-gradient(45deg, #fcee0a, #fcee0a 12px, #000 12px, #000 24px);
+    }
+
+    body.theme-cyber .title-glow {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 2.2rem;
+      color: #fcee0a;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px rgba(252, 238, 10, 0.8), 2px 2px 0px #ff003c;
+    }
+
+    body.theme-cyber .theme-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 1.5px;
+      background: #fcee0a;
+      color: #000;
+      border: none;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    body.theme-cyber .theme-btn:hover {
+      background: #00f0ff;
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.9);
+      transform: scale(1.02);
+    }
+
+    body.theme-cyber .theme-btn-accent {
+      background: #00f0ff;
+      color: #000;
+      border: none;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    body.theme-cyber .theme-btn-accent:hover {
+      background: #ff003c;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255, 0, 60, 0.9);
+    }
+
+    body.theme-cyber .input-box {
+      background: #040507;
+      border: 1.5px solid #00f0ff;
+      color: #fcee0a;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.05rem;
+      border-radius: 0;
+      box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.25);
+    }
+    body.theme-cyber .input-box:focus {
+      outline: none;
+      border-color: #fcee0a;
+      box-shadow: 0 0 18px rgba(252, 238, 10, 0.6);
+    }
+
+    body.theme-cyber .badge-tag {
+      background: rgba(252, 238, 10, 0.12);
+      border: 1px solid #fcee0a;
+      color: #fcee0a;
+      border-radius: 0;
+    }
+
+    .cyber-ram-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: #00f0ff;
+    }
+    .ram-block {
+      width: 7px;
+      height: 12px;
+      background: #00f0ff;
+      box-shadow: 0 0 5px #00f0ff;
+      animation: ramPulse 2s infinite alternate;
+    }
+    @keyframes ramPulse {
+      0% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    /* ==========================================================================
+       THEME 3: TOP GEAR '92 (SNES 16-BIT RETRO RACING)
+       ========================================================================== */
+    body.theme-topgear {
+      background: #00122e;
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    body.theme-topgear .crt-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+    }
+
+    body.theme-topgear .main-card {
+      background: rgba(14, 22, 45, 0.88);
+      border: 4px solid #ffffff;
+      border-radius: 0px;
+      box-shadow: 8px 8px 0px #e60012, -4px -4px 0px #0055ff;
+      backdrop-filter: blur(6px);
+      position: relative;
+    }
+
+    body.theme-topgear .topgear-header-strip {
+      height: 14px;
+      width: 100%;
+      background: repeating-linear-gradient(90deg, #e60012, #e60012 25px, #ffffff 25px, #ffffff 50px);
+      margin-bottom: 1.25rem;
+      border-bottom: 2px solid #000;
+    }
+
+    body.theme-topgear .title-glow {
+      font-family: 'Press Start 2P', monospace;
+      font-weight: 900;
+      font-size: 1.55rem;
+      color: #ffd700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 4px 4px 0px #e60012, -2px -2px 0px #000;
+    }
+
+    body.theme-topgear .theme-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.65rem;
+      background: #e60012;
+      color: #fff;
+      border: 3px solid #fff;
+      box-shadow: 4px 4px 0px #000;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.1s;
+    }
+    body.theme-topgear .theme-btn:hover {
+      background: #ff2233;
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px #000;
+    }
+
+    body.theme-topgear .theme-btn-accent {
+      background: #0055ff;
+      color: #fff;
+      border: 3px solid #fff;
+      box-shadow: 4px 4px 0px #000;
+    }
+    body.theme-topgear .theme-btn-accent:hover {
+      background: #2277ff;
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px #000;
+    }
+
+    body.theme-topgear .input-box {
+      background: #000000;
+      border: 3px solid #ffd700;
+      color: #00ff66;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.72rem;
+      border-radius: 0;
+      box-shadow: inset 3px 3px 0px #222;
+    }
+    body.theme-topgear .input-box:focus {
+      outline: none;
+      border-color: #e60012;
+      box-shadow: 0 0 10px #e60012;
+    }
+
+    body.theme-topgear .badge-tag {
+      background: #000;
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      font-size: 0.65rem;
+    }
+
+    /* ==========================================================================
+       THEME 4: COUNTER-STRIKE (TACTICAL MILITARY HUD / CS:GO / CS 1.6)
+       ========================================================================== */
+    body.theme-cs {
+      background: #0d1109;
+      color: #b5c798;
+      font-family: 'Share Tech Mono', 'Rajdhani', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    body.theme-cs .crt-overlay {
+      background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(10, 20, 10, 0.3) 50%);
+      background-size: 100% 3px;
+    }
+
+    body.theme-cs .main-card {
+      background: rgba(18, 24, 18, 0.94);
+      border: 2px solid #5a7742;
+      border-top: 4px solid #d49b29;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(90, 119, 66, 0.2);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    body.theme-cs .cs-header-strip {
+      height: 8px;
+      width: 100%;
+      background: linear-gradient(90deg, #d49b29 0%, #d49b29 35%, #5a7742 35%, #5a7742 70%, #de3c26 70%, #de3c26 100%);
+      margin-bottom: 1.25rem;
+    }
+
+    body.theme-cs .title-glow {
+      font-family: 'Black Ops One', 'Orbitron', cursive, sans-serif;
+      font-weight: 900;
+      font-size: 2.1rem;
+      color: #d49b29;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0px #000, 0 0 12px rgba(212, 155, 41, 0.6);
+    }
+
+    body.theme-cs .theme-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 1px;
+      background: #2b3921;
+      color: #d49b29;
+      border: 1.5px solid #5a7742;
+      box-shadow: 2px 2px 0px #000;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    body.theme-cs .theme-btn:hover {
+      background: #3e5230;
+      color: #ffffff;
+      border-color: #8ab666;
+      box-shadow: 0 0 10px rgba(90, 119, 66, 0.6);
+    }
+
+    body.theme-cs .theme-btn-accent {
+      background: #4a3610;
+      color: #ffd700;
+      border: 1.5px solid #d49b29;
+      box-shadow: 2px 2px 0px #000;
+    }
+    body.theme-cs .theme-btn-accent:hover {
+      background: #d49b29;
+      color: #000000;
+      box-shadow: 0 0 15px rgba(212, 155, 41, 0.8);
+    }
+
+    body.theme-cs .input-box {
+      background: #090e07;
+      border: 1.5px solid #5a7742;
+      color: #79f243;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.05rem;
+      border-radius: 2px;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
+    }
+    body.theme-cs .input-box:focus {
+      outline: none;
+      border-color: #d49b29;
+      box-shadow: 0 0 12px rgba(212, 155, 41, 0.5);
+    }
+
+    body.theme-cs .badge-tag {
+      background: rgba(90, 119, 66, 0.25);
+      border: 1px solid #5a7742;
+      color: #b5c798;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    /* ==========================================================================
+       THEME 6: SPIDER-MAN NOIR (1933 NEW YORK // DARK DETECTIVE VINTAGE)
+       ========================================================================== */
+    body.theme-noir {
+      background: #08080a;
+      color: #e0e0e0;
+      font-family: 'Special Elite', 'Share Tech Mono', monospace;
+      letter-spacing: 0.8px;
+    }
+
+    body.theme-noir .crt-overlay {
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45) 1px, transparent 1px, transparent 3px),
+                  radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.85) 85%);
+      opacity: 0.95;
+    }
+
+    body.theme-noir .main-card {
+      background: rgba(14, 14, 16, 0.92);
+      border: 2px solid #555555;
+      border-top: 4px solid #ffffff;
+      border-bottom: 4px solid #222222;
+      border-radius: 2px;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+
+    body.theme-noir .noir-header-strip {
+      height: 8px;
+      width: 100%;
+      background: repeating-linear-gradient(90deg, #111111, #111111 20px, #ffffff 20px, #ffffff 40px);
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid #444;
+    }
+
+    body.theme-noir .title-glow {
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: 2.1rem;
+      color: #ffffff;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 0px #000000, 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    body.theme-noir .theme-btn {
+      font-family: 'Special Elite', monospace;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 1.5px;
+      background: #18181c;
+      color: #ffffff;
+      border: 1.5px solid #777777;
+      border-radius: 2px;
+      box-shadow: 3px 3px 0px #000000;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    body.theme-noir .theme-btn:hover {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+      transform: translate(-1px, -1px);
+    }
+
+    body.theme-noir .theme-btn-accent {
+      background: #2a2a30;
+      color: #ffffff;
+      border: 1.5px solid #ffffff;
+      box-shadow: 3px 3px 0px #000000;
+    }
+    body.theme-noir .theme-btn-accent:hover {
+      background: #ffffff;
+      color: #000000;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+    }
+
+    body.theme-noir .input-box {
+      background: #0d0d0f;
+      border: 1.5px solid #666666;
+      color: #f0f0f0;
+      font-family: 'Special Elite', monospace;
+      font-size: 1.05rem;
+      border-radius: 2px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+    }
+    body.theme-noir .input-box:focus {
+      outline: none;
+      border-color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    }
+
+    body.theme-noir .badge-tag {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid #777777;
+      color: #ffffff;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.8rem;
+    }
+
+    /* Spider-Noir Trenchcoat Detective HUD */
+    .noir-hud {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Special Elite', monospace;
+      font-size: 0.82rem;
+      color: #cccccc;
+    }
+    .noir-goggles {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      background: #222;
+      box-shadow: 0 0 8px #ffffff;
+      animation: goggleGlow 2.5s infinite alternate;
+    }
+    @keyframes goggleGlow {
+      0% { box-shadow: 0 0 4px #888888; }
+      100% { box-shadow: 0 0 14px #ffffff; }
+    }
+
+    /* ==========================================================================
+       THEME 5: GRAND THEFT AUTO VI (VICE CITY / LEONIDA SUNSET)
+       ========================================================================== */
+    body.theme-gta {
+      background: #120324;
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.3px;
+    }
+
+    body.theme-gta .crt-overlay {
+      background: radial-gradient(circle at 50% 30%, rgba(255, 60, 170, 0.12), transparent 70%),
+                  repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 3px);
+      opacity: 0.85;
+    }
+
+    body.theme-gta .main-card {
+      background: rgba(24, 7, 38, 0.90);
+      border: 2px solid rgba(255, 92, 170, 0.6);
+      border-top: 5px solid #ff3399;
+      border-bottom: 5px solid #00f0ff;
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(255, 51, 153, 0.35), 0 0 60px rgba(0, 240, 255, 0.2);
+      backdrop-filter: blur(14px);
+      position: relative;
+    }
+
+    body.theme-gta .gta-header-strip {
+      height: 10px;
+      width: 100%;
+      background: linear-gradient(90deg, #ff007f 0%, #ff66cc 25%, #ffcc00 50%, #00f0ff 75%, #7b2cbf 100%);
+      border-radius: 6px;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.7);
+    }
+
+    body.theme-gta .title-glow {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-style: italic;
+      font-size: 2.3rem;
+      color: #ffffff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #ffffff 0%, #ffe6f0 45%, #ff3399 75%, #7b2cbf 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 15px rgba(255, 51, 153, 0.8)) drop-shadow(3px 3px 0px rgba(0,0,0,0.9));
+    }
+
+    body.theme-gta .theme-btn {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-style: italic;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #ff007f, #ff66cc);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 4px 15px rgba(255, 0, 127, 0.5);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    body.theme-gta .theme-btn:hover {
+      background: linear-gradient(135deg, #00f0ff, #7b2cbf);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.7);
+    }
+
+    body.theme-gta .theme-btn-accent {
+      background: linear-gradient(135deg, #00f0ff, #0088ff);
+      color: #000;
+      font-weight: 900;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.5);
+    }
+    body.theme-gta .theme-btn-accent:hover {
+      background: linear-gradient(135deg, #ffcc00, #ff007f);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(255, 204, 0, 0.8);
+    }
+
+    body.theme-gta .input-box {
+      background: rgba(10, 3, 20, 0.95);
+      border: 2px solid #ff3399;
+      color: #00f0ff;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 1.02rem;
+      border-radius: 8px;
+      box-shadow: inset 0 0 12px rgba(255, 51, 153, 0.3);
+    }
+    body.theme-gta .input-box:focus {
+      outline: none;
+      border-color: #00f0ff;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+    }
+
+    body.theme-gta .badge-tag {
+      background: linear-gradient(90deg, rgba(255, 0, 127, 0.2), rgba(0, 240, 255, 0.2));
+      border: 1px solid #ff3399;
+      color: #ffffff;
+      font-weight: 800;
+      border-radius: 6px;
+    }
+
+    /* GTA VI Wanted Level Stars & Vice City HUD */
+    .gta-hud {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 0.82rem;
+    }
+    .wanted-star {
+      color: #555;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    .wanted-star.active {
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffcc00, 0 0 18px #ff007f;
+      animation: starFlash 0.6s infinite alternate;
+    }
+    @keyframes starFlash {
+      0% { opacity: 0.6; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1.15); }
+    }
+
+    /* Counter-Strike HUD & Crosshair */
+    .cs-hud {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      color: #d49b29;
+    }
+    .cs-hud-val {
+      color: #79f243;
+      font-weight: bold;
+    }
+    .c4-planted-flash {
+      color: #de3c26;
+      animation: c4Beep 0.8s infinite alternate;
+    }
+    @keyframes c4Beep {
+      0% { opacity: 0.3; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 6px #de3c26); }
+    }
+
+    /* Top Gear Tachometer / Dash */
+    .topgear-dash {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.62rem;
+      color: #ffd700;
+    }
+    .nitro-flame-icon {
+      color: #ff3300;
+      animation: flameFlicker 0.15s infinite alternate;
+    }
+    @keyframes flameFlicker {
+      0% { transform: scale(1); filter: drop-shadow(0 0 4px #ff3300); }
+      100% { transform: scale(1.2); filter: drop-shadow(0 0 10px #ffff00); }
+    }
+
+    .blink-dot {
+      animation: blink 1s infinite alternate;
+    }
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    .glitch-hover:hover {
+      animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+    }
+    @keyframes glitch-anim {
+      0% { transform: translate(0) }
+      20% { transform: translate(-2px, 2px) }
+      40% { transform: translate(-2px, -2px) }
+      60% { transform: translate(2px, 2px) }
+      80% { transform: translate(2px, -2px) }
+      100% { transform: translate(0) }
+    }
+  
+/* ==========================================================================
+   LEGAL PAGES ENHANCEMENTS (TERMS, PRIVACY, LICENSE)
+   ========================================================================== */
+.legal-card {
+  padding: 2.2rem 2.4rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+.legal-card h1 {
+  font-size: 2.1rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.legal-card h2 {
+  font-size: 1.25rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legal-card p {
+  font-size: 1.02rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.legal-card ul {
+  margin-left: 1.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.legal-card li {
+  margin-bottom: 0.5rem;
+  font-size: 0.98rem;
+  opacity: 0.9;
+}
+
+.legal-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 1.1rem 1.3rem;
+  margin: 1.4rem 0;
+  font-size: 0.95rem;
+}
+
+.license-box {
+  background: rgba(0, 0, 0, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+  border-radius: 6px;
+  padding: 1.4rem;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 1.5rem 0;
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 1.5rem 0;
+}
+
+.badge-card {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.badge-card i {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.badge-card.allowed i { color: #10b981; }
+.badge-card.condition i { color: #f59e0b; }
+.badge-card.limitation i { color: #ef4444; }
+
+.badge-card .b-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.badge-card .b-desc {
+  font-size: 0.76rem;
+  opacity: 0.8;
+}
+
+.btn-back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}

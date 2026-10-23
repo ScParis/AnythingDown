@@ -8,246 +8,156 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cinzel:wght@700;900&family=Black+Ops+One&family=Montserrat:ital,wght@0,700;0,900;1,900&family=Orbitron:wght@400;600;800;900&family=Press+Start+2P&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      min-height: 100vh;
-      background: #02040c;
-      color: #e0f2fe;
-      font-family: 'Rajdhani', sans-serif;
-      padding: 2rem 1rem;
-      line-height: 1.6;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Background Cyber Grid */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(0, 243, 255, 0.08), transparent 70%),
-                  linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-      background-size: 100% 100%, 30px 30px, 30px 30px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      position: relative;
-      z-index: 10;
-      max-width: 820px;
-      width: 100%;
-    }
-
-    /* Top Nav */
-    .nav-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid rgba(0, 243, 255, 0.25);
-      padding-bottom: 1rem;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Orbitron', monospace;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #00f3ff;
-      text-decoration: none;
-      padding: 8px 16px;
-      border: 1px solid #00f3ff;
-      background: rgba(0, 243, 255, 0.1);
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .back-btn:hover {
-      background: #00f3ff;
-      color: #000;
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
-      transform: translateY(-2px);
-    }
-
-    .brand-title {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 1.3rem;
-      letter-spacing: 2px;
-      color: #00f3ff;
-      text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
-    }
-
-    /* Content Card */
-    .card {
-      background: rgba(4, 12, 30, 0.92);
-      border: 1.5px solid rgba(0, 243, 255, 0.35);
-      border-radius: 8px;
-      padding: 2.2rem;
-      box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
-      backdrop-filter: blur(10px);
-      margin-bottom: 2rem;
-    }
-
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 2rem;
-      color: #ffffff;
-      margin-bottom: 0.4rem;
-      letter-spacing: 1.5px;
-      text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-    }
-
-    .updated-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.85rem;
-      color: #00f3ff;
-      opacity: 0.8;
-      margin-bottom: 1.8rem;
-      display: inline-block;
-    }
-
-    h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.15rem;
-      color: #38bdf8;
-      margin-top: 1.6rem;
-      margin-bottom: 0.6rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-left: 3px solid #00f3ff;
-      padding-left: 10px;
-    }
-
-    p {
-      margin-bottom: 1rem;
-      font-size: 1.05rem;
-      color: #cbd5e1;
-    }
-
-    /* Badges Grid */
-    .badge-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin: 1.5rem 0;
-    }
-
-    .badge-card {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(0, 243, 255, 0.2);
-      border-radius: 6px;
-      padding: 12px 14px;
-      text-align: center;
-    }
-
-    .badge-card i {
-      font-size: 1.3rem;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .badge-card.allowed i { color: #10b981; }
-    .badge-card.condition i { color: #f59e0b; }
-    .badge-card.limitation i { color: #ef4444; }
-
-    .badge-card .b-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-
-    .badge-card .b-desc {
-      font-size: 0.78rem;
-      opacity: 0.8;
-    }
-
-    /* Code block for verbatim license */
-    .license-box {
-      background: #010814;
-      border: 1.5px solid #00f3ff;
-      box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.15);
-      border-radius: 6px;
-      padding: 1.4rem;
-      font-family: 'Fira Code', 'Share Tech Mono', monospace;
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: #93c5fd;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin: 1.5rem 0;
-    }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 1.5rem;
-      text-align: center;
-      font-size: 0.85rem;
-      opacity: 0.85;
-      font-family: 'Share Tech Mono', monospace;
-      width: 100%;
-    }
-
-    footer a {
-      color: #00f3ff;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-      color: #fff;
-    }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 0.8rem;
-      flex-wrap: wrap;
-    }
-  </style>
+  <link rel="stylesheet" href="/themes.css">
 </head>
-<body>
+<body class="theme-retro">
 
-  <div class="container">
-    
-    <!-- Navigation -->
-    <div class="nav-bar">
-      <a href="/" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Início</a>
-      <div class="brand-title"><i class="fa-solid fa-bolt"></i> ANYTHING // DOWN</div>
+  <!-- Fullscreen Animated Scene Canvas -->
+  <canvas id="worldCanvas"></canvas>
+
+  <!-- CRT Overlay -->
+  <div class="crt-overlay"></div>
+
+  <div class="app-container">
+
+    <!-- Top Navigation / Status / Switcher -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 10px;">
+      
+      <!-- Back Home Button -->
+      <a href="/" class="theme-btn btn-back-home" style="padding: 6px 14px; font-size: 0.68rem;" title="Retornar à tela inicial">
+        <i class="fa-solid fa-arrow-left"></i> INÍCIO
+      </a>
+
+      <!-- Themed HUD Status -->
+      <div id="topStatus" style="font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+        
+        <!-- TRON IDENTIFIER -->
+        <div class="identity-disc" id="identityDiscIcon"></div>
+        <div id="tronStatusText">
+          <div style="font-weight: bold; font-size: 0.9rem;">TRON // SECTOR 7G</div>
+          <div style="font-size: 0.7rem; opacity: 0.7;">LIGHTCYCLE ARENA: ACTIVE</div>
+        </div>
+
+        <!-- CYBERPUNK IDENTIFIER -->
+        <div id="cyberdeckBadge" style="display: none;">
+          <div style="font-weight: 800; color: #fcee0a; font-size: 0.9rem; letter-spacing: 1px;">NETRUNNER // CYBERDECK</div>
+          <div class="cyber-ram-bar">
+            <span>RAM:</span>
+            <div class="ram-block"></div><div class="ram-block"></div><div class="ram-block"></div>
+            <div class="ram-block"></div><div class="ram-block"></div><div class="ram-block"></div>
+            <div class="ram-block"></div><div class="ram-block"></div>
+            <span style="margin-left: 4px; color: #fcee0a;">16/16 // ICE: OFF</span>
+          </div>
+        </div>
+
+        <!-- TOP GEAR 1992 IDENTIFIER -->
+        <div id="topgearBadge" style="display: none;">
+          <div style="font-weight: 900; color: #ffd700; font-size: 0.78rem;">TOP GEAR // SPEEDWAY</div>
+          <div class="topgear-dash" style="margin-top: 4px;">
+            <span>POS: 1ST</span>
+            <span>SPEED: <b id="tgSpeedometer" style="color: #fff;">278</b> KM/H</span>
+            <span class="nitro-flame-icon"><i class="fa-solid fa-fire"></i> <b id="nitroText">NITRO x3</b></span>
+          </div>
+        </div>
+
+        <!-- COUNTER-STRIKE IDENTIFIER -->
+        <div id="csBadge" style="display: none;">
+          <div style="font-weight: 900; color: #d49b29; font-size: 0.82rem; letter-spacing: 1.5px;">
+            <i class="fa-solid fa-crosshairs"></i> COUNTER-STRIKE // DE_DUST2
+          </div>
+          <div class="cs-hud" style="margin-top: 3px;">
+            <span><i class="fa-solid fa-heart" style="color:#de3c26;"></i> <span id="csHealth" class="cs-hud-val">100</span></span>
+            <span><i class="fa-solid fa-shield-halved" style="color:#5a7742;"></i> <span id="csArmor" class="cs-hud-val">100</span></span>
+            <span><i class="fa-solid fa-dollar-sign" style="color:#79f243;"></i> <span id="csMoney" class="cs-hud-val">16000</span></span>
+            <span id="csBombState" class="c4-planted-flash" style="display: inline-flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-bomb"></i> <span id="bombTimer">C4: 35s</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- GTA VI IDENTIFIER -->
+        <div id="gtaBadge" style="display: none;">
+          <div style="font-weight: 900; font-style: italic; color: #ff3399; font-size: 0.85rem; letter-spacing: 1.5px;">
+            <i class="fa-solid fa-gem"></i> VICE CITY // LEONIDA
+          </div>
+          <div class="gta-hud" style="margin-top: 3px;">
+            <span><i class="fa-solid fa-wallet" style="color:#00f0ff;"></i> <b id="gtaCash" style="color: #00ff88;">$2,450,890</b></span>
+            <span id="wantedStars" style="letter-spacing: 2px;">
+              <i class="fa-solid fa-star wanted-star active"></i>
+              <i class="fa-solid fa-star wanted-star active"></i>
+              <i class="fa-solid fa-star wanted-star active"></i>
+              <i class="fa-solid fa-star wanted-star"></i>
+              <i class="fa-solid fa-star wanted-star"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- SPIDER-MAN NOIR IDENTIFIER -->
+        <div id="noirBadge" style="display: none;">
+          <div style="font-weight: 900; color: #ffffff; font-size: 0.84rem; letter-spacing: 2px;">
+            <i class="fa-solid fa-spider"></i> SPIDER-MAN NOIR // 1933
+          </div>
+          <div class="noir-hud" style="margin-top: 3px;">
+            <span><i class="fa-solid fa-city" style="color:#aaa;"></i> NEW YORK CITY</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;">
+              <span class="noir-goggles"></span>
+              <span class="noir-goggles"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div style="display: flex; gap: 8px;">
+        <button id="btnSpawnEntity" class="theme-btn" style="padding: 6px 12px; font-size: 0.68rem;" title="Ação do Tema">
+          <i id="spawnIcon" class="fa-solid fa-motorcycle"></i> <span id="spawnText">+MOTO</span>
+        </button>
+        <button id="btnAudioToggle" class="theme-btn" style="padding: 6px 12px; font-size: 0.68rem;">
+          <i class="fa-solid fa-volume-high"></i> SFX
+        </button>
+        <button id="btnThemeToggle" class="theme-btn theme-btn-accent" style="padding: 6px 14px; font-size: 0.68rem;">
+          <i class="fa-solid fa-shuffle"></i> TEMA: <span id="themeName">TRON '82</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Main Card -->
-    <div class="card">
-      <h1><i class="fa-solid fa-certificate" style="color: #00f3ff;"></i> Licença e Direitos Autorais</h1>
-      <div class="updated-tag">SOFTWARE DE CÓDIGO ABERTO // LICENÇA MIT OFICIAL</div>
+    <!-- Main Themed Card -->
+    <div class="main-card legal-card" style="position: relative;">
+      
+      <!-- Cyberpunk Hazard Bar -->
+      <div id="hazardLine" class="hazard-bar" style="display: none; margin-bottom: 1.25rem;"></div>
+
+      <!-- Top Gear Checkered / Red Strip -->
+      <div id="topgearStrip" class="topgear-header-strip" style="display: none;"></div>
+
+      <!-- Counter-Strike Tactical Strip -->
+      <div id="csStrip" class="cs-header-strip" style="display: none;"></div>
+
+      <!-- GTA VI Sunset Strip -->
+      <div id="gtaStrip" class="gta-header-strip" style="display: none;"></div>
+
+      <!-- Spider-Noir Strip -->
+      <div id="noirStrip" class="noir-header-strip" style="display: none;"></div>
+
+      <!-- Header Title -->
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <h1 class="title-glow glitch-hover" style="margin-bottom: 0.4rem;">LICENÇA // MIT</h1>
+        <p id="subTitle" style="font-size: 0.88rem; opacity: 0.85; letter-spacing: 1.5px;">
+          THE GRID &bull; ENCOM MAINFRAME RECOGNIZER &bull; MEDIA EXTRACTION UNIT
+        </p>
+      </div>
+
+      <div class="badge-tag" style="display: inline-block; padding: 4px 12px; margin-bottom: 1.5rem; font-weight: bold; text-transform: uppercase;">
+        SOFTWARE LIVRE &bull; CÓDIGO ABERTO NO GITHUB
+      </div>
 
       <p>
         O <b>AnythingDown</b> é distribuído como software livre e de código aberto sob os termos da <b>Licença MIT</b>. Isso significa que você possui total liberdade para utilizar, modificar, distribuir e integrar o projeto em seus próprios trabalhos, inclusive para fins comerciais.
       </p>
 
-      <!-- Badges -->
+      <!-- Permissions Badges -->
       <div class="badge-grid">
         <div class="badge-card allowed">
           <i class="fa-solid fa-check-circle"></i>
@@ -305,38 +215,49 @@ SOFTWARE.</div>
       </p>
       <ul>
         <li><b>yt-dlp:</b> O motor mais poderoso do mundo para extração de áudio e vídeo na web.</li>
-        <li><b>FFmpeg:</b> A suíte completa e universal para conversão e processamento de formatos multimídia.</li>
+        <li><b>FFmpeg:</b> A suíte completa e universal para conversão e processamento multimídia.</li>
         <li><b>Node.js & TypeScript:</b> A base robusta, veloz e tipada que orquestra toda a aplicação.</li>
-        <li><b>Express & CORS:</b> Framework de alta performance para a camada de API REST e entrega de streaming.</li>
+        <li><b>Express & CORS:</b> Framework de alta performance para a camada de API REST e streaming.</li>
         <li><b>Baileys:</b> Implementação aberta do protocolo WhatsApp Web multi-device.</li>
         <li><b>grammY:</b> Framework moderno e elegante para bots do Telegram.</li>
       </ul>
 
       <h2><i class="fa-brands fa-github"></i> Contribuições e Código-Fonte</h2>
       <p>
-        O repositório oficial é mantido por <b>ScParis</b> e está aberto a contribuições, issues e pull requests da comunidade:
+        O repositório oficial é mantido por <b>ScParis</b> e está aberto a contribuições da comunidade:
         <br><br>
         🔗 <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: #00f3ff; font-weight: bold;">
           https://github.com/ScParis/AnythingDown
         </a>
       </p>
+
     </div>
 
-    <!-- Footer -->
-    <footer>
-      <div class="footer-links">
-        <a href="/"><i class="fa-solid fa-house"></i> Início</a>
-        <a href="/terms.html"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
-        <a href="/privacy.html"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
-        <a href="/license.html"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
-        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Repositório</a>
+    <!-- Thematic Quote -->
+    <div id="bottomCredits" style="text-align: center; font-size: 0.75rem; margin-top: 1.25rem; opacity: 0.6; letter-spacing: 2px;">
+      "THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026
+    </div>
+
+    <!-- Legal Navigation & Author Signature -->
+    <footer style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12); text-align: center; font-size: 0.8rem; opacity: 0.85;">
+      <div style="display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 0.6rem; flex-wrap: wrap;">
+        <a href="/" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-house"></i> Início</a>
+        <span style="opacity: 0.4;">&bull;</span>
+        <a href="/terms.html" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
+        <span style="opacity: 0.4;">&bull;</span>
+        <a href="/privacy.html" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
+        <span style="opacity: 0.4;">&bull;</span>
+        <a href="/license.html" style="color: inherit; text-decoration: none; font-weight: bold;"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
+        <span style="opacity: 0.4;">&bull;</span>
+        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;"><i class="fa-brands fa-github"></i> Repositório</a>
       </div>
-      <div>
-        Desenvolvido com ⚡ por <a href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer"><b>ScParis</b></a> &bull; AnythingDown &copy; 2026
+      <div style="font-size: 0.76rem; opacity: 0.75; letter-spacing: 0.5px;">
+        Desenvolvido com ⚡ por <a href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer" style="color: #00f3ff; font-weight: bold; text-decoration: none;">ScParis</a> &bull; Código Aberto no <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: bold; text-decoration: underline;">GitHub</a>
       </div>
     </footer>
 
   </div>
 
+  <script src="/theme-engine.js"></script>
 </body>
 </html>
