@@ -1986,122 +1986,275 @@ class SoundFX {
 
     renderWorld();
 
-    // =========================================================================
-    // UI LOGIC & 3-WAY THEME SWITCHING
-    // =========================================================================
-    const body = document.body;
-    const btnThemeToggle = document.getElementById('btnThemeToggle');
-    const themeName = document.getElementById('themeName');
-    const btnAudioToggle = document.getElementById('btnAudioToggle');
-    const btnSpawnEntity = document.getElementById('btnSpawnEntity');
-    const spawnIcon = document.getElementById('spawnIcon');
-    const spawnText = document.getElementById('spawnText');
-    const hazardLine = document.getElementById('hazardLine');
-    const topgearStrip = document.getElementById('topgearStrip');
-    const csStrip = document.getElementById('csStrip');
-    const gtaStrip = document.getElementById('gtaStrip');
-    const noirStrip = document.getElementById('noirStrip');
-    const identityDiscIcon = document.getElementById('identityDiscIcon');
-    const cyberdeckBadge = document.getElementById('cyberdeckBadge');
-    const topgearBadge = document.getElementById('topgearBadge');
-    const csBadge = document.getElementById('csBadge');
-    const gtaBadge = document.getElementById('gtaBadge');
-    const noirBadge = document.getElementById('noirBadge');
-    const tronStatusText = document.getElementById('tronStatusText');
-    const subTitle = document.getElementById('subTitle');
-    const terminalHeader = document.getElementById('terminalHeader');
-    const footerUser = document.getElementById('footerUser');
-    const footerNode = document.getElementById('footerNode');
-    const bottomCredits = document.getElementById('bottomCredits');
-    const nitroText = document.getElementById('nitroText');
-
-    
-
-// Safe event binding
-/* bound */
-/* bound */
-/* bound */
-
-if (btnThemeToggle) {
-  btnThemeToggle.addEventListener("click", () => {
-    sfx.playTurn();
-    let nextTheme = "retro";
-    if (currentTheme === "retro") nextTheme = "cyber";
-    else if (currentTheme === "cyber") nextTheme = "topgear";
-    else if (currentTheme === "topgear") nextTheme = "cs";
-    else if (currentTheme === "cs") nextTheme = "gta";
-    else if (currentTheme === "gta") nextTheme = "noir";
-    else if (currentTheme === "noir") nextTheme = "retro";
-    applyTheme(nextTheme);
-  });
+// Safe element getters
+function getEl(id) {
+  return document.getElementById(id);
 }
 
-if (btnSpawnEntity) {
-  btnSpawnEntity.addEventListener("click", () => {
-    if (currentTheme === "retro") {
-      sfx.playTurn();
-      const isOrange = Math.random() > 0.5;
-      const newCycle = new Lightcycle(
-        isOrange ? "#ff6600" : "#00f3ff",
-        isOrange ? "#ff3300" : "#00d2ff",
-        isOrange
-      );
-      tronCycles.push(newCycle);
-      if (tronCycles.length > 8) tronCycles.shift();
-    } else if (currentTheme === "cyber") {
-      sfx.playTurn();
-      cyberAVs.push(new FlyingAV());
-      if (cyberAVs.length > 8) cyberAVs.shift();
-    } else if (currentTheme === "topgear") {
-      sfx.playNitro();
-      nitroActive = true;
-      nitroTimer = 110;
-      if (nitroCount > 0) nitroCount--;
-      const nitroText = document.getElementById("nitroText");
-      if (nitroText) nitroText.textContent = "NITRO x" + nitroCount;
-    } else if (currentTheme === "cs") {
-      fireCSWeapon(width * 0.25 + (Math.random() - 0.5) * 50, height * 0.45 + (Math.random() - 0.5) * 30);
-    } else if (currentTheme === "gta") {
-      sfx.playGTASiren();
-      gtaWantedLevel = (gtaWantedLevel % 5) + 1;
-      const stars = document.querySelectorAll("#wantedStars .wanted-star");
-      stars.forEach((star, idx) => {
-        if (idx < gtaWantedLevel) star.classList.add("active");
-        else star.classList.remove("active");
-      });
-      gtaChopperX = -80;
-      sfx.playGTACash();
-    } else if (currentTheme === "noir") {
-      sfx.playNoirWeb();
-      setTimeout(() => sfx.playNoirCamera(), 120);
-      for (let i = 0; i < 40; i++) {
-        noirRainDrops.push({
-          x: Math.random() * (width + 200),
-          y: Math.random() * height,
-          len: Math.random() * 35 + 25,
-          speed: Math.random() * 12 + 18,
-          alpha: 0.6
-        });
-      }
-      if (noirRainDrops.length > 200) noirRainDrops.splice(0, 40);
+function applyTheme(theme) {
+  currentTheme = theme;
+  localStorage.setItem("anythingdown_theme", theme);
+
+  const body = document.body;
+  const themeName = getEl("themeName");
+  const hazardLine = getEl("hazardLine");
+  const topgearStrip = getEl("topgearStrip");
+  const csStrip = getEl("csStrip");
+  const gtaStrip = getEl("gtaStrip");
+  const noirStrip = getEl("noirStrip");
+  const identityDiscIcon = getEl("identityDiscIcon");
+  const tronStatusText = getEl("tronStatusText");
+  const cyberdeckBadge = getEl("cyberdeckBadge");
+  const topgearBadge = getEl("topgearBadge");
+  const csBadge = getEl("csBadge");
+  const gtaBadge = getEl("gtaBadge");
+  const noirBadge = getEl("noirBadge");
+  const spawnIcon = getEl("spawnIcon");
+  const spawnText = getEl("spawnText");
+  const btnSpawnEntity = getEl("btnSpawnEntity");
+  const subTitle = getEl("subTitle");
+  const terminalHeader = getEl("terminalHeader");
+  const footerUser = getEl("footerUser");
+  const footerNode = getEl("footerNode");
+  const bottomCredits = getEl("bottomCredits");
+
+  const page = window.PAGE_TYPE || "home";
+
+  // Hide all strips and badges first
+  if (hazardLine) hazardLine.style.display = "none";
+  if (topgearStrip) topgearStrip.style.display = "none";
+  if (csStrip) csStrip.style.display = "none";
+  if (gtaStrip) gtaStrip.style.display = "none";
+  if (noirStrip) noirStrip.style.display = "none";
+
+  if (identityDiscIcon) identityDiscIcon.style.display = "none";
+  if (tronStatusText) tronStatusText.style.display = "none";
+  if (cyberdeckBadge) cyberdeckBadge.style.display = "none";
+  if (topgearBadge) topgearBadge.style.display = "none";
+  if (csBadge) csBadge.style.display = "none";
+  if (gtaBadge) gtaBadge.style.display = "none";
+  if (noirBadge) noirBadge.style.display = "none";
+
+  if (theme === "noir") {
+    body.className = "theme-noir";
+    if (themeName) themeName.textContent = "SPIDER-NOIR '33";
+    if (noirStrip) noirStrip.style.display = "block";
+    if (noirBadge) noirBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-spider";
+    if (spawnText) spawnText.textContent = "THWIP!";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Disparar Teia de Aranha no Vento / Câmera 1933";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "CASE FILE #1933 • PRIVATE EYE CODE • STREET JUSTICE";
+      else if (page === "privacy") subTitle.textContent = "CONFIDENTIAL INTEL • BURN AFTER READING • NYC POLICE BLACKOUT";
+      else if (page === "license") subTitle.textContent = "DAILY BUGLE PRESS PASS • 1933 OPEN INVESTIGATION PERMIT";
+      else subTitle.textContent = "NEW YORK 1933 • PRIVATE EYE INVESTIGATOR • MEDIA EXTRACTION BUREAU";
     }
-  });
+    if (terminalHeader) terminalHeader.textContent = "> POLICE SCANNER // 'WHEREVER I GO, THE WIND FOLLOWS...'";
+    if (footerUser) footerUser.innerHTML = "DETECTIVE: <b>PETER PARKER (SPIDER-MAN NOIR)</b>";
+    if (footerNode) footerNode.innerHTML = "LOCATION: <b>BOWERY DISTRICT // DAILY BUGLE ROOFTOP</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"IS THAT A RUBIK\'S CUBE?" &bull; SPIDER-MAN NOIR &copy; MARVEL &bull; ANYTHING // DOWN';
+
+  } else if (theme === "gta") {
+    body.className = "theme-gta";
+    if (themeName) themeName.textContent = "GTA VI // LEONIDA";
+    if (gtaStrip) gtaStrip.style.display = "block";
+    if (gtaBadge) gtaBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-helicopter";
+    if (spawnText) spawnText.textContent = "WANTED +1";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Aumentar Nível de Procurado / Sirenes da VCPD";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "VICE CITY CODE • STATE OF LEONIDA LAWS • REGULATORY PROTOCOL";
+      else if (page === "privacy") subTitle.textContent = "OFF THE GRID • NO PAPER TRAILS • STATE OF LEONIDA ZERO RECORD";
+      else if (page === "license") subTitle.textContent = "LEONIDA OPEN PASS • MIT FREE SOFTWARE LICENSE • ROCKSTAR SPIRIT";
+      else subTitle.textContent = "VICE CITY 2026 • STATE OF LEONIDA • MEDIA EXTRACTION UNDERWORLD";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> VCPD SCANNER // 'ALL UNITS, SUSPECT ENGAGED ON OCEAN DRIVE'...";
+    if (footerUser) footerUser.innerHTML = "OPERATOR: <b>LUCIA & JASON (BONNIE & CLYDE)</b>";
+    if (footerNode) footerNode.innerHTML = "DISTRICT: <b>VICE CITY BEACH // STARFISH ISLAND</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"TRUST?" &bull; GRAND THEFT AUTO VI &copy; ROCKSTAR GAMES &bull; ANYTHING // DOWN';
+
+  } else if (theme === "cs") {
+    body.className = "theme-cs";
+    if (themeName) themeName.textContent = "CS 1.6 / DUST II";
+    if (csStrip) csStrip.style.display = "block";
+    if (csBadge) csBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-crosshairs";
+    if (spawnText) spawnText.textContent = "FIRE [AK47]";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Disparar Rajada de AK-47 / Headshot";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "DE_DUST2 BRIEFING • RULES OF ENGAGEMENT • TACTICAL PROTOCOL";
+      else if (page === "privacy") subTitle.textContent = "BLACK OPS PROTOCOL • ZERO RETENTION • CLASSIFIED OPERATION";
+      else if (page === "license") subTitle.textContent = "DEFUSE KIT PERMIT • MIT OPEN SOURCE TACTICAL LICENSE";
+      else subTitle.textContent = "DE_DUST2 • COUNTER-TERRORIST OPS • MEDIA EXTRACTION TACTICAL UNIT";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> RADIO // 'BOMB HAS BEEN PLANTED' - CT FORCES MOVING IN...";
+    if (footerUser) footerUser.innerHTML = "OPERATOR: <b>SEAL TEAM 6 (CT)</b>";
+    if (footerNode) footerNode.innerHTML = "LOCATION: <b>DE_DUST2 // BOMBSITE A</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"OK, LET\'S GO!" &bull; COUNTER-STRIKE &copy; VALVE &bull; ANYTHING // DOWN';
+
+  } else if (theme === "topgear") {
+    body.className = "theme-topgear";
+    if (themeName) themeName.textContent = "TOP GEAR '92";
+    if (topgearStrip) topgearStrip.style.display = "block";
+    if (topgearBadge) topgearBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-fire";
+    if (spawnText) spawnText.textContent = "NITRO!";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Acionar Nitro no Supercarro";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "SUPER NINTENDO 1992 • TRACK RULES • FAIR PLAY REGULATIONS";
+      else if (page === "privacy") subTitle.textContent = "PIT STOP CONFIDENTIAL • ZERO TELEMETRY LOG • DRIVER PRIVACY";
+      else if (page === "license") subTitle.textContent = "1ST PLACE TROPHY • 1992 16-BIT PUBLIC DOMAIN LICENSE";
+      else subTitle.textContent = "SUPER NINTENDO 1992 • CANNIBAL SPEEDWAY • MEDIA EXTRACTION UNIT";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> CHECKPOINT 1 // QUALIFYING IN PROGRESS...";
+    if (footerUser) footerUser.innerHTML = "DRIVER: <b>PLAYER 1 (RED CANNIBAL)</b>";
+    if (footerNode) footerNode.innerHTML = "TRACK: <b>MONACO CIRCUIT LAP 1/3</b>";
+    if (bottomCredits) bottomCredits.innerHTML = 'READY... SET... GO! &bull; TOP GEAR &copy; 1992 KEMCO &bull; ANYTHING // DOWN';
+
+  } else if (theme === "cyber") {
+    body.className = "theme-cyber";
+    if (themeName) themeName.textContent = "CYBERPUNK 2077";
+    if (hazardLine) hazardLine.style.display = "block";
+    if (cyberdeckBadge) cyberdeckBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-plane-up";
+    if (spawnText) spawnText.textContent = "+AV";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Disparar Carro Voador (AV) em Night City";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "NIGHT CITY 2077 • NETRUNNER DIRECTIVE • TERMS OF ACCESS";
+      else if (page === "privacy") subTitle.textContent = "ICE SHIELD ACTIVATED • ZERO CYBERDECK LOGS • NETRUNNER STEALTH";
+      else if (page === "license") subTitle.textContent = "OPEN QUICKHACK CODE • FREE PUBLIC CYBERWARE 2077";
+      else subTitle.textContent = "NIGHT CITY 2077 • NETRUNNER PROTOCOL • MEDIA EXTRACTION UNIT";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> BREACH_PROTOCOL // INITIALIZING QUICKHACK DAEMON...";
+    if (footerUser) footerUser.innerHTML = "NETRUNNER: <b>V // ARASAKA INFILTRATOR</b>";
+    if (footerNode) footerNode.innerHTML = "SUBNET: <b>PACIFICA ICE GATE 3001</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"WAKE THE F**K UP, SAMURAI." &bull; ANYTHING // DOWN &copy; 2026';
+
+  } else {
+    // TRON '82 (Default)
+    body.className = "theme-retro";
+    if (themeName) themeName.textContent = "TRON '82";
+    if (identityDiscIcon) identityDiscIcon.style.display = "inline-flex";
+    if (tronStatusText) tronStatusText.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-motorcycle";
+    if (spawnText) spawnText.textContent = "+MOTO";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Disparar Moto de Luz na Grid";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "THE GRID • ENCOM MAINFRAME DIRECTIVE • USER TERMS PROTOCOL";
+      else if (page === "privacy") subTitle.textContent = "THE GRID • I/O TOWER DATA SHIELD • ZERO AUDIT FOOTPRINT";
+      else if (page === "license") subTitle.textContent = "FLYNN LIVES • OPEN SOURCE ENCOM CORE LICENSE 2026";
+      else subTitle.textContent = "THE GRID • ENCOM MAINFRAME RECOGNIZER • MEDIA EXTRACTION UNIT";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> MCP.DEREZ // REQUISITANDO ACESSO AO I/O TOWER...";
+    if (footerUser) footerUser.innerHTML = "USER: <b>FLYNN // ACTIVE</b>";
+    if (footerNode) footerNode.innerHTML = "MCP GRID: <b>I/O TOWER 3001</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026';
+  }
 }
 
-if (btnAudioToggle) {
-  btnAudioToggle.addEventListener("click", () => {
-    sfx.enabled = !sfx.enabled;
-    btnAudioToggle.innerHTML = sfx.enabled 
-      ? '<i class="fa-solid fa-volume-high"></i> SFX' 
-      : '<i class="fa-solid fa-volume-xmark"></i> MUTE';
-    if (sfx.enabled) sfx.playTone(880);
-  });
-}
+// Global exposure
+window.applyTheme = applyTheme;
+window.sfx = sfx;
 
-// Auto initialize theme on load
+// Event Listeners for Theme Switching and Controls
 document.addEventListener("DOMContentLoaded", () => {
+  const btnThemeToggle = getEl("btnThemeToggle");
+  const btnAudioToggle = getEl("btnAudioToggle");
+  const btnSpawnEntity = getEl("btnSpawnEntity");
+
+  if (btnThemeToggle) {
+    btnThemeToggle.addEventListener("click", () => {
+      sfx.playTurn();
+      let nextTheme = "retro";
+      if (currentTheme === "retro") nextTheme = "cyber";
+      else if (currentTheme === "cyber") nextTheme = "topgear";
+      else if (currentTheme === "topgear") nextTheme = "cs";
+      else if (currentTheme === "cs") nextTheme = "gta";
+      else if (currentTheme === "gta") nextTheme = "noir";
+      else if (currentTheme === "noir") nextTheme = "retro";
+      applyTheme(nextTheme);
+    });
+  }
+
+  if (btnSpawnEntity) {
+    btnSpawnEntity.addEventListener("click", () => {
+      if (currentTheme === "retro") {
+        sfx.playTurn();
+        const isOrange = Math.random() > 0.5;
+        const newCycle = new Lightcycle(
+          isOrange ? "#ff6600" : "#00f3ff",
+          isOrange ? "#ff3300" : "#00d2ff",
+          isOrange
+        );
+        tronCycles.push(newCycle);
+        if (tronCycles.length > 8) tronCycles.shift();
+      } else if (currentTheme === "cyber") {
+        sfx.playTurn();
+        cyberAVs.push(new FlyingAV());
+        if (cyberAVs.length > 8) cyberAVs.shift();
+      } else if (currentTheme === "topgear") {
+        sfx.playNitro();
+        nitroActive = true;
+        nitroTimer = 110;
+        if (nitroCount > 0) nitroCount--;
+        const nitroText = getEl("nitroText");
+        if (nitroText) nitroText.textContent = "NITRO x" + nitroCount;
+      } else if (currentTheme === "cs") {
+        fireCSWeapon(width * 0.25 + (Math.random() - 0.5) * 50, height * 0.45 + (Math.random() - 0.5) * 30);
+      } else if (currentTheme === "gta") {
+        sfx.playGTASiren();
+        gtaWantedLevel = (gtaWantedLevel % 5) + 1;
+        const stars = document.querySelectorAll("#wantedStars .wanted-star");
+        stars.forEach((star, idx) => {
+          if (idx < gtaWantedLevel) star.classList.add("active");
+          else star.classList.remove("active");
+        });
+        gtaChopperX = -80;
+        sfx.playGTACash();
+      } else if (currentTheme === "noir") {
+        sfx.playNoirWeb();
+        setTimeout(() => sfx.playNoirCamera(), 120);
+        for (let i = 0; i < 40; i++) {
+          noirRainDrops.push({
+            x: Math.random() * (width + 200),
+            y: Math.random() * height,
+            len: Math.random() * 35 + 25,
+            speed: Math.random() * 12 + 18,
+            alpha: 0.6
+          });
+        }
+        if (noirRainDrops.length > 200) noirRainDrops.splice(0, 40);
+      }
+    });
+  }
+
+  if (btnAudioToggle) {
+    btnAudioToggle.addEventListener("click", () => {
+      sfx.enabled = !sfx.enabled;
+      btnAudioToggle.innerHTML = sfx.enabled 
+        ? '<i class="fa-solid fa-volume-high"></i> SFX' 
+        : '<i class="fa-solid fa-volume-xmark"></i> MUTE';
+      if (sfx.enabled) sfx.playTone(880);
+    });
+  }
+
+  // Initial theme application
   applyTheme(currentTheme);
 });
+
+// Immediate execution fallback
 if (document.readyState !== "loading") {
   applyTheme(currentTheme);
 }
