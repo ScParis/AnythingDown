@@ -1251,3 +1251,204 @@ body.theme-noir .badge-card {
   color: #ffffff;
   border-radius: 2px;
 }
+
+/* ==========================================================================
+   THEME 7: THE SIMPSONS (SPRINGFIELD // NUCLEAR PLANT & DONUTS)
+   ========================================================================== */
+body.theme-simpsons {
+  background: #70d1fe;
+  color: #000000;
+  font-family: 'Sniglet', 'Montserrat', cursive, sans-serif;
+  letter-spacing: 0.5px;
+}
+
+body.theme-simpsons .crt-overlay {
+  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.25), transparent 75%),
+              repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04) 1px, transparent 1px, transparent 3px);
+  opacity: 0.6;
+}
+
+body.theme-simpsons .main-card {
+  background: #fed90f;
+  border: 4px solid #000000;
+  border-radius: 20px;
+  box-shadow: 8px 8px 0px #000000, 0 10px 30px rgba(0, 0, 0, 0.2);
+  color: #000000;
+  position: relative;
+}
+
+/* Springfield Clouds & Donut Sprinkles Strip */
+body.theme-simpsons .simpsons-header-strip {
+  height: 14px;
+  width: 100%;
+  background: #ff69b4;
+  background-image: radial-gradient(#ffffff 20%, transparent 20%), 
+                    radial-gradient(#39ff14 20%, transparent 20%), 
+                    radial-gradient(#fed90f 20%, transparent 20%), 
+                    radial-gradient(#00f0ff 20%, transparent 20%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px, 4px 12px, 12px 4px;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+}
+
+body.theme-simpsons .title-glow {
+  font-family: 'Bangers', cursive;
+  font-size: 2.7rem;
+  letter-spacing: 3px;
+  color: #fed90f;
+  -webkit-text-stroke: 2px #000000;
+  text-shadow: 4px 4px 0px #000000, 7px 7px 0px rgba(0, 0, 0, 0.35);
+}
+
+body.theme-simpsons #subTitle {
+  font-family: 'Sniglet', cursive;
+  font-weight: 800;
+  color: #000000;
+  opacity: 0.9;
+  letter-spacing: 0.8px;
+}
+
+body.theme-simpsons .theme-btn {
+  font-family: 'Bangers', cursive;
+  font-size: 1.15rem;
+  letter-spacing: 1.5px;
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px #000000;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s ease-in-out;
+}
+body.theme-simpsons .theme-btn:hover {
+  background: #ff69b4;
+  color: #ffffff;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000000;
+}
+body.theme-simpsons .theme-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000000;
+}
+
+body.theme-simpsons .theme-btn-accent {
+  background: #ff69b4;
+  color: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
+}
+body.theme-simpsons .theme-btn-accent:hover {
+  background: #39ff14;
+  color: #000000;
+  box-shadow: 6px 6px 0px #000000;
+}
+
+body.theme-simpsons .input-box {
+  background: #ffffff;
+  border: 3px solid #000000;
+  color: #000000;
+  font-family: 'Sniglet', cursive;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px #000000;
+}
+body.theme-simpsons .input-box:focus {
+  outline: none;
+  border-color: #000000;
+  background: #fffde7;
+  box-shadow: 5px 5px 0px #000000;
+}
+
+body.theme-simpsons .badge-tag {
+  background: #ff69b4;
+  border: 2px solid #000000;
+  color: #ffffff;
+  font-family: 'Bangers', cursive;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #000000;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+body.theme-simpsons .simpsons-hud {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Sniglet', cursive;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #000000;
+}
+
+/* Legal Page Simpsons Styles */
+body.theme-simpsons .legal-card {
+  background: #fed90f;
+  border: 4px solid #000000;
+  box-shadow: 8px 8px 0px #000000;
+  color: #000000;
+  border-radius: 20px;
+}
+body.theme-simpsons .legal-card h1 {
+  font-family: 'Bangers', cursive;
+  color: #fed90f;
+  -webkit-text-stroke: 2px #000000;
+  text-shadow: 4px 4px 0px #000000;
+  letter-spacing: 3px;
+}
+body.theme-simpsons .legal-card h2 {
+  font-family: 'Bangers', cursive;
+  font-size: 1.45rem;
+  color: #000000;
+  border-left: 6px solid #ff69b4;
+  border-bottom: 2px solid #000000;
+  background: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #000000;
+  letter-spacing: 1.5px;
+}
+body.theme-simpsons .legal-card p,
+body.theme-simpsons .legal-card li {
+  color: #1a1a1a;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  font-weight: bold;
+}
+body.theme-simpsons .legal-card code {
+  background: #ffffff;
+  color: #d81b60;
+  border: 2px solid #000000;
+  padding: 2px 8px;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0px #000000;
+  font-weight: bold;
+}
+body.theme-simpsons .legal-box {
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 14px;
+  box-shadow: 6px 6px 0px #000000;
+  color: #000000;
+}
+body.theme-simpsons .license-box {
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 12px;
+  box-shadow: 5px 5px 0px #000000;
+  color: #000000;
+  font-family: "Sniglet", monospace;
+  font-weight: bold;
+}
+body.theme-simpsons .badge-card {
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 12px;
+  box-shadow: 5px 5px 0px #000000;
+  color: #000000;
+}
+

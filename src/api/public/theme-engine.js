@@ -93,6 +93,31 @@ class SoundFX {
         this.playTone(987.77, sine, 0.1, 0.18);
         setTimeout(() => this.playTone(1318.51, sine, 0.25, 0.22), 80);
       }
+      playDoh() {
+        // Homer's classic comic "D'OH!" frequency pitch bend
+        if (!this.ctx || !this.enabled) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(360, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.22);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.24);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } catch(e) {}
+      }
+      playSimpsonsOpening() {
+        // "The Simp-sons!" 4-note motif (C - E - F# - A)
+        this.playTone(523.25, 'triangle', 0.16, 0.22); // C5
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.16, 0.22), 170); // E5
+        setTimeout(() => this.playTone(739.99, 'triangle', 0.18, 0.22), 340); // F#5
+        setTimeout(() => this.playTone(880.00, 'triangle', 0.35, 0.26), 510); // A5
+      }
       playSuccess() {
         if (currentTheme === 'cs') {
           // "Counter-Terrorists Win / Bomb Defused" Fanfare
@@ -1442,6 +1467,311 @@ class SoundFX {
     }
 
     // =========================================================================
+    // 7. THE SIMPSONS (SPRINGFIELD // NUCLEAR PLANT & DONUTS) CANVAS ENGINE
+    // =========================================================================
+    let simpsonsClouds = [];
+    let simpsonsDonuts = [];
+    let simpsonsSteamPuffs = [];
+    let simpsonsRadioactiveGlow = 0;
+
+    function initSimpsonsTheme() {
+      // Springfield Opening Sky Clouds (Fluffy White Clouds with Soft Shadow)
+      simpsonsClouds = [
+        { x: width * 0.08, y: height * 0.12, r: 42, speed: 0.35 },
+        { x: width * 0.35, y: height * 0.08, r: 55, speed: 0.45 },
+        { x: width * 0.68, y: height * 0.15, r: 48, speed: 0.38 },
+        { x: width * 0.90, y: height * 0.10, r: 38, speed: 0.30 }
+      ];
+
+      // Giant Homer Pink Frosted Sprinkled Donuts
+      simpsonsDonuts = [];
+      for (let i = 0; i < 9; i++) {
+        simpsonsDonuts.push({
+          x: Math.random() * width,
+          y: Math.random() * height * 0.85,
+          size: Math.random() * 22 + 20, // 20px - 42px
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.03,
+          speedY: Math.random() * 0.6 + 0.3,
+          wobble: Math.random() * Math.PI * 2
+        });
+      }
+
+      // Cooling Tower Radioactive Steam Puffs
+      simpsonsSteamPuffs = [];
+      for (let i = 0; i < 18; i++) {
+        simpsonsSteamPuffs.push({
+          x: width * 0.82 + (Math.random() - 0.5) * 35,
+          y: height * 0.55 - Math.random() * 160,
+          r: Math.random() * 18 + 14,
+          alpha: Math.random() * 0.6 + 0.2,
+          speedY: Math.random() * 0.8 + 0.5,
+          grow: 0.15
+        });
+      }
+    }
+
+    initSimpsonsTheme();
+
+    function drawSimpsonsScene() {
+      const now = Date.now();
+
+      // 1. Springfield Sunny Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#4fbcf9');
+      skyGrad.addColorStop(0.55, '#78d5fd');
+      skyGrad.addColorStop(1, '#a6e7ff');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Springfield Opening Clouds
+      drawSimpsonsClouds();
+
+      // 3. Springfield Hills & Nuclear Cooling Towers
+      drawSpringfieldHillsAndPlant(now);
+
+      // 4. Homer's Pink Frosted Sprinkled Donuts (Rotating & Gently Drifting)
+      drawSimpsonsDonuts(now);
+    }
+
+    // Fluffy Cartoon Springfield Clouds
+    function drawSimpsonsClouds() {
+      ctx.save();
+      for (const cloud of simpsonsClouds) {
+        cloud.x += cloud.speed;
+        if (cloud.x - cloud.r * 3 > width) {
+          cloud.x = -cloud.r * 3;
+          cloud.y = Math.random() * (height * 0.28) + 20;
+        }
+
+        const cx = cloud.x;
+        const cy = cloud.y;
+        const r = cloud.r;
+
+        // Cloud Shadow
+        ctx.fillStyle = 'rgba(70, 160, 230, 0.25)';
+        ctx.beginPath();
+        ctx.arc(cx - r * 0.7, cy + 4, r * 0.65, 0, Math.PI * 2);
+        ctx.arc(cx, cy + 4, r * 0.9, 0, Math.PI * 2);
+        ctx.arc(cx + r * 0.7, cy + 4, r * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cloud Solid White Body
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(cx - r * 0.7, cy, r * 0.65, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r * 0.9, 0, Math.PI * 2);
+        ctx.arc(cx + r * 0.7, cy, r * 0.7, 0, Math.PI * 2);
+        ctx.arc(cx - r * 0.35, cy - r * 0.45, r * 0.6, 0, Math.PI * 2);
+        ctx.arc(cx + r * 0.35, cy - r * 0.45, r * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // Springfield Nuclear Power Plant & Green Hills
+    function drawSpringfieldHillsAndPlant(now) {
+      ctx.save();
+
+      // Distant Springfield Green Rolling Hills
+      const hillBase = height * 0.76;
+      ctx.fillStyle = '#6ab04c';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(0, hillBase);
+      ctx.bezierCurveTo(width * 0.25, hillBase - 50, width * 0.45, hillBase + 30, width * 0.7, hillBase - 40);
+      ctx.bezierCurveTo(width * 0.85, hillBase - 80, width * 0.95, hillBase - 20, width, hillBase - 30);
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#273c10';
+      ctx.stroke();
+
+      // Near Foreground Hill
+      ctx.fillStyle = '#78c850';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(0, hillBase + 45);
+      ctx.bezierCurveTo(width * 0.3, hillBase + 10, width * 0.6, hillBase + 80, width, hillBase + 35);
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Springfield Nuclear Power Plant Cooling Towers (On Right Horizon)
+      const towerBaseX = width * 0.82;
+      const towerBaseY = hillBase - 25;
+      const towerW = Math.min(width * 0.12, 110);
+      const towerH = 140;
+
+      // Radioactive Steam Emission from Towers
+      for (const puff of simpsonsSteamPuffs) {
+        puff.y -= puff.speedY;
+        puff.r += puff.grow;
+        puff.alpha -= 0.0035;
+
+        if (puff.alpha <= 0 || puff.y < 0) {
+          puff.x = towerBaseX + (Math.random() - 0.5) * (towerW * 0.6);
+          puff.y = towerBaseY - towerH;
+          puff.r = Math.random() * 14 + 10;
+          puff.alpha = Math.random() * 0.5 + 0.3;
+        }
+
+        ctx.save();
+        ctx.fillStyle = `rgba(57, 255, 20, ${puff.alpha * 0.45})`; // Radioactive Green Glow
+        ctx.beginPath();
+        ctx.arc(puff.x, puff.y, puff.r * 1.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(255, 255, 255, ${puff.alpha * 0.8})`; // White Steam Center
+        ctx.beginPath();
+        ctx.arc(puff.x, puff.y, puff.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Left Tower Silhouette
+      drawCoolingTower(towerBaseX - towerW * 0.6, towerBaseY + 15, towerW * 0.85, towerH * 0.85);
+
+      // Main Front Cooling Tower
+      drawCoolingTower(towerBaseX, towerBaseY, towerW, towerH);
+
+      ctx.restore();
+    }
+
+    function drawCoolingTower(bx, by, tw, th) {
+      ctx.save();
+      ctx.fillStyle = '#b0bec5';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 3.5;
+
+      const topW = tw * 0.65;
+      const waistW = tw * 0.50;
+      const topY = by - th;
+      const waistY = by - th * 0.58;
+
+      // Hyperbolic Cooling Tower Outline
+      ctx.beginPath();
+      ctx.moveTo(bx - tw * 0.5, by);
+      ctx.quadraticCurveTo(bx - waistW * 0.5, waistY, bx - topW * 0.5, topY);
+      ctx.lineTo(bx + topW * 0.5, topY);
+      ctx.quadraticCurveTo(bx + waistW * 0.5, waistY, bx + tw * 0.5, by);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Top Ring / Rim
+      ctx.fillStyle = '#cfd8dc';
+      ctx.beginPath();
+      ctx.ellipse(bx, topY, topW * 0.5, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Radioactive Sector 7G Trefoil Hazard Symbol
+      ctx.fillStyle = '#39ff14';
+      ctx.beginPath();
+      ctx.arc(bx, waistY + 15, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Homer's Frosted Pink Donuts with Colorful Rainbow Sprinkles
+    function drawSimpsonsDonuts(now) {
+      ctx.save();
+      for (const donut of simpsonsDonuts) {
+        donut.y += donut.speedY;
+        donut.rotation += donut.rotSpeed;
+        donut.wobble += 0.02;
+
+        if (donut.y - donut.size > height) {
+          donut.y = -donut.size * 2;
+          donut.x = Math.random() * width;
+        }
+
+        const dx = donut.x + Math.sin(donut.wobble) * 12;
+        const dy = donut.y;
+        const R = donut.size;
+        const rHole = R * 0.38;
+
+        ctx.save();
+        ctx.translate(dx, dy);
+        ctx.rotate(donut.rotation);
+
+        // Donut Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.beginPath();
+        ctx.arc(4, 5, R, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 1. Golden Dough Body with Black Cartoon Outline
+        ctx.fillStyle = '#e8a853';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(0, 0, R, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // 2. Glossy Pink Strawberry Frosting
+        ctx.fillStyle = '#ff69b4';
+        ctx.beginPath();
+        ctx.arc(0, 0, R * 0.90, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Frosting wavy drippings
+        ctx.fillStyle = '#ff1493';
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+          const dripX = Math.cos(a) * (R * 0.72);
+          const dripY = Math.sin(a) * (R * 0.72);
+          ctx.beginPath();
+          ctx.arc(dripX, dripY, R * 0.18, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 3. Center Donut Hole Cutout
+        ctx.fillStyle = '#78d5fd'; // Matches Springfield sky
+        ctx.beginPath();
+        ctx.arc(0, 0, rHole, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+
+        // 4. Multi-color Rainbow Sprinkles (White, Yellow, Lime, Blue, Orange)
+        const sprinkles = [
+          { x: -R * 0.55, y: -R * 0.25, rot: 0.4, color: '#ffffff' },
+          { x: R * 0.45, y: -R * 0.40, rot: -0.6, color: '#39ff14' },
+          { x: -R * 0.25, y: R * 0.55, rot: 0.9, color: '#fed90f' },
+          { x: R * 0.50, y: R * 0.35, rot: 0.2, color: '#00f0ff' },
+          { x: -R * 0.40, y: R * 0.20, rot: -0.8, color: '#ff4081' },
+          { x: R * 0.15, y: -R * 0.65, rot: 1.2, color: '#fed90f' },
+          { x: -R * 0.60, y: 0, rot: 0.1, color: '#39ff14' },
+          { x: 0, y: R * 0.65, rot: -0.4, color: '#ffffff' }
+        ];
+
+        for (const sp of sprinkles) {
+          ctx.save();
+          ctx.translate(sp.x, sp.y);
+          ctx.rotate(sp.rot);
+          ctx.fillStyle = sp.color;
+          ctx.fillRect(-4, -1.8, 8, 3.6);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#000000';
+          ctx.strokeRect(-4, -1.8, 8, 3.6);
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    // =========================================================================
     // 5. GRAND THEFT AUTO VI (VICE CITY / LEONIDA SUNSET) ENGINE
     // =========================================================================
     let gtaPalmTrees = [];
@@ -1979,6 +2309,9 @@ class SoundFX {
       } else if (currentTheme === 'noir') {
         // SPIDER-MAN NOIR THEME
         drawSpiderNoirScene();
+      } else if (currentTheme === 'simpsons') {
+        // THE SIMPSONS SPRINGFIELD THEME
+        drawSimpsonsScene();
       }
 
       requestAnimationFrame(renderWorld);
@@ -2002,6 +2335,7 @@ function applyTheme(theme) {
   const csStrip = getEl("csStrip");
   const gtaStrip = getEl("gtaStrip");
   const noirStrip = getEl("noirStrip");
+  const simpsonsStrip = getEl("simpsonsStrip");
   const identityDiscIcon = getEl("identityDiscIcon");
   const tronStatusText = getEl("tronStatusText");
   const cyberdeckBadge = getEl("cyberdeckBadge");
@@ -2009,6 +2343,7 @@ function applyTheme(theme) {
   const csBadge = getEl("csBadge");
   const gtaBadge = getEl("gtaBadge");
   const noirBadge = getEl("noirBadge");
+  const simpsonsBadge = getEl("simpsonsBadge");
   const spawnIcon = getEl("spawnIcon");
   const spawnText = getEl("spawnText");
   const btnSpawnEntity = getEl("btnSpawnEntity");
@@ -2029,6 +2364,7 @@ function applyTheme(theme) {
   if (csStrip) csStrip.style.display = "none";
   if (gtaStrip) gtaStrip.style.display = "none";
   if (noirStrip) noirStrip.style.display = "none";
+  if (simpsonsStrip) simpsonsStrip.style.display = "none";
 
   if (identityDiscIcon) identityDiscIcon.style.display = "none";
   if (tronStatusText) tronStatusText.style.display = "none";
@@ -2037,8 +2373,33 @@ function applyTheme(theme) {
   if (csBadge) csBadge.style.display = "none";
   if (gtaBadge) gtaBadge.style.display = "none";
   if (noirBadge) noirBadge.style.display = "none";
+  if (simpsonsBadge) simpsonsBadge.style.display = "none";
 
-  if (theme === "noir") {
+  if (theme === "simpsons") {
+    body.className = "theme-simpsons";
+    if (themeName) themeName.textContent = "THE SIMPSONS";
+    if (simpsonsStrip) simpsonsStrip.style.display = "block";
+    if (simpsonsBadge) simpsonsBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-circle-dot";
+    if (spawnText) spawnText.textContent = "+DONUT!";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Chuva de Donuts do Homer / D'OH!";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "SPRINGFIELD • REGULAMENTOS DA CIDADE • TERMOS DO PREFEITO QUIMBY";
+      else if (page === "privacy") subTitle.textContent = "USINA DE SPRINGFIELD • ZERO VAZAMENTO RADIOATIVO • SIGILO TOTAL";
+      else if (page === "license") subTitle.textContent = "LICENÇA ABERTA DE SPRINGFIELD • CÓDIGO LIVRE DO PROFESSOR FRINK";
+      else subTitle.textContent = "SPRINGFIELD • USINA NUCLEAR SETOR 7G • CENTRAL DE DOWNLOAD DO HOMER";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> SETOR_7G // ALERTA: HOMER PRESSIONOU O BOTÃO DE DOWNLOAD...";
+    if (footerUser) footerUser.innerHTML = "OPERADOR: <b>HOMER J. SIMPSON (INSPETOR 7G)</b>";
+    if (footerNode) footerNode.innerHTML = "LOCAL: <b>SPRINGFIELD NUCLEAR PLANT // SECTOR 7G</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"MMMM... DONUTS." &bull; THE SIMPSONS &copy; 20TH TELEVISION &bull; ANYTHING // DOWN';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // DUFF BEER DELIVERY EXPRESS";
+    if (tgBotTag) tgBotTag.textContent = "MOE'S TAVERN";
+    if (waBotTag) waBotTag.textContent = "KWIK-E-MART";
+
+  } else if (theme === "noir") {
     body.className = "theme-noir";
     if (themeName) themeName.textContent = "SPIDER-NOIR '33";
     if (noirStrip) noirStrip.style.display = "block";
@@ -2204,7 +2565,8 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (currentTheme === "topgear") nextTheme = "cs";
       else if (currentTheme === "cs") nextTheme = "gta";
       else if (currentTheme === "gta") nextTheme = "noir";
-      else if (currentTheme === "noir") nextTheme = "retro";
+      else if (currentTheme === "noir") nextTheme = "simpsons";
+      else if (currentTheme === "simpsons") nextTheme = "retro";
       applyTheme(nextTheme);
     });
   }
@@ -2257,6 +2619,21 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
         if (noirRainDrops.length > 200) noirRainDrops.splice(0, 40);
+      } else if (currentTheme === "simpsons") {
+        sfx.playDoh();
+        // Homer Donut Explosion
+        for (let i = 0; i < 6; i++) {
+          simpsonsDonuts.push({
+            x: width * 0.5 + (Math.random() - 0.5) * (width * 0.6),
+            y: -50 - Math.random() * 120,
+            size: Math.random() * 26 + 22,
+            rotation: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() - 0.5) * 0.08,
+            speedY: Math.random() * 2.5 + 2.0,
+            wobble: Math.random() * Math.PI * 2
+          });
+        }
+        if (simpsonsDonuts.length > 25) simpsonsDonuts.splice(0, 6);
       }
     });
   }
