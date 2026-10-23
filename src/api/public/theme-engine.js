@@ -2017,6 +2017,9 @@ function applyTheme(theme) {
   const footerUser = getEl("footerUser");
   const footerNode = getEl("footerNode");
   const bottomCredits = getEl("bottomCredits");
+  const botsStatusText = getEl("botsStatusText");
+  const tgBotTag = getEl("tgBotTag");
+  const waBotTag = getEl("waBotTag");
 
   const page = window.PAGE_TYPE || "home";
 
@@ -2055,6 +2058,9 @@ function applyTheme(theme) {
     if (footerUser) footerUser.innerHTML = "DETECTIVE: <b>PETER PARKER (SPIDER-MAN NOIR)</b>";
     if (footerNode) footerNode.innerHTML = "LOCATION: <b>BOWERY DISTRICT // DAILY BUGLE ROOFTOP</b>";
     if (bottomCredits) bottomCredits.innerHTML = '"IS THAT A RUBIK\'S CUBE?" &bull; SPIDER-MAN NOIR &copy; MARVEL &bull; ANYTHING // DOWN';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // INVESTIGAÇÃO POLICIAL 1933";
+    if (tgBotTag) tgBotTag.textContent = "CASO EM ANDAMENTO";
+    if (waBotTag) waBotTag.textContent = "CONFIDENCIAL";
 
   } else if (theme === "gta") {
     body.className = "theme-gta";
@@ -2076,6 +2082,9 @@ function applyTheme(theme) {
     if (footerUser) footerUser.innerHTML = "OPERATOR: <b>LUCIA & JASON (BONNIE & CLYDE)</b>";
     if (footerNode) footerNode.innerHTML = "DISTRICT: <b>VICE CITY BEACH // STARFISH ISLAND</b>";
     if (bottomCredits) bottomCredits.innerHTML = '"TRUST?" &bull; GRAND THEFT AUTO VI &copy; ROCKSTAR GAMES &bull; ANYTHING // DOWN';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // CHEGANDO EM VICE CITY 2026";
+    if (tgBotTag) tgBotTag.textContent = "EM BREVE";
+    if (waBotTag) waBotTag.textContent = "EM BREVE";
 
   } else if (theme === "cs") {
     body.className = "theme-cs";
@@ -2097,6 +2106,9 @@ function applyTheme(theme) {
     if (footerUser) footerUser.innerHTML = "OPERATOR: <b>SEAL TEAM 6 (CT)</b>";
     if (footerNode) footerNode.innerHTML = "LOCATION: <b>DE_DUST2 // BOMBSITE A</b>";
     if (bottomCredits) bottomCredits.innerHTML = '"OK, LET\'S GO!" &bull; COUNTER-STRIKE &copy; VALVE &bull; ANYTHING // DOWN';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // REFORÇOS TÁTICOS A CAMINHO";
+    if (tgBotTag) tgBotTag.textContent = "ETA: EM BREVE";
+    if (waBotTag) waBotTag.textContent = "STANDBY CT";
 
   } else if (theme === "topgear") {
     body.className = "theme-topgear";
@@ -2118,6 +2130,9 @@ function applyTheme(theme) {
     if (footerUser) footerUser.innerHTML = "DRIVER: <b>PLAYER 1 (RED CANNIBAL)</b>";
     if (footerNode) footerNode.innerHTML = "TRACK: <b>MONACO CIRCUIT LAP 1/3</b>";
     if (bottomCredits) bottomCredits.innerHTML = 'READY... SET... GO! &bull; TOP GEAR &copy; 1992 KEMCO &bull; ANYTHING // DOWN';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // CIRCUITO BÔNUS BLOQUEADO";
+    if (tgBotTag) tgBotTag.textContent = "CIRCUITO 2";
+    if (waBotTag) waBotTag.textContent = "BLOQUEADO";
 
   } else if (theme === "cyber") {
     body.className = "theme-cyber";
@@ -2139,6 +2154,9 @@ function applyTheme(theme) {
     if (footerUser) footerUser.innerHTML = "NETRUNNER: <b>V // ARASAKA INFILTRATOR</b>";
     if (footerNode) footerNode.innerHTML = "SUBNET: <b>PACIFICA ICE GATE 3001</b>";
     if (bottomCredits) bottomCredits.innerHTML = '"WAKE THE F**K UP, SAMURAI." &bull; ANYTHING // DOWN &copy; 2026';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // QUICKHACK EM DESENVOLVIMENTO";
+    if (tgBotTag) tgBotTag.textContent = "NETRUNNER // EM BREVE";
+    if (waBotTag) waBotTag.textContent = "CORPO // EM BREVE";
 
   } else {
     // TRON '82 (Default)
@@ -2161,6 +2179,9 @@ function applyTheme(theme) {
     if (footerUser) footerUser.innerHTML = "USER: <b>FLYNN // ACTIVE</b>";
     if (footerNode) footerNode.innerHTML = "MCP GRID: <b>I/O TOWER 3001</b>";
     if (bottomCredits) bottomCredits.innerHTML = '"THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // SECTOR 7G COMPILING";
+    if (tgBotTag) tgBotTag.textContent = "COMPILANDO...";
+    if (waBotTag) waBotTag.textContent = "EM BREVE";
   }
 }
 
