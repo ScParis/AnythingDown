@@ -17,22 +17,47 @@ export function createServer() {
   const app = express();
   const downloader = new AnythingDown();
 
-  // Automatically check Render Secret Files (/etc/secrets/cookies.txt) or env vars
-  if (!process.env.COOKIES_FILE && fs.existsSync('/etc/secrets/cookies.txt')) {
-    process.env.COOKIES_FILE = '/etc/secrets/cookies.txt';
-    Logger.info('Found and configured cookies from Render Secret File: /etc/secrets/cookies.txt');
-  }
+  // Multi-Platform Cookies Manager: Merges platform-specific cookies and secret files into a unified master cookie jar
+  try {
+    const cookieSources: string[] = [];
 
-  // Automatically extract raw cookies from env var if provided (Render Secret / Env Var)
-  if (process.env.YTDLP_COOKIES_TEXT && !process.env.COOKIES_FILE) {
-    try {
-      const cookieFilePath = path.join(os.tmpdir(), 'ytdlp_env_cookies.txt');
-      fs.writeFileSync(cookieFilePath, process.env.YTDLP_COOKIES_TEXT, { encoding: 'utf-8', mode: 0o600 });
-      process.env.COOKIES_FILE = cookieFilePath;
-      Logger.info(`Configured cookies from YTDLP_COOKIES_TEXT at ${cookieFilePath}`);
-    } catch (e: any) {
-      Logger.warn(`Failed to write YTDLP_COOKIES_TEXT to file: ${e.message}`);
+    // 1. Generic Master Cookies
+    if (process.env.YTDLP_COOKIES_TEXT) cookieSources.push(process.env.YTDLP_COOKIES_TEXT);
+    if (process.env.COOKIES_TEXT) cookieSources.push(process.env.COOKIES_TEXT);
+
+    // 2. Platform-Specific Variables (Instagram, TikTok, Twitter/X, Facebook, YouTube)
+    if (process.env.INSTAGRAM_COOKIES_TEXT) cookieSources.push(process.env.INSTAGRAM_COOKIES_TEXT);
+    if (process.env.TIKTOK_COOKIES_TEXT) cookieSources.push(process.env.TIKTOK_COOKIES_TEXT);
+    if (process.env.TWITTER_COOKIES_TEXT) cookieSources.push(process.env.TWITTER_COOKIES_TEXT);
+    if (process.env.FACEBOOK_COOKIES_TEXT) cookieSources.push(process.env.FACEBOOK_COOKIES_TEXT);
+    if (process.env.YOUTUBE_COOKIES_TEXT) cookieSources.push(process.env.YOUTUBE_COOKIES_TEXT);
+
+    // 3. Render Secret Files (/etc/secrets/*.txt)
+    const secretFiles = [
+      '/etc/secrets/cookies.txt',
+      '/etc/secrets/instagram_cookies.txt',
+      '/etc/secrets/youtube_cookies.txt',
+      '/etc/secrets/tiktok_cookies.txt'
+    ];
+    for (const sf of secretFiles) {
+      if (fs.existsSync(sf)) {
+        try {
+          const content = fs.readFileSync(sf, 'utf-8');
+          if (content.trim()) cookieSources.push(content);
+        } catch {}
+      }
     }
+
+    if (cookieSources.length > 0) {
+      const masterCookiePath = path.join(os.tmpdir(), 'master_multiplatform_cookies.txt');
+      const header = '# Netscape HTTP Cookie File\n# Multi-Platform Unified Cookie Jar for AnythingDown\n\n';
+      const mergedContent = header + cookieSources.map(c => c.trim()).filter(Boolean).join('\n\n');
+      fs.writeFileSync(masterCookiePath, mergedContent, { encoding: 'utf-8', mode: 0o600 });
+      process.env.COOKIES_FILE = masterCookiePath;
+      Logger.info(`Unified ${cookieSources.length} cookie sources into ${masterCookiePath}`);
+    }
+  } catch (err: any) {
+    Logger.warn(`Error configuring multi-platform cookies: ${err.message}`);
   }
 
   app.use(cors());
