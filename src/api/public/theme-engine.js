@@ -118,6 +118,24 @@ class SoundFX {
         setTimeout(() => this.playTone(739.99, 'triangle', 0.18, 0.22), 340); // F#5
         setTimeout(() => this.playTone(880.00, 'triangle', 0.35, 0.26), 510); // A5
       }
+      playPacmanWaka() {
+        // Iconic 1980 arcade "Waka-Waka" dual-tone chirp
+        this.playTone(493.88, 'triangle', 0.07, 0.18); // B4
+        setTimeout(() => this.playTone(261.63, 'sawtooth', 0.08, 0.16), 65); // C4
+      }
+      playPacmanFruit() {
+        // Arcade bonus fruit capture / cherry ding
+        this.playTone(1046.50, 'square', 0.09, 0.2);
+        setTimeout(() => this.playTone(1318.51, 'square', 0.09, 0.2), 80);
+        setTimeout(() => this.playTone(1567.98, 'square', 0.16, 0.25), 160);
+      }
+      playPacmanGhostEat() {
+        // Ghost eaten sound (rapid ascending sequence)
+        this.playTone(300, 'square', 0.06, 0.22);
+        setTimeout(() => this.playTone(600, 'square', 0.06, 0.22), 50);
+        setTimeout(() => this.playTone(900, 'square', 0.08, 0.25), 100);
+        setTimeout(() => this.playTone(1200, 'square', 0.12, 0.25), 150);
+      }
       playSuccess() {
         if (currentTheme === 'cs') {
           // "Counter-Terrorists Win / Bomb Defused" Fanfare
@@ -1772,6 +1790,251 @@ class SoundFX {
     }
 
     // =========================================================================
+    // 8. PAC-MAN 1980 (NAMCO / MIDWAY NEON RETRO ARCADE MAZE) ENGINE
+    // =========================================================================
+    let pacmanX = 0;
+    let pacmanY = 120;
+    let pacmanDir = 1; // 1 = right, -1 = left
+    let pacmanSpeed = 3.6;
+    let pacmanMouthAngle = 0.2;
+    let pacmanMouthDir = 0.04;
+    let pacmanDots = [];
+    let pacmanGhosts = [];
+    let pacmanFruits = [];
+    let pacmanScore = 24500;
+
+    function initPacmanTheme() {
+      pacmanX = -50;
+      pacmanY = height * 0.78;
+      pacmanDir = 1;
+
+      // Generate rows of neon pellets / energizers across the viewport
+      pacmanDots = [];
+      const dotSpacing = 36;
+      const count = Math.ceil(width / dotSpacing) + 2;
+      for (let i = 0; i < count; i++) {
+        const isEnergizer = (i % 12 === 0);
+        pacmanDots.push({
+          x: i * dotSpacing,
+          y: pacmanY,
+          isEnergizer: isEnergizer,
+          radius: isEnergizer ? 7 : 3.5,
+          eaten: false
+        });
+      }
+
+      // 4 Famous Ghosts: Blinky (Red), Pinky (Pink), Inky (Cyan), Clyde (Orange)
+      pacmanGhosts = [
+        { name: 'Blinky', color: '#ff0000', x: -140, y: pacmanY, dir: 1, speed: 3.4, eyeDir: 1 },
+        { name: 'Pinky',  color: '#ffb8de', x: -190, y: pacmanY, dir: 1, speed: 3.3, eyeDir: 1 },
+        { name: 'Inky',   color: '#00ffff', x: -240, y: pacmanY, dir: 1, speed: 3.2, eyeDir: 1 },
+        { name: 'Clyde',  color: '#ffb852', x: -290, y: pacmanY, dir: 1, speed: 3.1, eyeDir: 1 }
+      ];
+
+      // Floating Arcade Fruit / Cherry Bonuses
+      pacmanFruits = [
+        { x: width * 0.25, y: height * 0.32, type: 'cherry', floatOffset: 0 },
+        { x: width * 0.75, y: height * 0.28, type: 'strawberry', floatOffset: Math.PI }
+      ];
+    }
+
+    initPacmanTheme();
+
+    function drawPacmanScene() {
+      // 1. Deep Arcade Black Background with Blue Neon Maze Grid Outline
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, width, height);
+
+      // Neon Arcade Maze Border Lines (Top, Middle, Bottom)
+      ctx.save();
+      ctx.strokeStyle = '#2121de';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#2121de';
+      ctx.shadowBlur = 10;
+
+      // Upper Maze Arch
+      const mazeY = pacmanY;
+      ctx.beginPath();
+      ctx.moveTo(0, mazeY - 35);
+      ctx.lineTo(width, mazeY - 35);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, mazeY + 35);
+      ctx.lineTo(width, mazeY + 35);
+      ctx.stroke();
+
+      // Occasional maze block obstacles in background
+      ctx.fillStyle = 'rgba(33, 33, 222, 0.12)';
+      ctx.fillRect(width * 0.15, mazeY - 110, 80, 50);
+      ctx.strokeRect(width * 0.15, mazeY - 110, 80, 50);
+      ctx.fillRect(width * 0.55, mazeY - 110, 100, 50);
+      ctx.strokeRect(width * 0.55, mazeY - 110, 100, 50);
+      ctx.restore();
+
+      // 2. Draw Pac-Dots / Energizers
+      ctx.save();
+      const now = performance.now() * 0.005;
+      for (const dot of pacmanDots) {
+        if (dot.eaten) continue;
+        ctx.fillStyle = dot.isEnergizer ? '#ffff00' : '#ffb8ae';
+        const r = dot.isEnergizer ? (dot.radius + Math.sin(now * 3) * 1.5) : dot.radius;
+        if (dot.isEnergizer) {
+          ctx.shadowColor = '#ffff00';
+          ctx.shadowBlur = 8;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 3. Draw Pac-Man with Chomp Animation
+      pacmanX += pacmanSpeed * pacmanDir;
+      pacmanMouthAngle += pacmanMouthDir;
+      if (pacmanMouthAngle > 0.45 || pacmanMouthAngle < 0.04) {
+        pacmanMouthDir = -pacmanMouthDir;
+      }
+
+      // Check dot consumption
+      for (const dot of pacmanDots) {
+        if (!dot.eaten && Math.abs(pacmanX - dot.x) < 18) {
+          dot.eaten = true;
+          pacmanScore += dot.isEnergizer ? 50 : 10;
+          const scoreEl = getEl("pacScore");
+          if (scoreEl) scoreEl.textContent = pacmanScore;
+        }
+      }
+
+      // Wrap around screen
+      if (pacmanDir === 1 && pacmanX > width + 100) {
+        pacmanX = -80;
+        for (const dot of pacmanDots) dot.eaten = false;
+      } else if (pacmanDir === -1 && pacmanX < -100) {
+        pacmanX = width + 80;
+        for (const dot of pacmanDots) dot.eaten = false;
+      }
+
+      // Render Pac-Man Body
+      ctx.save();
+      ctx.translate(pacmanX, pacmanY);
+      if (pacmanDir === -1) {
+        ctx.scale(-1, 1);
+      }
+      ctx.fillStyle = '#ffff00';
+      ctx.shadowColor = '#ffff00';
+      ctx.shadowBlur = 12;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 22, pacmanMouthAngle * Math.PI, (2 - pacmanMouthAngle) * Math.PI, false);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 4. Draw The 4 Ghosts Chasing Pac-Man
+      for (const ghost of pacmanGhosts) {
+        ghost.x += ghost.speed * ghost.dir;
+        if (ghost.dir === 1 && ghost.x > width + 150) {
+          ghost.x = -150 - Math.random() * 80;
+        }
+
+        drawArcadeGhost(ghost.x, ghost.y, ghost.color, ghost.eyeDir);
+      }
+
+      // 5. Draw Floating Arcade Fruit Bonuses (Cherries & Strawberries)
+      drawPacmanFruits();
+    }
+
+    // Helper: Draw Authentic Arcade Ghost with skirt ruffles and googly eyes
+    function drawArcadeGhost(x, y, color, eyeDir) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      const R = 18;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+
+      ctx.beginPath();
+      // Round top dome
+      ctx.arc(0, -4, R, Math.PI, 0, false);
+      // Sides down
+      ctx.lineTo(R, 16);
+
+      // Wavy Skirt feet (3 ruffles)
+      const ruffWidth = (R * 2) / 3;
+      ctx.quadraticCurveTo(R - ruffWidth * 0.5, 10, R - ruffWidth, 16);
+      ctx.quadraticCurveTo(R - ruffWidth * 1.5, 10, R - ruffWidth * 2, 16);
+      ctx.quadraticCurveTo(-R + ruffWidth * 0.5, 10, -R, 16);
+      ctx.lineTo(-R, -4);
+      ctx.closePath();
+      ctx.fill();
+
+      // Ghost Eyes (White sclera)
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      const eyeOffsetX = eyeDir * 3;
+      ctx.beginPath();
+      ctx.arc(-6 + eyeOffsetX, -6, 5, 0, Math.PI * 2);
+      ctx.arc(6 + eyeOffsetX, -6, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ghost Pupils (Deep Blue Looking Forward)
+      ctx.fillStyle = '#0000aa';
+      ctx.beginPath();
+      ctx.arc(-5 + eyeOffsetX * 1.3, -6, 2.8, 0, Math.PI * 2);
+      ctx.arc(7 + eyeOffsetX * 1.3, -6, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Helper: Draw Classic 1980 Pixelated Cherries
+    function drawPacmanFruits() {
+      ctx.save();
+      const t = performance.now() * 0.003;
+      for (const fruit of pacmanFruits) {
+        fruit.floatOffset += 0.03;
+        const fy = fruit.y + Math.sin(fruit.floatOffset) * 8;
+
+        ctx.save();
+        ctx.translate(fruit.x, fy);
+
+        // Brown Stems
+        ctx.strokeStyle = '#8b5a2b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -16);
+        ctx.quadraticCurveTo(-6, -8, -8, 2);
+        ctx.moveTo(0, -16);
+        ctx.quadraticCurveTo(6, -8, 8, 4);
+        ctx.stroke();
+
+        // Twin Bright Red Cherries
+        ctx.fillStyle = '#ff0000';
+        ctx.shadowColor = '#ff0000';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(-8, 5, 7.5, 0, Math.PI * 2);
+        ctx.arc(8, 7, 7.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White Glint Highlights
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-10, 3, 2, 0, Math.PI * 2);
+        ctx.arc(6, 5, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    // =========================================================================
     // 5. GRAND THEFT AUTO VI (VICE CITY / LEONIDA SUNSET) ENGINE
     // =========================================================================
     let gtaPalmTrees = [];
@@ -2312,6 +2575,9 @@ class SoundFX {
       } else if (currentTheme === 'simpsons') {
         // THE SIMPSONS SPRINGFIELD THEME
         drawSimpsonsScene();
+      } else if (currentTheme === 'pacman') {
+        // PAC-MAN 1980 ARCADE THEME
+        drawPacmanScene();
       }
 
       requestAnimationFrame(renderWorld);
@@ -2336,6 +2602,7 @@ function applyTheme(theme) {
   const gtaStrip = getEl("gtaStrip");
   const noirStrip = getEl("noirStrip");
   const simpsonsStrip = getEl("simpsonsStrip");
+  const pacmanStrip = getEl("pacmanStrip");
   const identityDiscIcon = getEl("identityDiscIcon");
   const tronStatusText = getEl("tronStatusText");
   const cyberdeckBadge = getEl("cyberdeckBadge");
@@ -2344,6 +2611,7 @@ function applyTheme(theme) {
   const gtaBadge = getEl("gtaBadge");
   const noirBadge = getEl("noirBadge");
   const simpsonsBadge = getEl("simpsonsBadge");
+  const pacmanBadge = getEl("pacmanBadge");
   const spawnIcon = getEl("spawnIcon");
   const spawnText = getEl("spawnText");
   const btnSpawnEntity = getEl("btnSpawnEntity");
@@ -2365,6 +2633,7 @@ function applyTheme(theme) {
   if (gtaStrip) gtaStrip.style.display = "none";
   if (noirStrip) noirStrip.style.display = "none";
   if (simpsonsStrip) simpsonsStrip.style.display = "none";
+  if (pacmanStrip) pacmanStrip.style.display = "none";
 
   if (identityDiscIcon) identityDiscIcon.style.display = "none";
   if (tronStatusText) tronStatusText.style.display = "none";
@@ -2374,8 +2643,33 @@ function applyTheme(theme) {
   if (gtaBadge) gtaBadge.style.display = "none";
   if (noirBadge) noirBadge.style.display = "none";
   if (simpsonsBadge) simpsonsBadge.style.display = "none";
+  if (pacmanBadge) pacmanBadge.style.display = "none";
 
-  if (theme === "simpsons") {
+  if (theme === "pacman") {
+    body.className = "theme-pacman";
+    if (themeName) themeName.textContent = "PAC-MAN '80";
+    if (pacmanStrip) pacmanStrip.style.display = "block";
+    if (pacmanBadge) pacmanBadge.style.display = "block";
+
+    if (spawnIcon) spawnIcon.className = "fa-solid fa-ghost";
+    if (spawnText) spawnText.textContent = "WAKA!";
+    if (btnSpawnEntity) btnSpawnEntity.title = "Comer Fantasma / Chomp Waka-Waka!";
+
+    if (subTitle) {
+      if (page === "terms") subTitle.textContent = "PAC-MAN ARCADE • REGRAS DO LABIRINTO 1980 • MOEDA 1UP INSERIDA";
+      else if (page === "privacy") subTitle.textContent = "ALTO SCORE PROTEGIDO • NENHUM FANTASMA RASTREIA SEUS DADOS";
+      else if (page === "license") subTitle.textContent = "LICENÇA RETRO ARCADE • CÓDIGO ABERTO MIDWAY / NAMCO 1980";
+      else subTitle.textContent = "PAC-MAN ARCADE • LABIRINTO NEON 1980 • POWER PELLET MEDIA EXTRACTION";
+    }
+    if (terminalHeader) terminalHeader.textContent = "> PAC_CPU // 1UP READY: INSERINDO MOEDA NO FLIPERAMA...";
+    if (footerUser) footerUser.innerHTML = "PLAYER 1: <b>PAC-MAN (HIGH SCORE: 3,333,360)</b>";
+    if (footerNode) footerNode.innerHTML = "CABINET: <b>MIDWAY ARCADE // LEVEL 256 CHERRY</b>";
+    if (bottomCredits) bottomCredits.innerHTML = '"WAKA WAKA WAKA!" &bull; PAC-MAN &copy; 1980 BANDAI NAMCO &bull; ANYTHING // DOWN';
+    if (botsStatusText) botsStatusText.textContent = "EM BREVE // INKY & BLINKY CLOUD DISPATCH";
+    if (tgBotTag) tgBotTag.textContent = "ARCADE BOT";
+    if (waBotTag) waBotTag.textContent = "WAKA BOT";
+
+  } else if (theme === "simpsons") {
     body.className = "theme-simpsons";
     if (themeName) themeName.textContent = "THE SIMPSONS";
     if (simpsonsStrip) simpsonsStrip.style.display = "block";
@@ -2566,7 +2860,8 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (currentTheme === "cs") nextTheme = "gta";
       else if (currentTheme === "gta") nextTheme = "noir";
       else if (currentTheme === "noir") nextTheme = "simpsons";
-      else if (currentTheme === "simpsons") nextTheme = "retro";
+      else if (currentTheme === "simpsons") nextTheme = "pacman";
+      else if (currentTheme === "pacman") nextTheme = "retro";
       applyTheme(nextTheme);
     });
   }
@@ -2634,6 +2929,23 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
         if (simpsonsDonuts.length > 25) simpsonsDonuts.splice(0, 6);
+      } else if (currentTheme === "pacman") {
+        sfx.playPacmanWaka();
+        setTimeout(() => sfx.playPacmanGhostEat(), 80);
+        // Turbo Pac-Man Boost & Score Frenzy
+        pacmanSpeed = 7.5;
+        setTimeout(() => { pacmanSpeed = 3.6; }, 1200);
+        pacmanScore += 200;
+        const scoreEl = getEl("pacScore");
+        if (scoreEl) scoreEl.textContent = pacmanScore;
+        // Re-spawn bonus fruit
+        pacmanFruits.push({
+          x: width * 0.5 + (Math.random() - 0.5) * (width * 0.5),
+          y: height * 0.35 + (Math.random() - 0.5) * (height * 0.2),
+          type: 'cherry',
+          floatOffset: Math.random() * Math.PI
+        });
+        if (pacmanFruits.length > 6) pacmanFruits.shift();
       }
     });
   }
