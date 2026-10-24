@@ -40,18 +40,25 @@ export function createServer() {
       const ytdlp = await downloader['binaryManager'].getYtDlpPath();
       const ffmpeg = downloader['binaryManager'].getFfmpegPath();
       let ytdlpVersion = 'unknown';
+      let ytdlpError = null;
       try {
         const { spawnSync } = await import('node:child_process');
-        const v = spawnSync(ytdlp, ['--version'], { encoding: 'utf-8', timeout: 3000 });
-        if (v.status === 0) ytdlpVersion = v.stdout.trim();
-      } catch {}
+        const v = spawnSync(ytdlp, ['--version'], { encoding: 'utf-8', timeout: 5000 });
+        if (v.status === 0) {
+          ytdlpVersion = v.stdout.trim();
+        } else {
+          ytdlpError = `status=${v.status}, stderr=${v.stderr}`;
+        }
+      } catch (e: any) {
+        ytdlpError = e.message;
+      }
 
       res.json({
         status: 'ok',
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
         binaries: {
-          ytdlp: { path: ytdlp, version: ytdlpVersion, ready: true },
+          ytdlp: { path: ytdlp, version: ytdlpVersion, error: ytdlpError, ready: true },
           ffmpeg: { path: ffmpeg || null, ready: !!ffmpeg },
         },
       });
@@ -93,6 +100,7 @@ export function createServer() {
       res.status(422).json({
         success: false,
         error: userFriendlyError,
+        rawError: rawMsg,
       });
     }
   });
