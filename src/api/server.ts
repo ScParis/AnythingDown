@@ -9,15 +9,12 @@ import { detectPlatform, isValidUrl } from '../utils/url-detector.js';
 import { sanitizeFilename, removeFileSafe, generateId } from '../utils/file.js';
 import { Logger } from '../utils/logger.js';
 import { createTelegramBot } from '../bot/telegram.js';
+import { MetricsManager } from '../core/metrics-manager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function createServer() {
-  const app = express();
-  const downloader = new AnythingDown();
-
-  // Multi-Platform Cookies Manager: Merges platform-specific cookies and secret files into a unified master cookie jar
+export function reloadUnifiedCookies(): { sourcesCount: number; path: string | null; size: number } {
   try {
     const cookieSources: string[] = [];
 
@@ -25,14 +22,14 @@ export function createServer() {
     if (process.env.YTDLP_COOKIES_TEXT) cookieSources.push(process.env.YTDLP_COOKIES_TEXT);
     if (process.env.COOKIES_TEXT) cookieSources.push(process.env.COOKIES_TEXT);
 
-    // 2. Platform-Specific Variables (Instagram, TikTok, Twitter/X, Facebook, YouTube)
+    // 2. Platform-Specific Variables
     if (process.env.INSTAGRAM_COOKIES_TEXT) cookieSources.push(process.env.INSTAGRAM_COOKIES_TEXT);
     if (process.env.TIKTOK_COOKIES_TEXT) cookieSources.push(process.env.TIKTOK_COOKIES_TEXT);
     if (process.env.TWITTER_COOKIES_TEXT) cookieSources.push(process.env.TWITTER_COOKIES_TEXT);
     if (process.env.FACEBOOK_COOKIES_TEXT) cookieSources.push(process.env.FACEBOOK_COOKIES_TEXT);
     if (process.env.YOUTUBE_COOKIES_TEXT) cookieSources.push(process.env.YOUTUBE_COOKIES_TEXT);
 
-    // 3. Render Secret Files (/etc/secrets/*.txt)
+    // 3. Render Secret Files
     const secretFiles = [
       '/etc/secrets/cookies.txt',
       '/etc/secrets/instagram_cookies.txt',
@@ -54,10 +51,36 @@ export function createServer() {
       const mergedContent = header + cookieSources.map(c => c.trim()).filter(Boolean).join('\n\n');
       fs.writeFileSync(masterCookiePath, mergedContent, { encoding: 'utf-8', mode: 0o600 });
       process.env.COOKIES_FILE = masterCookiePath;
-      Logger.info(`Unified ${cookieSources.length} cookie sources into ${masterCookiePath}`);
+      const size = fs.statSync(masterCookiePath).size;
+      Logger.info(`Unified ${cookieSources.length} cookie sources into ${masterCookiePath} (${size} bytes)`);
+      return { sourcesCount: cookieSources.length, path: masterCookiePath, size };
     }
   } catch (err: any) {
     Logger.warn(`Error configuring multi-platform cookies: ${err.message}`);
+  }
+  return { sourcesCount: 0, path: process.env.COOKIES_FILE || null, size: 0 };
+}
+
+export function createServer() {
+  const app = express();
+  const downloader = new AnythingDown();
+  const metrics = MetricsManager.getInstance();
+  const ADMIN_KEY = process.env.ADMIN_KEY || 'anythingdown_admin_2026';
+
+  // Initialize unified cookies
+  reloadUnifiedCookies();
+
+  function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+    const authHeader = req.headers['authorization'];
+    const customHeader = req.headers['x-admin-key'] as string;
+    const queryKey = req.query.key as string;
+
+    const token = (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null) || customHeader || queryKey;
+    if (!token || token !== ADMIN_KEY) {
+      res.status(401).json({ success: false, error: 'Acesso não autorizado. Chave administrativa inválida.' });
+      return;
+    }
+    next();
   }
 
   app.use(cors());
@@ -113,8 +136,86 @@ export function createServer() {
     }
   });
 
+  // Serve Admin Dashboard
+  app.get('/admin', (_req: Request, res: Response) => {
+    const adminPath = path.join(publicDir, 'admin.html');
+    const srcAdminPath = path.join(srcPublicDir, 'admin.html');
+    if (fs.existsSync(adminPath)) {
+      res.sendFile(adminPath);
+    } else if (fs.existsSync(srcAdminPath)) {
+      res.sendFile(srcAdminPath);
+    } else {
+      res.status(404).send('Admin dashboard não encontrado.');
+    }
+  });
+
+  // Admin API Endpoints
+  app.get('/api/admin/metrics', requireAdmin, async (_req: Request, res: Response) => {
+    try {
+      const ytdlp = await downloader['binaryManager'].getYtDlpPath();
+      const ffmpeg = downloader['binaryManager'].getFfmpegPath();
+      const cookiesPath = process.env.COOKIES_FILE;
+      const cookiesExist = cookiesPath ? fs.existsSync(cookiesPath) : false;
+      const cookiesSize = cookiesExist && cookiesPath ? fs.statSync(cookiesPath).size : 0;
+
+      res.json({
+        success: true,
+        timestamp: Date.now(),
+        metrics: metrics.getSummary(),
+        system: {
+          serverUptime: process.uptime(),
+          nodeVersion: process.version,
+          platform: process.platform,
+          arch: process.arch,
+          memoryUsage: process.memoryUsage(),
+          loadAvg: os.loadavg(),
+          freeMem: os.freemem(),
+          totalMem: os.totalmem(),
+          binaries: {
+            ytdlp: { path: ytdlp, ready: true },
+            ffmpeg: { path: ffmpeg || null, ready: !!ffmpeg },
+          },
+          cookies: {
+            file: cookiesPath,
+            exists: cookiesExist,
+            size: cookiesSize,
+          }
+        }
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  app.post('/api/admin/reload-cookies', requireAdmin, (_req: Request, res: Response) => {
+    const result = reloadUnifiedCookies();
+    res.json({ success: true, message: 'Cookies recarregados e unificados com sucesso!', result });
+  });
+
+  app.post('/api/admin/clear-temp', requireAdmin, (_req: Request, res: Response) => {
+    const tempDir = path.join(os.tmpdir(), 'anythingdown_api');
+    let removedFiles = 0;
+    if (fs.existsSync(tempDir)) {
+      const files = fs.readdirSync(tempDir);
+      for (const f of files) {
+        try {
+          fs.unlinkSync(path.join(tempDir, f));
+          removedFiles++;
+        } catch {}
+      }
+    }
+    res.json({ success: true, message: `Cache temporário limpo. ${removedFiles} arquivos removidos.` });
+  });
+
+  app.post('/api/admin/reset-metrics', requireAdmin, (_req: Request, res: Response) => {
+    metrics.reset();
+    res.json({ success: true, message: 'Métricas zeradas com sucesso.' });
+  });
+
   // Extract Info
   app.post('/api/info', async (req: Request, res: Response): Promise<void> => {
+    const startTime = Date.now();
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'unknown';
     try {
       const { url } = req.body;
       if (!url || typeof url !== 'string' || !isValidUrl(url)) {
@@ -124,6 +225,14 @@ export function createServer() {
 
       const platform = detectPlatform(url);
       const info = await downloader.getInfo(url);
+
+      metrics.recordActivity({
+        type: 'info',
+        platform,
+        statusCode: 200,
+        durationMs: Date.now() - startTime,
+        clientIp,
+      });
 
       res.json({
         success: true,
@@ -146,6 +255,16 @@ export function createServer() {
         userFriendlyError = 'O Instagram exige login para visualizar este conteúdo específico (perfil privado ou restrito).';
       }
 
+      const platform = req.body?.url ? detectPlatform(req.body.url) : 'unknown';
+      metrics.recordActivity({
+        type: 'info',
+        platform,
+        statusCode: 422,
+        durationMs: Date.now() - startTime,
+        error: userFriendlyError,
+        clientIp,
+      });
+
       Logger.warn(`Metadata extraction failed for ${req.body?.url}: ${rawMsg}`);
       res.status(422).json({
         success: false,
@@ -158,12 +277,15 @@ export function createServer() {
   // Download with direct file streaming
   app.get('/api/download', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let tempFile: string | undefined;
-    try {
-      const url = req.query.url as string;
-      const format = (req.query.format as string) || 'mp4';
-      const isAudio = format === 'mp3' || req.query.audio === 'true';
-      const quality = (req.query.quality as string) || 'best';
+    const startTime = Date.now();
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'unknown';
+    const url = req.query.url as string;
+    const format = (req.query.format as string) || 'mp4';
+    const isAudio = format === 'mp3' || req.query.audio === 'true';
+    const quality = (req.query.quality as string) || 'best';
+    const platform = url ? detectPlatform(url) : 'unknown';
 
+    try {
       if (!url || !isValidUrl(url)) {
         res.status(400).json({ error: 'Valid "url" query parameter is required.' });
         return;
@@ -192,6 +314,17 @@ export function createServer() {
         if (errDesc.includes('No video formats found')) {
           errDesc = 'Este post é composto exclusivamente por fotos/imagens e não possui fluxo de vídeo ou áudio para extração. Utilize a opção de baixar fotos.';
         }
+
+        metrics.recordActivity({
+          type: 'download',
+          platform,
+          format: isAudio ? 'mp3' : 'mp4',
+          statusCode: 422,
+          durationMs: Date.now() - startTime,
+          error: errDesc,
+          clientIp,
+        });
+
         res.status(422).json({ error: errDesc });
         return;
       }
@@ -208,6 +341,15 @@ export function createServer() {
       const safeAscii = downloadName.replace(/[^\x20-\x7E]/g, '_');
       const encodedName = encodeURIComponent(downloadName);
       res.setHeader('Content-Disposition', `attachment; filename="${safeAscii}"; filename*=UTF-8''${encodedName}`);
+
+      metrics.recordActivity({
+        type: 'download',
+        platform,
+        format: isAudio ? 'mp3' : 'mp4',
+        statusCode: 200,
+        durationMs: Date.now() - startTime,
+        clientIp,
+      });
 
       const fileStream = fs.createReadStream(tempFile);
       fileStream.pipe(res);
@@ -230,12 +372,26 @@ export function createServer() {
       if (errMsg.includes('No video formats found')) {
         errMsg = 'Este post é composto por fotos/imagens e não possui fluxo de vídeo ou áudio para download.';
       }
+
+      metrics.recordActivity({
+        type: 'download',
+        platform,
+        format: isAudio ? 'mp3' : 'mp4',
+        statusCode: 422,
+        durationMs: Date.now() - startTime,
+        error: errMsg,
+        clientIp,
+      });
+
       res.status(422).json({ error: errMsg });
     }
   });
 
   // Direct Media File Proxy / Download (Images, Carousel Photos, etc.)
   app.get('/api/download-file', async (req: Request, res: Response): Promise<void> => {
+    const startTime = Date.now();
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'unknown';
+
     try {
       const fileUrl = req.query.url as string;
       const customName = (req.query.filename as string) || 'foto_instagram.jpg';
@@ -253,6 +409,16 @@ export function createServer() {
       });
 
       if (!response.ok) {
+        metrics.recordActivity({
+          type: 'file',
+          platform: 'instagram',
+          format: 'image',
+          statusCode: 502,
+          durationMs: Date.now() - startTime,
+          error: 'Falha ao transferir mídia da CDN',
+          clientIp,
+        });
+
         res.status(502).json({ error: 'Falha ao transferir mídia da CDN de origem.' });
         return;
       }
@@ -264,9 +430,28 @@ export function createServer() {
       const encodedName = encodeURIComponent(customName);
       res.setHeader('Content-Disposition', `attachment; filename="${safeAscii}"; filename*=UTF-8''${encodedName}`);
 
+      metrics.recordActivity({
+        type: 'file',
+        platform: 'instagram',
+        format: 'image',
+        statusCode: 200,
+        durationMs: Date.now() - startTime,
+        clientIp,
+      });
+
       const buffer = Buffer.from(await response.arrayBuffer());
       res.send(buffer);
     } catch (err: any) {
+      metrics.recordActivity({
+        type: 'file',
+        platform: 'instagram',
+        format: 'image',
+        statusCode: 500,
+        durationMs: Date.now() - startTime,
+        error: err.message,
+        clientIp,
+      });
+
       Logger.error(`Media download-file error: ${err.message}`);
       res.status(500).json({ error: 'Erro ao transferir arquivo de mídia.' });
     }
