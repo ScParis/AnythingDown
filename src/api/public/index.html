@@ -225,8 +225,22 @@
           </div>
         </div>
 
+        <!-- Photos Download Section (for Instagram carousels / image posts) -->
+        <div id="photosContainer" style="display: none; margin-top: 1.1rem; border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 0.88rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-images" style="color: #00f3ff;"></i> CARROSSEL DE FOTOS (<span id="photoCount">0</span>)
+            </span>
+            <span style="font-size: 0.72rem; opacity: 0.75; text-transform: uppercase;">CLIQUE NA FOTO PARA BAIXAR</span>
+          </div>
+          <div id="photoGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding: 6px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; margin-bottom: 12px;"></div>
+          <button id="btnDownloadAllPhotos" class="theme-btn" style="width: 100%; padding: 12px; text-align: center;">
+            <i class="fa-solid fa-cloud-arrow-down"></i> BAIXAR TODAS AS FOTOS DO ÁLBUM
+          </button>
+        </div>
+
         <!-- Download Buttons -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.1rem;">
+        <div id="videoAudioButtons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.1rem;">
           <button id="btnDownloadVideo" class="theme-btn" style="padding: 13px 14px; text-align: center;">
             <i class="fa-solid fa-film"></i> BAIXAR VÍDEO (MP4)
           </button>
@@ -328,11 +342,17 @@
     const mediaTitle = document.getElementById("mediaTitle");
     const mediaAuthor = document.getElementById("mediaAuthor");
     const mediaDuration = document.getElementById("mediaDuration");
+    const photosContainer = document.getElementById("photosContainer");
+    const photoGrid = document.getElementById("photoGrid");
+    const photoCount = document.getElementById("photoCount");
+    const btnDownloadAllPhotos = document.getElementById("btnDownloadAllPhotos");
+    const videoAudioButtons = document.getElementById("videoAudioButtons");
     const btnDownloadVideo = document.getElementById("btnDownloadVideo");
     const btnDownloadAudio = document.getElementById("btnDownloadAudio");
     const errorAlert = document.getElementById("errorAlert");
     const errorMsg = document.getElementById("errorMsg");
     let currentUrl = "";
+    let currentMediaItems = [];
 
     // Enter key handler
     urlInput.addEventListener('keydown', (e) => {
@@ -420,20 +440,46 @@
         logTerminal(`TITLE: ${info.title.slice(0, 50)}...`);
         sfx.playSuccess();
 
-        if (window.ActivityStage) {
-          window.ActivityStage.complete(() => {
-            mediaTitle.textContent = info.title;
-            mediaThumb.src = info.thumbnail || 'https://via.placeholder.com/150';
-            mediaAuthor.innerHTML = `<i class="fa-solid fa-user"></i> AUTOR: ${info.author?.name || 'DESCONHECIDO'}`;
-            mediaDuration.innerHTML = info.duration ? `<i class="fa-regular fa-clock"></i> DURAÇÃO: ${Math.floor(info.duration / 60)}m ${info.duration % 60}s` : '';
-            mediaCard.style.display = 'block';
-          });
-        } else {
+        function renderCardDetails() {
           mediaTitle.textContent = info.title;
           mediaThumb.src = info.thumbnail || 'https://via.placeholder.com/150';
           mediaAuthor.innerHTML = `<i class="fa-solid fa-user"></i> AUTOR: ${info.author?.name || 'DESCONHECIDO'}`;
           mediaDuration.innerHTML = info.duration ? `<i class="fa-regular fa-clock"></i> DURAÇÃO: ${Math.floor(info.duration / 60)}m ${info.duration % 60}s` : '';
+
+          const isPhotoPost = info.type === 'slideshow' || info.type === 'image' || (info.formats?.length === 0 && info.media?.length > 0);
+          currentMediaItems = info.media || [];
+
+          if (isPhotoPost && currentMediaItems.length > 0) {
+            photosContainer.style.display = 'block';
+            photoCount.textContent = currentMediaItems.length;
+            photoGrid.innerHTML = '';
+            currentMediaItems.forEach((item, index) => {
+              const itemDiv = document.createElement('div');
+              itemDiv.style.cssText = 'position: relative; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 243, 255, 0.3); aspect-ratio: 1; background: #000; cursor: pointer; transition: transform 0.2s, border-color 0.2s;';
+              itemDiv.innerHTML = `
+                <img src="${item.url}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.75); font-size: 0.68rem; padding: 2px 4px; text-align: center; color: #fff;">
+                  #${index + 1} <i class="fa-solid fa-download"></i>
+                </div>
+              `;
+              itemDiv.title = `Clique para baixar a Foto #${index + 1} em alta resolução`;
+              itemDiv.addEventListener('click', () => {
+                downloadSinglePhoto(item.url, `foto_${index + 1}.jpg`);
+              });
+              photoGrid.appendChild(itemDiv);
+            });
+            videoAudioButtons.style.display = 'none';
+          } else {
+            photosContainer.style.display = 'none';
+            videoAudioButtons.style.display = 'grid';
+          }
           mediaCard.style.display = 'block';
+        }
+
+        if (window.ActivityStage) {
+          window.ActivityStage.complete(renderCardDetails);
+        } else {
+          renderCardDetails();
         }
 
         btnAnalyze.innerHTML = originalBtnText;
@@ -509,6 +555,30 @@
           errorAlert.style.display = 'block';
           errorMsg.textContent = err.message;
         });
+    }
+
+    function downloadSinglePhoto(photoUrl, filename) {
+      sfx.playSuccess();
+      const proxyUrl = `/api/download-file?url=${encodeURIComponent(photoUrl)}&filename=${encodeURIComponent(filename)}`;
+      const a = document.createElement('a');
+      a.href = proxyUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 500);
+      logTerminal(`[DOWNLOAD] FOTO SALVA: ${filename}`);
+    }
+
+    if (btnDownloadAllPhotos) {
+      btnDownloadAllPhotos.addEventListener('click', async () => {
+        if (!currentMediaItems || currentMediaItems.length === 0) return;
+        sfx.playSuccess();
+        logTerminal(`[DOWNLOAD EM MASSA] INICIANDO DOWNLOAD DE ${currentMediaItems.length} FOTOS...`);
+        for (let i = 0; i < currentMediaItems.length; i++) {
+          downloadSinglePhoto(currentMediaItems[i].url, `foto_${i + 1}.jpg`);
+          await new Promise(r => setTimeout(r, 450));
+        }
+      });
     }
 
     btnDownloadVideo.addEventListener('click', () => {

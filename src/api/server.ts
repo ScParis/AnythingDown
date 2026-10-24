@@ -188,7 +188,11 @@ export function createServer() {
       });
 
       if (!result.success || !result.filePath || !fs.existsSync(result.filePath)) {
-        res.status(500).json({ error: result.error || 'Download failed on server' });
+        let errDesc = result.error || 'Falha ao processar download no servidor.';
+        if (errDesc.includes('No video formats found')) {
+          errDesc = 'Este post é composto exclusivamente por fotos/imagens e não possui fluxo de vídeo ou áudio para extração. Utilize a opção de baixar fotos.';
+        }
+        res.status(422).json({ error: errDesc });
         return;
       }
 
@@ -220,9 +224,51 @@ export function createServer() {
       res.on('close', () => {
         removeFileSafe(tempFile);
       });
-    } catch (err) {
+    } catch (err: any) {
       if (tempFile) removeFileSafe(tempFile);
-      next(err);
+      let errMsg = err.message || 'Erro interno no servidor de download.';
+      if (errMsg.includes('No video formats found')) {
+        errMsg = 'Este post é composto por fotos/imagens e não possui fluxo de vídeo ou áudio para download.';
+      }
+      res.status(422).json({ error: errMsg });
+    }
+  });
+
+  // Direct Media File Proxy / Download (Images, Carousel Photos, etc.)
+  app.get('/api/download-file', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const fileUrl = req.query.url as string;
+      const customName = (req.query.filename as string) || 'foto_instagram.jpg';
+
+      if (!fileUrl || !isValidUrl(fileUrl)) {
+        res.status(400).json({ error: 'URL do arquivo inválida.' });
+        return;
+      }
+
+      const response = await fetch(fileUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36',
+          'Referer': 'https://www.instagram.com/',
+        }
+      });
+
+      if (!response.ok) {
+        res.status(502).json({ error: 'Falha ao transferir mídia da CDN de origem.' });
+        return;
+      }
+
+      const contentType = response.headers.get('content-type') || 'image/jpeg';
+      res.setHeader('Content-Type', contentType);
+
+      const safeAscii = customName.replace(/[^\x20-\x7E]/g, '_');
+      const encodedName = encodeURIComponent(customName);
+      res.setHeader('Content-Disposition', `attachment; filename="${safeAscii}"; filename*=UTF-8''${encodedName}`);
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      res.send(buffer);
+    } catch (err: any) {
+      Logger.error(`Media download-file error: ${err.message}`);
+      res.status(500).json({ error: 'Erro ao transferir arquivo de mídia.' });
     }
   });
 
@@ -243,10 +289,6 @@ export function startApiServer(port = 3000, host = '0.0.0.0') {
   const server = app.listen(port, host, () => {
     Logger.info(`🚀 AnythingDown REST API running at http://${host}:${port}`);
     Logger.info(`📊 Health check: http://${host}:${port}/api/health`);
-
-    // Verify and update yt-dlp asynchronously on startup to keep YouTube extractors fresh
-    const downloader = new AnythingDown();
-    downloader['binaryManager'].updateYtDlp().catch(() => {});
   });
 
   server.on('error', (err: NodeJS.ErrnoException) => {

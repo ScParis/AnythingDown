@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { BaseExtractor } from './base.js';
-import { MediaInfo, MediaFormat, MediaType } from '../types/media.js';
+import { MediaInfo, MediaFormat, MediaType, MediaItem } from '../types/media.js';
 import { DownloadOptions, DownloadResult } from '../types/options.js';
 import { BinaryManager } from '../core/binary-manager.js';
 import { ProcessRunner } from '../core/process-runner.js';
@@ -68,9 +68,44 @@ export class YtDlpExtractor extends BaseExtractor {
       hasVideo: f.vcodec !== 'none' && !!f.vcodec,
     }));
 
+    const hasFormatsWithVideo = formats.some(f => f.hasVideo);
+    const hasFormatsWithAudio = formats.some(f => f.hasAudio);
+
     let mediaType: MediaType = 'video';
-    if (raw.vcodec === 'none' && raw.acodec !== 'none') {
+    if (!hasFormatsWithVideo && hasFormatsWithAudio) {
       mediaType = 'audio';
+    } else if (raw.vcodec === 'none' && raw.acodec !== 'none') {
+      mediaType = 'audio';
+    } else if (!hasFormatsWithVideo && !hasFormatsWithAudio) {
+      if ((raw.entries && raw.entries.length > 1) || raw._type === 'playlist') {
+        mediaType = 'slideshow';
+      } else {
+        mediaType = 'image';
+      }
+    }
+
+    const mediaItems: MediaItem[] = [];
+    if (raw.entries && Array.isArray(raw.entries)) {
+      for (const entry of raw.entries) {
+        const thumbs = entry.thumbnails || [];
+        const bestThumb = thumbs.slice().sort((a: any, b: any) => ((b.width || 0) * (b.height || 0)) - ((a.width || 0) * (a.height || 0)))[0];
+        const itemUrl = bestThumb?.url || entry.url;
+        if (itemUrl) {
+          mediaItems.push({
+            type: 'image',
+            url: itemUrl,
+            width: bestThumb?.width,
+            height: bestThumb?.height,
+          });
+        }
+      }
+    } else if (raw.url) {
+      mediaItems.push({ type: (mediaType === 'slideshow' ? 'image' : mediaType) as 'video' | 'image' | 'audio', url: raw.url });
+    } else if (raw.thumbnails && Array.isArray(raw.thumbnails) && raw.thumbnails.length > 0) {
+      const bestThumb = raw.thumbnails.slice().sort((a: any, b: any) => ((b.width || 0) * (b.height || 0)) - ((a.width || 0) * (a.height || 0)))[0];
+      if (bestThumb?.url) {
+        mediaItems.push({ type: 'image', url: bestThumb.url, width: bestThumb.width, height: bestThumb.height });
+      }
     }
 
     return {
@@ -89,7 +124,7 @@ export class YtDlpExtractor extends BaseExtractor {
       originalUrl: url,
       type: mediaType,
       formats,
-      media: raw.url ? [{ type: mediaType, url: raw.url }] : [],
+      media: mediaItems,
       raw,
     };
   }
@@ -156,9 +191,19 @@ export class YtDlpExtractor extends BaseExtractor {
     });
 
     if (exitCode !== 0) {
+      let friendlyError = stderr || 'yt-dlp download failed';
+      if (friendlyError.includes('No video formats found')) {
+        friendlyError = 'Este post é composto por fotos/imagens e não contém faixas de vídeo ou áudio para download.';
+      } else if (friendlyError.includes('Requested format is not available')) {
+        friendlyError = 'O formato solicitado não está disponível para esta mídia.';
+      } else if (friendlyError.includes('This video is unavailable') || friendlyError.includes('Video unavailable')) {
+        friendlyError = 'Esta mídia não está mais disponível ou foi removida da plataforma.';
+      } else if (friendlyError.includes("This content isn't available to everyone") || friendlyError.includes("can't be seen by certain audiences")) {
+        friendlyError = 'Este post possui restrição de audiência (idade, região ou conteúdo sensível) definida pelo autor da postagem.';
+      }
       return {
         success: false,
-        error: stderr || 'yt-dlp download failed',
+        error: friendlyError,
       };
     }
 

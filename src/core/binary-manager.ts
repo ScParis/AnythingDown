@@ -15,6 +15,8 @@ export class BinaryManager {
   private customBinDir?: string;
   private customYtdlpPath?: string;
   private customFfmpegPath?: string;
+  private cachedYtdlpPath?: string;
+  private cachedFfmpegPath?: string;
   private autoDownload: boolean;
 
   constructor(options: {
@@ -43,7 +45,7 @@ export class BinaryManager {
     try {
       const result = spawnSync(cmdPath, ['--version'], {
         encoding: 'utf-8',
-        timeout: 5000,
+        timeout: 15000,
         stdio: ['ignore', 'pipe', 'pipe']
       });
       if (result.status !== 0) {
@@ -57,7 +59,12 @@ export class BinaryManager {
   }
 
   public async getYtDlpPath(): Promise<string> {
+    if (this.cachedYtdlpPath && fs.existsSync(this.cachedYtdlpPath)) {
+      return this.cachedYtdlpPath;
+    }
+
     if (this.customYtdlpPath && this.isBinaryWorking(this.customYtdlpPath)) {
+      this.cachedYtdlpPath = this.customYtdlpPath;
       return this.customYtdlpPath;
     }
 
@@ -65,6 +72,7 @@ export class BinaryManager {
     const commonPaths = ['/usr/local/bin/yt-dlp', '/usr/bin/yt-dlp'];
     for (const p of commonPaths) {
       if (fs.existsSync(p) && this.isBinaryWorking(p)) {
+        this.cachedYtdlpPath = p;
         return p;
       }
     }
@@ -75,6 +83,7 @@ export class BinaryManager {
       const whichCmd = isWin ? 'where yt-dlp' : 'which yt-dlp';
       const resolved = execSync(whichCmd, { encoding: 'utf-8', timeout: 3000 }).trim().split('\n')[0];
       if (resolved && fs.existsSync(resolved) && this.isBinaryWorking(resolved)) {
+        this.cachedYtdlpPath = resolved;
         return resolved;
       }
     } catch {
@@ -85,6 +94,7 @@ export class BinaryManager {
     const binDir = this.getBinDir();
     const localBinPath = path.join(binDir, isWin ? 'yt-dlp.exe' : 'yt-dlp');
     if (fs.existsSync(localBinPath) && this.isBinaryWorking(localBinPath)) {
+      this.cachedYtdlpPath = localBinPath;
       return localBinPath;
     }
 
@@ -94,6 +104,7 @@ export class BinaryManager {
       await this.downloadYtDlp(localBinPath);
       if (this.isBinaryWorking(localBinPath)) {
         Logger.info(`yt-dlp installed successfully at ${localBinPath}`);
+        this.cachedYtdlpPath = localBinPath;
         return localBinPath;
       }
     }
@@ -102,7 +113,12 @@ export class BinaryManager {
   }
 
   public getFfmpegPath(): string | undefined {
+    if (this.cachedFfmpegPath && fs.existsSync(this.cachedFfmpegPath)) {
+      return this.cachedFfmpegPath;
+    }
+
     if (this.customFfmpegPath && this.isBinaryWorking(this.customFfmpegPath)) {
+      this.cachedFfmpegPath = this.customFfmpegPath;
       return this.customFfmpegPath;
     }
 
@@ -113,6 +129,7 @@ export class BinaryManager {
       const whichCmd = isWin ? 'where ffmpeg' : 'which ffmpeg';
       const resolved = execSync(whichCmd, { encoding: 'utf-8', timeout: 3000 }).trim().split('\n')[0];
       if (resolved && fs.existsSync(resolved)) {
+        this.cachedFfmpegPath = resolved;
         return resolved;
       }
     } catch {
@@ -122,6 +139,7 @@ export class BinaryManager {
     const binDir = this.getBinDir();
     const localFfmpeg = path.join(binDir, isWin ? 'ffmpeg.exe' : 'ffmpeg');
     if (fs.existsSync(localFfmpeg) && this.isBinaryWorking(localFfmpeg)) {
+      this.cachedFfmpegPath = localFfmpeg;
       return localFfmpeg;
     }
 
