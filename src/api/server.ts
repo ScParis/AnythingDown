@@ -39,12 +39,19 @@ export function createServer() {
     try {
       const ytdlp = await downloader['binaryManager'].getYtDlpPath();
       const ffmpeg = downloader['binaryManager'].getFfmpegPath();
+      let ytdlpVersion = 'unknown';
+      try {
+        const { spawnSync } = await import('node:child_process');
+        const v = spawnSync(ytdlp, ['--version'], { encoding: 'utf-8', timeout: 3000 });
+        if (v.status === 0) ytdlpVersion = v.stdout.trim();
+      } catch {}
+
       res.json({
         status: 'ok',
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
         binaries: {
-          ytdlp: { path: ytdlp, ready: true },
+          ytdlp: { path: ytdlp, version: ytdlpVersion, ready: true },
           ffmpeg: { path: ffmpeg || null, ready: !!ffmpeg },
         },
       });
