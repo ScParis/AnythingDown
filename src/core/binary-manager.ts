@@ -46,8 +46,12 @@ export class BinaryManager {
         timeout: 5000,
         stdio: ['ignore', 'pipe', 'pipe']
       });
+      if (result.status !== 0) {
+        Logger.warn(`isBinaryWorking failed for ${cmdPath}: status=${result.status}, error=${result.error?.message}, stderr=${result.stderr}`);
+      }
       return result.status === 0;
-    } catch {
+    } catch (e: any) {
+      Logger.warn(`isBinaryWorking exception for ${cmdPath}: ${e.message}`);
       return false;
     }
   }
@@ -57,16 +61,16 @@ export class BinaryManager {
       return this.customYtdlpPath;
     }
 
-    const binDir = this.getBinDir();
-    const isWin = os.platform() === 'win32';
-    const localBinPath = path.join(binDir, isWin ? 'yt-dlp.exe' : 'yt-dlp');
-
-    // 1. Check local binary cache in ~/.anythingdown/bin
-    if (fs.existsSync(localBinPath) && this.isBinaryWorking(localBinPath)) {
-      return localBinPath;
+    // 1. Check common system paths explicitly (/usr/local/bin/yt-dlp, /usr/bin/yt-dlp)
+    const commonPaths = ['/usr/local/bin/yt-dlp', '/usr/bin/yt-dlp'];
+    for (const p of commonPaths) {
+      if (fs.existsSync(p) && this.isBinaryWorking(p)) {
+        return p;
+      }
     }
 
     // 2. Check system PATH with which
+    const isWin = os.platform() === 'win32';
     try {
       const whichCmd = isWin ? 'where yt-dlp' : 'which yt-dlp';
       const resolved = execSync(whichCmd, { encoding: 'utf-8', timeout: 3000 }).trim().split('\n')[0];
@@ -74,10 +78,17 @@ export class BinaryManager {
         return resolved;
       }
     } catch {
-      // Continue to download
+      // Continue to local binary check
     }
 
-    // 3. Download official standalone binary if enabled
+    // 3. Check local binary cache in ~/.anythingdown/bin
+    const binDir = this.getBinDir();
+    const localBinPath = path.join(binDir, isWin ? 'yt-dlp.exe' : 'yt-dlp');
+    if (fs.existsSync(localBinPath) && this.isBinaryWorking(localBinPath)) {
+      return localBinPath;
+    }
+
+    // 4. Download official standalone binary if enabled
     if (this.autoDownload) {
       Logger.info('yt-dlp not found or broken. Downloading latest standalone binary...');
       await this.downloadYtDlp(localBinPath);

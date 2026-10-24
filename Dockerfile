@@ -24,18 +24,20 @@ FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Install system dependencies: python3 (required for yt-dlp), ffmpeg, curl, git, ca-certificates
+# Install system dependencies: python3, python3-pip, ffmpeg, curl, git, ca-certificates
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
+    python3-pip \
     ffmpeg \
     curl \
     git \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install latest official yt-dlp standalone binary (yt-dlp_linux bundle includes complete dependencies)
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp
+# Install latest official yt-dlp binary
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp \
+    && /usr/local/bin/yt-dlp --version
 
 # Environment variables
 ENV NODE_ENV=production
