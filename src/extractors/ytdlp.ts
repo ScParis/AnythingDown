@@ -31,11 +31,13 @@ export class YtDlpExtractor extends BaseExtractor {
       '--js-runtimes', 'node',
     ];
 
-    if (options.cookies) {
-      args.push('--cookies', options.cookies);
+    const cookiesArg = options.cookies || process.env.COOKIES_FILE || process.env.YTDLP_COOKIES;
+    if (cookiesArg) {
+      args.push('--cookies', cookiesArg);
     }
-    if (options.proxy) {
-      args.push('--proxy', options.proxy);
+    const proxyArg = options.proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.ALL_PROXY || process.env.PROXY;
+    if (proxyArg) {
+      args.push('--proxy', proxyArg);
     }
     if (options.additionalArgs) {
       args.push(...options.additionalArgs);
@@ -132,11 +134,13 @@ export class YtDlpExtractor extends BaseExtractor {
       }
     }
 
-    if (options.cookies) {
-      args.push('--cookies', options.cookies);
+    const cookiesArg = options.cookies || process.env.COOKIES_FILE || process.env.YTDLP_COOKIES;
+    if (cookiesArg) {
+      args.push('--cookies', cookiesArg);
     }
-    if (options.proxy) {
-      args.push('--proxy', options.proxy);
+    const proxyArg = options.proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.ALL_PROXY || process.env.PROXY;
+    if (proxyArg) {
+      args.push('--proxy', proxyArg);
     }
     if (options.additionalArgs) {
       args.push(...options.additionalArgs);

@@ -17,6 +17,18 @@ export function createServer() {
   const app = express();
   const downloader = new AnythingDown();
 
+  // Automatically extract raw cookies from env var if provided (Render Secret / Env Var)
+  if (process.env.YTDLP_COOKIES_TEXT && !process.env.COOKIES_FILE) {
+    try {
+      const cookieFilePath = path.join(os.tmpdir(), 'ytdlp_env_cookies.txt');
+      fs.writeFileSync(cookieFilePath, process.env.YTDLP_COOKIES_TEXT, { encoding: 'utf-8', mode: 0o600 });
+      process.env.COOKIES_FILE = cookieFilePath;
+      Logger.info(`Configured cookies from YTDLP_COOKIES_TEXT at ${cookieFilePath}`);
+    } catch (e: any) {
+      Logger.warn(`Failed to write YTDLP_COOKIES_TEXT to file: ${e.message}`);
+    }
+  }
+
   app.use(cors());
   app.use(express.json());
 
