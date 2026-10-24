@@ -23,10 +23,10 @@
   <div class="app-container">
 
     <!-- Top Navigation / Status / Switcher -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 10px;">
+    <div class="top-nav-bar">
       
       <!-- Back Home Button -->
-      <a href="/" class="theme-btn btn-back-home" style="padding: 6px 14px; font-size: 0.68rem;" title="Retornar à tela inicial">
+      <a href="/" class="theme-btn btn-back-home" title="Retornar à tela inicial">
         <i class="fa-solid fa-arrow-left"></i> INÍCIO
       </a>
 
@@ -122,24 +122,24 @@
       </div>
 
       <!-- Controls -->
-      <div style="display: flex; gap: 8px;">
-        <button id="btnSpawnEntity" class="theme-btn" style="padding: 6px 12px; font-size: 0.68rem;" title="Ação do Tema">
+      <div class="top-controls">
+        <button id="btnSpawnEntity" class="theme-btn" title="Ação do Tema">
           <i id="spawnIcon" class="fa-solid fa-motorcycle"></i> <span id="spawnText">+MOTO</span>
         </button>
-        <button id="btnAudioToggle" class="theme-btn" style="padding: 6px 12px; font-size: 0.68rem;">
+        <button id="btnAudioToggle" class="theme-btn">
           <i class="fa-solid fa-volume-high"></i> SFX
         </button>
-        <button id="btnThemeToggle" class="theme-btn theme-btn-accent" style="padding: 6px 14px; font-size: 0.68rem;">
+        <button id="btnThemeToggle" class="theme-btn theme-btn-accent">
           <i class="fa-solid fa-shuffle"></i> TEMA: <span id="themeName">TRON '82</span>
         </button>
       </div>
     </div>
 
     <!-- Main Themed Card -->
-    <div class="main-card legal-card" style="position: relative;">
+    <div class="main-card legal-card">
       
       <!-- Cyberpunk Hazard Bar -->
-      <div id="hazardLine" class="hazard-bar" style="display: none; margin-bottom: 1.25rem;"></div>
+      <div id="hazardLine" class="hazard-bar" style="display: none;"></div>
 
       <!-- Top Gear Checkered / Red Strip -->
       <div id="topgearStrip" class="topgear-header-strip" style="display: none;"></div>

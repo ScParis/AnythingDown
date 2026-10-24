@@ -25,8 +25,8 @@
   <div class="app-container">
 
     <!-- Top Navigation / Status / Switcher -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-      <div id="topStatus" style="font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+    <div class="top-nav-bar">
+      <div id="topStatus" style="font-size: 0.85rem;">
         
         <!-- TRON IDENTIFIER -->
         <div class="identity-disc" id="identityDiscIcon"></div>
@@ -90,8 +90,6 @@
           </div>
         </div>
 
-      </div>
-
         <!-- SPIDER-MAN NOIR IDENTIFIER -->
         <div id="noirBadge" style="display: none;">
           <div style="font-weight: 900; color: #ffffff; font-size: 0.84rem; letter-spacing: 2px;">
@@ -118,25 +116,26 @@
             <span style="color: #39ff14;"><i class="fa-solid fa-bolt"></i> CORE: 98% OK</span>
           </div>
         </div>
+      </div>
       <!-- Controls -->
-      <div style="display: flex; gap: 8px;">
-        <button id="btnSpawnEntity" class="theme-btn" style="padding: 6px 12px; font-size: 0.68rem;" title="Ação do Tema">
+      <div class="top-controls">
+        <button id="btnSpawnEntity" class="theme-btn" title="Ação do Tema">
           <i id="spawnIcon" class="fa-solid fa-motorcycle"></i> <span id="spawnText">+MOTO</span>
         </button>
-        <button id="btnAudioToggle" class="theme-btn" style="padding: 6px 12px; font-size: 0.68rem;">
+        <button id="btnAudioToggle" class="theme-btn">
           <i class="fa-solid fa-volume-high"></i> SFX
         </button>
-        <button id="btnThemeToggle" class="theme-btn theme-btn-accent" style="padding: 6px 14px; font-size: 0.68rem;">
+        <button id="btnThemeToggle" class="theme-btn theme-btn-accent">
           <i class="fa-solid fa-shuffle"></i> TEMA: <span id="themeName">TRON '82</span>
         </button>
       </div>
     </div>
 
     <!-- Main Card -->
-    <div class="main-card" style="padding: 1.75rem; position: relative;">
+    <div class="main-card">
       
       <!-- Cyberpunk Hazard Bar -->
-      <div id="hazardLine" class="hazard-bar" style="display: none; margin-bottom: 1.25rem;"></div>
+      <div id="hazardLine" class="hazard-bar" style="display: none;"></div>
 
       <!-- Top Gear Checkered / Red Strip -->
       <div id="topgearStrip" class="topgear-header-strip" style="display: none;"></div>
@@ -154,18 +153,17 @@
       <div id="simpsonsStrip" class="simpsons-header-strip" style="display: none;"></div>
 
       <!-- Header Title -->
-      <div style="text-align: center; margin-bottom: 1.5rem;">
-        <h1 class="title-glow glitch-hover" style="margin-bottom: 0.4rem;">ANYTHING // DOWN</h1>
-        <p id="subTitle" style="font-size: 0.88rem; opacity: 0.85; letter-spacing: 1.5px;">
+      <div style="text-align: center;">
+        <h1 class="title-glow glitch-hover">ANYTHING // DOWN</h1>
+        <p id="subTitle">
           THE GRID &bull; ENCOM MAINFRAME RECOGNIZER &bull; MEDIA EXTRACTION UNIT
         </p>
       </div>
 
       <!-- Input Bar -->
       <div style="position: relative; margin-bottom: 1rem;">
-        <input id="urlInput" type="url" class="input-box" placeholder="Cole o link aqui (Instagram Reels, TikTok, YouTube, Facebook)..." 
-               style="width: 100%; padding: 13px 120px 13px 14px;">
-        <button id="btnAnalyze" class="theme-btn" style="position: absolute; right: 6px; top: 6px; bottom: 6px; padding: 0 18px;">
+        <input id="urlInput" type="url" class="input-box" placeholder="Cole o link aqui (Instagram Reels, TikTok, YouTube, Facebook)...">
+        <button id="btnAnalyze" class="theme-btn">
           <i class="fa-solid fa-bolt"></i> EXTRAIR
         </button>
       </div>
@@ -219,7 +217,7 @@
     </div>
 
     <!-- Bots & Cloud Status Notification Card -->
-    <div id="botsInfoCard" class="main-card" style="margin-top: 1.1rem; padding: 1.1rem 1.4rem; position: relative;">
+    <div id="botsInfoCard" class="main-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 8px;">
         <span style="font-weight: 800; letter-spacing: 1.2px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem;">
           <i class="fa-solid fa-robot" style="color: #00f3ff;"></i> ROBÔS & INTEGRAÇÕES MULTI-PLATAFORMA
