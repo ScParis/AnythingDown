@@ -3163,9 +3163,507 @@ const FaviconEngine = (() => {
   return { setTheme };
 })();
 
+// =========================================================================
+// ACTIVITY STAGE ANIMATION CONTROLLER (ANALYZE & DOWNLOAD MODES)
+// =========================================================================
+const ActivityStage = (() => {
+  let animId = null;
+  let mode = null; // 'analyze' | 'download'
+  let progress = 0; // 0 to 100
+  let targetProgress = 0;
+  let frame = 0;
+
+  function getElements() {
+    return {
+      stage: document.getElementById('activityStage'),
+      title: document.getElementById('activityTitle'),
+      percent: document.getElementById('activityPercent'),
+      canvas: document.getElementById('activityCanvas'),
+      bar: document.getElementById('activityProgressBar'),
+      status: document.getElementById('activityStatus')
+    };
+  }
+
+  function start(activityMode) {
+    mode = activityMode;
+    progress = 0;
+    targetProgress = mode === 'analyze' ? 95 : 99;
+    frame = 0;
+
+    const els = getElements();
+    if (!els.stage || !els.canvas) return;
+
+    els.stage.style.display = 'block';
+    updateThemeLabels();
+
+    if (animId) cancelAnimationFrame(animId);
+    loop();
+  }
+
+  function updateThemeLabels() {
+    const els = getElements();
+    if (!els.title || !els.status) return;
+
+    if (mode === 'analyze') {
+      switch (currentTheme) {
+        case 'pacman':
+          els.title.textContent = '👾 PAC-RADAR // RASTREANDO STREAM';
+          els.status.textContent = 'DEVORANDO PONTOS & DESVENDANDO LABIRINTO...';
+          break;
+        case 'simpsons':
+          els.title.textContent = '🍩 SETOR 7G // PROCESSANDO LINK';
+          els.status.textContent = 'HOMER TESTANDO TEMPERATURA DO REATOR NUCLEAR...';
+          break;
+        case 'cs':
+          els.title.textContent = '💣 C4 TACTICAL SCAN // RECONHECIMENTO';
+          els.status.textContent = 'VARRENDO BOMBSITE & DECRIPTANDO PAYLOAD...';
+          break;
+        case 'gta':
+          els.title.textContent = '🌴 LEONIDA POLICE SCANNER // INTERCEPT';
+          els.status.textContent = 'RASTREANDO FREQUÊNCIA DA MÍDIA EM VICE CITY...';
+          break;
+        case 'topgear':
+          els.title.textContent = '🏎️ TELEMETRIA PIT-STOP // LEITURA ECU';
+          els.status.textContent = 'AQUECENDO PNEUS & ANALISANDO DADOS DA PISTA...';
+          break;
+        case 'noir':
+          els.title.textContent = '🕷️ INVESTIGAÇÃO NOIR // ARQUIVO CONFIDENCIAL';
+          els.status.textContent = 'SEGUINDO RASTRO NA NOITE CHUVOSA DE NY...';
+          break;
+        case 'cyber':
+          els.title.textContent = '⚡ BREACH PROTOCOL // ARASAKA ICE-BREAKER';
+          els.status.textContent = 'INJETANDO QUICKHACK DE DECRIPTAÇÃO NO SUBNET...';
+          break;
+        case 'retro':
+        default:
+          els.title.textContent = '🌐 RECOGNIZER SCAN // ENCOM MAINFRAME';
+          els.status.textContent = 'DIGITALIZANDO SINAL DO I/O TOWER VIA TRON GRID...';
+          break;
+      }
+    } else { // download
+      switch (currentTheme) {
+        case 'pacman':
+          els.title.textContent = '🍒 BONUS FRUIT EXTRACTION // HIGH SCORE';
+          els.status.textContent = 'ENGOLINDO DADOS // FANTASMAS AZUIS DERROTADOS!';
+          break;
+        case 'simpsons':
+          els.title.textContent = '⚡ FLUXO NUCLEAR CONCLUÍDO // D\'OH SALVO!';
+          els.status.textContent = 'ENCHENDO OS TANQUES DE ENERGIA... WOO-HOO!';
+          break;
+        case 'cs':
+          els.title.textContent = '🛡️ BOMB DEFUSED // MISSION ACCOMPLISHED';
+          els.status.textContent = 'EXTRAINDO ARQUIVO FINAL... COUNTER-TERRORISTS WIN!';
+          break;
+        case 'gta':
+          els.title.textContent = '⭐ 5 ESTRELAS // MISSION PASSED: RESPECT +';
+          els.status.textContent = 'DISPARANDO CONTEÚDO VIA RÁDIO FLASH FM...';
+          break;
+        case 'topgear':
+          els.title.textContent = '🏁 BANDEIRA QUADRICULADA // POLE POSITION!';
+          els.status.textContent = 'CRUZANDO A LINHA DE CHEGADA A 300 KM/H...';
+          break;
+        case 'noir':
+          els.title.textContent = '📸 CASO ARQUIVADO // EVIDÊNCIA COLETADA';
+          els.status.textContent = 'REVELANDO NEGATIVOS NO QUARTO ESCURO...';
+          break;
+        case 'cyber':
+          els.title.textContent = '💾 CYBERDECK BUFFER SYNC // RAM 100%';
+          els.status.textContent = 'PAYLOAD BAIXADO PARA MEMÓRIA NEURAL... CHUMBA!';
+          break;
+        case 'retro':
+        default:
+          els.title.textContent = '💿 DISC COMPLETED // FLYNN LIVES';
+          els.status.textContent = 'TRANSFERINDO BITS DE VÍDEO PELOS CIRCUITOS MCP...';
+          break;
+      }
+    }
+  }
+
+  function setProgress(val) {
+    targetProgress = Math.min(100, Math.max(0, val));
+  }
+
+  function complete(callback) {
+    targetProgress = 100;
+    progress = 100;
+    const els = getElements();
+    if (els.bar) els.bar.style.width = '100%';
+    if (els.percent) els.percent.textContent = '100%';
+    setTimeout(() => {
+      stop();
+      if (callback) callback();
+    }, 600);
+  }
+
+  function stop() {
+    if (animId) cancelAnimationFrame(animId);
+    animId = null;
+    mode = null;
+    const els = getElements();
+    if (els.stage) els.stage.style.display = 'none';
+  }
+
+  function renderCanvas(ctx, width, height) {
+    ctx.clearRect(0, 0, width, height);
+    frame++;
+
+    const pRatio = progress / 100;
+    const activePos = 30 + pRatio * (width - 60);
+
+    switch (currentTheme) {
+      case 'pacman': {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.strokeStyle = '#2121de';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(10, 15); ctx.lineTo(width - 10, 15);
+        ctx.moveTo(10, height - 15); ctx.lineTo(width - 10, height - 15);
+        ctx.stroke();
+
+        const cy = height / 2;
+
+        if (mode === 'analyze') {
+          for (let x = 30; x < width - 20; x += 24) {
+            if (x > activePos + 8) {
+              ctx.fillStyle = '#FFB897';
+              ctx.beginPath();
+              ctx.arc(x, cy, 3, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          const chomp = 0.25 * Math.abs(Math.sin(frame * 0.3));
+          ctx.fillStyle = '#FFE600';
+          ctx.beginPath();
+          ctx.arc(activePos, cy, 14, chomp * Math.PI, (2 - chomp) * Math.PI);
+          ctx.lineTo(activePos, cy);
+          ctx.fill();
+
+          const ghostX = Math.max(20, activePos - 45);
+          drawGhost(ctx, ghostX, cy - 10, '#ff0000');
+        } else {
+          const ghostX = Math.min(width - 25, activePos + 35);
+          const isFlashing = Math.floor(frame / 6) % 2 === 0;
+          drawGhost(ctx, ghostX, cy - 10, isFlashing ? '#0000ff' : '#ffffff');
+
+          const chomp = 0.3 * Math.abs(Math.sin(frame * 0.35));
+          ctx.fillStyle = '#FFE600';
+          ctx.beginPath();
+          ctx.arc(activePos, cy, 14, chomp * Math.PI, (2 - chomp) * Math.PI);
+          ctx.lineTo(activePos, cy);
+          ctx.fill();
+        }
+        break;
+      }
+
+      case 'simpsons': {
+        ctx.fillStyle = '#001a33';
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        ctx.strokeStyle = '#334d66';
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.moveTo(15, cy); ctx.lineTo(width - 15, cy);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#39FF14';
+        ctx.lineWidth = 8;
+        ctx.shadowColor = '#39FF14';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(15, cy); ctx.lineTo(activePos, cy);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ctx.save();
+        ctx.translate(activePos, cy);
+        ctx.rotate(frame * 0.1);
+        ctx.fillStyle = '#DE9B52';
+        ctx.beginPath();
+        ctx.arc(0, 0, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FF599C';
+        ctx.beginPath();
+        ctx.arc(0, 0, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#001a33';
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        break;
+      }
+
+      case 'cs': {
+        ctx.fillStyle = '#0a0f08';
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        const radarX = 45;
+        ctx.strokeStyle = '#2d5a27';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(radarX, cy, 22, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(radarX, cy, 11, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const sweepAngle = frame * 0.08;
+        ctx.strokeStyle = '#5bf336';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(radarX, cy);
+        ctx.lineTo(radarX + Math.cos(sweepAngle) * 22, cy + Math.sin(sweepAngle) * 22);
+        ctx.stroke();
+
+        const barX = 85;
+        const barW = width - 100;
+        ctx.fillStyle = '#1c2618';
+        ctx.fillRect(barX, cy - 8, barW, 16);
+        ctx.strokeStyle = '#5bf336';
+        ctx.strokeRect(barX, cy - 8, barW, 16);
+
+        ctx.fillStyle = '#5bf336';
+        ctx.fillRect(barX + 2, cy - 6, (barW - 4) * pRatio, 12);
+
+        const isBlink = Math.floor(frame / 5) % 2 === 0;
+        ctx.fillStyle = isBlink ? '#ff2222' : '#550000';
+        ctx.shadowColor = isBlink ? '#ff0000' : 'transparent';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(barX + (barW - 4) * pRatio, cy, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        break;
+      }
+
+      case 'gta': {
+        const grad = ctx.createLinearGradient(0, 0, width, 0);
+        grad.addColorStop(0, '#190a2c');
+        grad.addColorStop(0.5, '#7b1161');
+        grad.addColorStop(1, '#ff6a00');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        ctx.strokeStyle = '#00F5D4';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#00F5D4';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(10, cy + 12); ctx.lineTo(width - 10, cy + 12);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        const carX = activePos;
+        ctx.fillStyle = '#FF1493';
+        ctx.shadowColor = '#FF1493';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(carX - 20, cy + 10);
+        ctx.lineTo(carX + 15, cy + 10);
+        ctx.lineTo(carX + 8, cy + 2);
+        ctx.lineTo(carX - 8, cy + 2);
+        ctx.lineTo(carX - 16, cy + 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = 'rgba(255, 255, 200, 0.3)';
+        ctx.beginPath();
+        ctx.moveTo(carX + 15, cy + 7);
+        ctx.lineTo(carX + 50, cy + 3);
+        ctx.lineTo(carX + 50, cy + 11);
+        ctx.closePath();
+        ctx.fill();
+        break;
+      }
+
+      case 'topgear': {
+        ctx.fillStyle = '#080808';
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        ctx.fillStyle = '#1c1c1c';
+        ctx.fillRect(10, cy - 14, width - 20, 28);
+
+        const finX = width - 25;
+        for (let i = 0; i < 4; i++) {
+          ctx.fillStyle = (i % 2 === 0) ? '#ffffff' : '#000000';
+          ctx.fillRect(finX, cy - 14 + i * 7, 10, 7);
+        }
+
+        const carX = activePos;
+        ctx.fillStyle = '#e60000';
+        ctx.fillRect(carX - 18, cy - 7, 24, 14);
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(carX - 2, cy - 5, 8, 10);
+
+        const flameLength = 12 + Math.random() * 10;
+        ctx.fillStyle = '#00e5ff';
+        ctx.beginPath();
+        ctx.moveTo(carX - 18, cy - 4);
+        ctx.lineTo(carX - 18 - flameLength, cy);
+        ctx.lineTo(carX - 18, cy + 4);
+        ctx.closePath();
+        ctx.fill();
+        break;
+      }
+
+      case 'noir': {
+        ctx.fillStyle = '#050505';
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(10, cy - 18, width - 20, 36);
+
+        for (let x = 16; x < width - 15; x += 16) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(x, cy - 16, 6, 4);
+          ctx.fillRect(x, cy + 12, 6, 4);
+        }
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(activePos, cy, 14, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px monospace';
+        ctx.fillText('NOIR', activePos - 12, cy + 3);
+        break;
+      }
+
+      case 'cyber': {
+        ctx.fillStyle = '#050608';
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        ctx.fillStyle = 'rgba(252, 238, 9, 0.25)';
+        ctx.font = '9px monospace';
+        for (let x = 15; x < width - 20; x += 35) {
+          const char = String.fromCharCode(48 + ((frame + x) % 10));
+          ctx.fillText(`0x${char}A`, x, cy - 8);
+          ctx.fillText(`F${char}`, x, cy + 16);
+        }
+
+        ctx.strokeStyle = '#FCEE09';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#FCEE09';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(10, cy); ctx.lineTo(activePos, cy);
+        ctx.stroke();
+
+        ctx.fillStyle = '#00F0FF';
+        ctx.shadowColor = '#00F0FF';
+        ctx.fillRect(activePos - 4, cy - 10, 8, 20);
+        ctx.shadowBlur = 0;
+        break;
+      }
+
+      case 'retro':
+      default: {
+        ctx.fillStyle = '#010612';
+        ctx.fillRect(0, 0, width, height);
+
+        const cy = height / 2;
+
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(10, cy - 15); ctx.lineTo(width - 10, cy - 15);
+        ctx.moveTo(10, cy + 15); ctx.lineTo(width - 10, cy + 15);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#00f3ff';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(10, cy); ctx.lineTo(activePos, cy);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 8;
+        ctx.fillRect(activePos - 12, cy - 6, 16, 12);
+        ctx.shadowBlur = 0;
+        break;
+      }
+    }
+  }
+
+  function drawGhost(ctx, x, y, color) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x + 10, y + 10, 10, Math.PI, 0, false);
+    ctx.lineTo(x + 20, y + 20);
+    ctx.lineTo(x + 15, y + 16);
+    ctx.lineTo(x + 10, y + 20);
+    ctx.lineTo(x + 5, y + 16);
+    ctx.lineTo(x, y + 20);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(x + 7, y + 8, 3, 0, Math.PI * 2);
+    ctx.arc(x + 13, y + 8, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0000ff';
+    ctx.beginPath();
+    ctx.arc(x + 8, y + 8, 1.5, 0, Math.PI * 2);
+    ctx.arc(x + 14, y + 8, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function loop() {
+    if (!mode) return;
+
+    if (progress < targetProgress) {
+      progress += (targetProgress - progress) * 0.08 + 0.15;
+      if (progress > targetProgress) progress = targetProgress;
+    }
+
+    const els = getElements();
+    if (els.bar) els.bar.style.width = `${Math.floor(progress)}%`;
+    if (els.percent) els.percent.textContent = `${Math.floor(progress)}%`;
+
+    if (els.canvas) {
+      const ctx = els.canvas.getContext('2d');
+      renderCanvas(ctx, els.canvas.width, els.canvas.height);
+    }
+
+    animId = requestAnimationFrame(loop);
+  }
+
+  return {
+    start,
+    setProgress,
+    complete,
+    stop,
+    updateThemeLabels
+  };
+})();
+
 // Global exposure
 window.applyTheme = applyTheme;
 window.FaviconEngine = FaviconEngine;
+window.ActivityStage = ActivityStage;
 window.sfx = sfx;
 
 // Event Listeners for Theme Switching and Controls
@@ -3283,6 +3781,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (sfx.enabled) sfx.playTone(880);
     });
   }
+
+  // Update ActivityStage on theme switch
+  if (window.ActivityStage) window.ActivityStage.updateThemeLabels();
 
   // Initial theme application
   applyTheme(currentTheme);

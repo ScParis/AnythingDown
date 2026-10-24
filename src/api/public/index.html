@@ -185,6 +185,23 @@
         </button>
       </div>
 
+      <!-- Activity Stage Animation Box (Analyze & Download) -->
+      <div id="activityStage" style="display: none; margin-bottom: 1.25rem;">
+        <div id="activityBox" class="activity-stage-box">
+          <div class="activity-header">
+            <span id="activityTitle" class="activity-title">ANALISANDO MÍDIA</span>
+            <span id="activityPercent" class="activity-percent">0%</span>
+          </div>
+          <div class="activity-canvas-wrap">
+            <canvas id="activityCanvas" width="460" height="70"></canvas>
+          </div>
+          <div class="activity-progress-track">
+            <div id="activityProgressBar" class="activity-progress-fill"></div>
+          </div>
+          <div id="activityStatus" class="activity-status-text">INTERCEPTANDO STREAM...</div>
+        </div>
+      </div>
+
       <!-- Detected Platform Tag -->
       <div id="platformRow" style="display: none; align-items: center; gap: 10px; margin-bottom: 1rem; font-size: 0.85rem;">
         <span>SINAL DE REDE IDENTIFICADO:</span>
@@ -366,6 +383,8 @@
       btnAnalyze.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> EXTRAINDO...';
       btnAnalyze.disabled = true;
 
+      if (window.ActivityStage) window.ActivityStage.start('analyze');
+
       let scanMsg = 'ANALISANDO PAYLOAD DE MÍDIA...';
       if (currentTheme === 'retro') scanMsg = 'SCANNING STREAM VIA HYBRID RECOGNIZER...';
       else if (currentTheme === 'cyber') scanMsg = 'UPLOADING QUICKHACK TO TARGET SUBNET...';
@@ -374,6 +393,7 @@
       else if (currentTheme === 'gta') scanMsg = 'INTERCEPTING LEONIDA SURVEILLANCE FEED...';
       else if (currentTheme === 'noir') scanMsg = 'INVESTIGATING PRIVATE EYE EVIDENCE... THE WIND WHISPERS A LEAD...';
       else if (currentTheme === 'simpsons') scanMsg = 'HOMER NO SETOR 7G... D\'OH! ALGUÉM DERRAMOU CAFÉ NO REATOR!...';
+      else if (currentTheme === 'pacman') scanMsg = 'PAC-RADAR // ENCONTRANDO LABIRINTO DE STREAM...';
       logTerminal(scanMsg);
 
       try {
@@ -395,19 +415,31 @@
         else if (currentTheme === 'gta') successMsg = `[MISSION PASSED] RESPECT + // ${data.platform.toUpperCase()}`;
         else if (currentTheme === 'noir') successMsg = `[CASE CLOSED] EVIDENCE ACQUIRED // ${data.platform.toUpperCase()}`;
         else if (currentTheme === 'simpsons') successMsg = `[DONUT EXTRAÍDO] WOO-HOO! // ${data.platform.toUpperCase()}`;
+        else if (currentTheme === 'pacman') successMsg = `[LABIRINTO VENCIDO] WAKA-WAKA! // ${data.platform.toUpperCase()}`;
         logTerminal(successMsg);
         logTerminal(`TITLE: ${info.title.slice(0, 50)}...`);
         sfx.playSuccess();
 
-        mediaTitle.textContent = info.title;
-        mediaThumb.src = info.thumbnail || 'https://via.placeholder.com/150';
-        mediaAuthor.innerHTML = `<i class="fa-solid fa-user"></i> AUTOR: ${info.author?.name || 'DESCONHECIDO'}`;
-        mediaDuration.innerHTML = info.duration ? `<i class="fa-regular fa-clock"></i> DURAÇÃO: ${Math.floor(info.duration / 60)}m ${info.duration % 60}s` : '';
+        if (window.ActivityStage) {
+          window.ActivityStage.complete(() => {
+            mediaTitle.textContent = info.title;
+            mediaThumb.src = info.thumbnail || 'https://via.placeholder.com/150';
+            mediaAuthor.innerHTML = `<i class="fa-solid fa-user"></i> AUTOR: ${info.author?.name || 'DESCONHECIDO'}`;
+            mediaDuration.innerHTML = info.duration ? `<i class="fa-regular fa-clock"></i> DURAÇÃO: ${Math.floor(info.duration / 60)}m ${info.duration % 60}s` : '';
+            mediaCard.style.display = 'block';
+          });
+        } else {
+          mediaTitle.textContent = info.title;
+          mediaThumb.src = info.thumbnail || 'https://via.placeholder.com/150';
+          mediaAuthor.innerHTML = `<i class="fa-solid fa-user"></i> AUTOR: ${info.author?.name || 'DESCONHECIDO'}`;
+          mediaDuration.innerHTML = info.duration ? `<i class="fa-regular fa-clock"></i> DURAÇÃO: ${Math.floor(info.duration / 60)}m ${info.duration % 60}s` : '';
+          mediaCard.style.display = 'block';
+        }
 
-        mediaCard.style.display = 'block';
         btnAnalyze.innerHTML = originalBtnText;
         btnAnalyze.disabled = false;
       } catch (err) {
+        if (window.ActivityStage) window.ActivityStage.stop();
         sfx.playError();
         logTerminal(`[ERROR] ${err.message}`);
         errorAlert.style.display = 'block';
@@ -417,19 +449,44 @@
       }
     });
 
-    // Downloads
-    btnDownloadVideo.addEventListener('click', () => {
+    // Downloads with Animation Stage
+    function triggerDownload(format, isAudio) {
       if (!currentUrl) return;
       sfx.playSuccess();
-      logTerminal(`DISPARANDO DOWNLOAD MP4 VIA STREAM...`);
-      window.location.href = `/api/download?url=${encodeURIComponent(currentUrl)}&format=mp4`;
+      
+      if (window.ActivityStage) {
+        window.ActivityStage.start('download');
+        let prog = 10;
+        const interval = setInterval(() => {
+          prog += 15;
+          if (prog >= 100) {
+            clearInterval(interval);
+            window.ActivityStage.complete();
+          } else {
+            window.ActivityStage.setProgress(prog);
+          }
+        }, 350);
+      }
+
+      logTerminal(`DISPARANDO DOWNLOAD ${format.toUpperCase()} VIA STREAM ENGINE...`);
+      const dlUrl = `/api/download?url=${encodeURIComponent(currentUrl)}&format=${format}${isAudio ? '&audio=true' : ''}`;
+      
+      // Use hidden iframe to trigger browser download without navigating away
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = dlUrl;
+      document.body.appendChild(iframe);
+      setTimeout(() => {
+        try { document.body.removeChild(iframe); } catch(e) {}
+      }, 30000);
+    }
+
+    btnDownloadVideo.addEventListener('click', () => {
+      triggerDownload('mp4', false);
     });
 
     btnDownloadAudio.addEventListener('click', () => {
-      if (!currentUrl) return;
-      sfx.playSuccess();
-      logTerminal(`DISPARANDO EXTRAÇÃO MP3 VIA FFMPEG...`);
-      window.location.href = `/api/download?url=${encodeURIComponent(currentUrl)}&format=mp3`;
+      triggerDownload('mp3', true);
     });
 
     // Copy WhatsApp Command

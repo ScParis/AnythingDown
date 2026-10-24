@@ -1791,10 +1791,160 @@ body.theme-pacman .license-box {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.7rem;
 }
-body.theme-pacman .badge-card {
-  background: rgba(0, 0, 0, 0.85);
-  border: 2px solid #2121de;
-  color: #ffffff;
+/* ==========================================================================
+   ACTIVITY STAGE BOX & THEMATIC PROGRESS BAR
+   ========================================================================== */
+.activity-stage-box {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.activity-canvas-wrap {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+#activityCanvas {
+  width: 100%;
+  max-width: 460px;
+  height: 70px;
+  display: block;
+}
+
+.activity-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.activity-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #00f3ff;
+  border-radius: 4px;
+  transition: width 0.2s linear;
+}
+
+.activity-status-text {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  letter-spacing: 0.8px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Theme 1: Tron */
+body.theme-retro .activity-stage-box {
+  border: 1.5px solid #00f3ff;
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.35);
+}
+body.theme-retro .activity-title { color: #00f3ff; font-family: 'Orbitron', monospace; }
+body.theme-retro .activity-percent { color: #ffffff; font-family: 'Share Tech Mono', monospace; }
+body.theme-retro .activity-progress-fill { background: linear-gradient(90deg, #00f3ff, #ffffff); box-shadow: 0 0 10px #00f3ff; }
+
+/* Theme 2: Cyberpunk */
+body.theme-cyber .activity-stage-box {
+  border: 2px solid #FCEE09;
+  box-shadow: 0 0 20px rgba(252, 238, 9, 0.4);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+body.theme-cyber .activity-title { color: #FCEE09; font-family: 'Rajdhani', sans-serif; font-weight: 800; }
+body.theme-cyber .activity-percent { color: #00F0FF; font-family: 'Share Tech Mono', monospace; }
+body.theme-cyber .activity-progress-fill { background: linear-gradient(90deg, #FCEE09, #00F0FF); }
+
+/* Theme 3: Top Gear */
+body.theme-topgear .activity-stage-box {
+  border: 2px solid #e60000;
+  box-shadow: 0 0 25px rgba(230, 0, 0, 0.4);
+}
+body.theme-topgear .activity-title { color: #ffd700; font-family: 'Montserrat', sans-serif; font-weight: 900; font-style: italic; }
+body.theme-topgear .activity-percent { color: #ffffff; font-weight: 900; }
+body.theme-topgear .activity-progress-fill { background: linear-gradient(90deg, #e60000, #ffd700); }
+
+/* Theme 4: Counter-Strike */
+body.theme-cs .activity-stage-box {
+  border: 2px solid #5bf336;
+  background: rgba(10, 16, 9, 0.9);
+  box-shadow: 0 0 20px rgba(91, 243, 54, 0.3);
+}
+body.theme-cs .activity-title { color: #5bf336; font-family: 'Black Ops One', cursive; }
+body.theme-cs .activity-percent { color: #d4a373; font-family: 'Share Tech Mono', monospace; }
+body.theme-cs .activity-progress-fill { background: #5bf336; box-shadow: 0 0 10px #5bf336; }
+
+/* Theme 5: GTA VI */
+body.theme-gta .activity-stage-box {
+  border: 2px solid #FF1493;
+  box-shadow: 0 0 25px rgba(255, 20, 147, 0.5);
+}
+body.theme-gta .activity-title { color: #00F5D4; font-family: 'Montserrat', sans-serif; font-style: italic; font-weight: 900; }
+body.theme-gta .activity-percent { color: #FFE600; font-family: 'Montserrat', sans-serif; font-weight: 900; }
+body.theme-gta .activity-progress-fill { background: linear-gradient(90deg, #FF1493, #00F5D4); }
+
+/* Theme 6: Spider-Noir */
+body.theme-noir .activity-stage-box {
+  border: 2px solid #ffffff;
+  background: rgba(12, 12, 14, 0.95);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+}
+body.theme-noir .activity-title { color: #ffffff; font-family: 'Special Elite', cursive; }
+body.theme-noir .activity-percent { color: #dddddd; font-family: 'Special Elite', cursive; }
+body.theme-noir .activity-progress-fill { background: #ffffff; }
+
+/* Theme 7: The Simpsons */
+body.theme-simpsons .activity-stage-box {
+  border: 3px solid #000000;
+  background: #FFE600;
+  box-shadow: 6px 6px 0px #000000;
+  border-radius: 12px;
+}
+body.theme-simpsons .activity-title { color: #000000; font-family: 'Bangers', cursive; font-size: 1.1rem; letter-spacing: 1.5px; }
+body.theme-simpsons .activity-percent { color: #FF3366; font-family: 'Bangers', cursive; font-size: 1.1rem; }
+body.theme-simpsons .activity-canvas-wrap { background: #002244; border: 2px solid #000; border-radius: 8px; }
+body.theme-simpsons .activity-progress-track { background: #000; border: 2px solid #000; height: 12px; border-radius: 6px; }
+body.theme-simpsons .activity-progress-fill { background: linear-gradient(90deg, #39FF14, #00F0FF); }
+body.theme-simpsons .activity-status-text { color: #000000; font-family: 'Sniglet', cursive; font-weight: 800; }
+
+/* Theme 8: Pac-Man */
+body.theme-pacman .activity-stage-box {
+  border: 3px solid #2121de;
+  background: #000000;
+  box-shadow: 0 0 25px rgba(33, 33, 222, 0.6);
+  border-radius: 4px;
+}
+body.theme-pacman .activity-title { color: #FFE600; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; }
+body.theme-pacman .activity-percent { color: #FFB897; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; }
+body.theme-pacman .activity-canvas-wrap { background: #000000; border: 2px solid #2121de; border-radius: 4px; }
+body.theme-pacman .activity-progress-track { background: #111; border: 2px solid #2121de; height: 10px; border-radius: 2px; }
+body.theme-pacman .activity-progress-fill { background: #FFE600; }
+body.theme-pacman .activity-status-text { color: #FFE600; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; }
 
 
