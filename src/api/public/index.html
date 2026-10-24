@@ -454,31 +454,61 @@
       if (!currentUrl) return;
       sfx.playSuccess();
       
+      const dlUrl = `/api/download?url=${encodeURIComponent(currentUrl)}&format=${format}${isAudio ? '&audio=true' : ''}`;
+      logTerminal(`DISPARANDO DOWNLOAD ${format.toUpperCase()} VIA STREAM ENGINE...`);
+
       if (window.ActivityStage) {
         window.ActivityStage.start('download');
-        let prog = 10;
-        const interval = setInterval(() => {
-          prog += 15;
-          if (prog >= 100) {
-            clearInterval(interval);
-            window.ActivityStage.complete();
-          } else {
-            window.ActivityStage.setProgress(prog);
-          }
-        }, 350);
+        window.ActivityStage.setProgress(20);
       }
 
-      logTerminal(`DISPARANDO DOWNLOAD ${format.toUpperCase()} VIA STREAM ENGINE...`);
-      const dlUrl = `/api/download?url=${encodeURIComponent(currentUrl)}&format=${format}${isAudio ? '&audio=true' : ''}`;
-      
-      // Use hidden iframe to trigger browser download without navigating away
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = dlUrl;
-      document.body.appendChild(iframe);
-      setTimeout(() => {
-        try { document.body.removeChild(iframe); } catch(e) {}
-      }, 30000);
+      // Check with fetch / direct download
+      fetch(dlUrl)
+        .then(async (response) => {
+          if (!response.ok) {
+            let errText = 'Falha ao processar download no servidor.';
+            try {
+              const errJson = await response.json();
+              if (errJson.error) errText = errJson.error;
+            } catch(e) {}
+            throw new Error(errText);
+          }
+
+          if (window.ActivityStage) window.ActivityStage.setProgress(70);
+
+          // Get blob and trigger browser save dialog
+          const blob = await response.blob();
+          const filenameHeader = response.headers.get('content-disposition');
+          let filename = `anythingdown_media.${format}`;
+          if (filenameHeader) {
+            const match = filenameHeader.match(/filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i);
+            if (match && match[1]) filename = decodeURIComponent(match[1]);
+          }
+
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+          }, 1000);
+
+          if (window.ActivityStage) {
+            window.ActivityStage.complete();
+          }
+          logTerminal(`[DOWNLOAD CONCLUÍDO] ARQUIVO SALVO: ${filename}`);
+        })
+        .catch((err) => {
+          if (window.ActivityStage) window.ActivityStage.stop();
+          sfx.playError();
+          logTerminal(`[ERRO NO DOWNLOAD] ${err.message}`);
+          errorAlert.style.display = 'block';
+          errorMsg.textContent = err.message;
+        });
     }
 
     btnDownloadVideo.addEventListener('click', () => {

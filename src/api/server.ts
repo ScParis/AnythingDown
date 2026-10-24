@@ -100,6 +100,9 @@ export function createServer() {
         status: 'ok',
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
+        cookiesFile: process.env.COOKIES_FILE || null,
+        cookiesExist: process.env.COOKIES_FILE ? fs.existsSync(process.env.COOKIES_FILE) : false,
+        cookiesSize: process.env.COOKIES_FILE && fs.existsSync(process.env.COOKIES_FILE) ? fs.statSync(process.env.COOKIES_FILE).size : 0,
         binaries: {
           ytdlp: { path: ytdlp, version: ytdlpVersion, error: ytdlpError, ready: true },
           ffmpeg: { path: ffmpeg || null, ready: !!ffmpeg },

@@ -123,9 +123,10 @@ export class YtDlpExtractor extends BaseExtractor {
       args.push('--extract-audio');
       args.push('--audio-format', options.audioFormat || 'mp3');
       args.push('--audio-quality', '0');
+      args.push('-f', 'bestaudio/best');
     } else if (options.quality) {
       if (options.quality === 'best') {
-        args.push('-f', 'bestvideo+bestaudio/best');
+        args.push('-f', 'bestvideo+bestaudio/bestvideo/bestaudio/best');
       } else if (options.quality === 'worst') {
         args.push('-f', 'worst');
       } else {
