@@ -17,6 +17,12 @@ export function createServer() {
   const app = express();
   const downloader = new AnythingDown();
 
+  // Automatically check Render Secret Files (/etc/secrets/cookies.txt) or env vars
+  if (!process.env.COOKIES_FILE && fs.existsSync('/etc/secrets/cookies.txt')) {
+    process.env.COOKIES_FILE = '/etc/secrets/cookies.txt';
+    Logger.info('Found and configured cookies from Render Secret File: /etc/secrets/cookies.txt');
+  }
+
   // Automatically extract raw cookies from env var if provided (Render Secret / Env Var)
   if (process.env.YTDLP_COOKIES_TEXT && !process.env.COOKIES_FILE) {
     try {
