@@ -28,7 +28,7 @@ export class YtDlpExtractor extends BaseExtractor {
       '--no-warnings',
       '--no-playlist',
       '--skip-download',
-      '--extractor-args', 'youtube:player_client=android,web',
+      '--extractor-args', 'youtube:player_client=android,ios,web,mweb',
     ];
 
     if (options.cookies) {
@@ -105,7 +105,7 @@ export class YtDlpExtractor extends BaseExtractor {
       '--no-playlist',
       '--output', outputTemplate,
       '--print-json',
-      '--extractor-args', 'youtube:player_client=android,web',
+      '--extractor-args', 'youtube:player_client=android,ios,web,mweb',
     ];
 
     if (ffmpegPath) {
