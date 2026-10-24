@@ -112,6 +112,10 @@ export function createServer() {
         userFriendlyError = 'O YouTube exige login ou verificação para este conteúdo.';
       } else if (rawMsg.includes('Failed to extract any player response') || rawMsg.includes('player response')) {
         userFriendlyError = 'O YouTube bloqueou temporariamente a requisição para este link específico ou o vídeo foi removido.';
+      } else if (rawMsg.includes("This content isn't available to everyone") || rawMsg.includes("can't be seen by certain audiences")) {
+        userFriendlyError = 'Este post do Instagram possui restrição de audiência (idade, região ou conteúdo sensível) definida pelo autor da postagem.';
+      } else if (rawMsg.includes('empty media response') || rawMsg.includes('login required') || rawMsg.includes('Rate-limit reached')) {
+        userFriendlyError = 'O Instagram exige login para visualizar este conteúdo específico (perfil privado ou restrito).';
       }
 
       Logger.warn(`Metadata extraction failed for ${req.body?.url}: ${rawMsg}`);
