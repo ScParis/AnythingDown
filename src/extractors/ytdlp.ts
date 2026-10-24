@@ -28,6 +28,7 @@ export class YtDlpExtractor extends BaseExtractor {
       '--no-warnings',
       '--no-playlist',
       '--skip-download',
+      '--js-runtimes', 'node',
       '--extractor-args', 'youtube:player_client=android,ios,web,mweb',
     ];
 
@@ -105,6 +106,7 @@ export class YtDlpExtractor extends BaseExtractor {
       '--no-playlist',
       '--output', outputTemplate,
       '--print-json',
+      '--js-runtimes', 'node',
       '--extractor-args', 'youtube:player_client=android,ios,web,mweb',
     ];
 
