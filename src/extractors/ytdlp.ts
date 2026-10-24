@@ -28,6 +28,8 @@ export class YtDlpExtractor extends BaseExtractor {
       '--no-warnings',
       '--no-playlist',
       '--skip-download',
+      '--ignore-no-formats-error',
+      '--format', 'all/best',
       '--js-runtimes', 'node',
     ];
 
