@@ -2838,10 +2838,334 @@ function applyTheme(theme) {
     if (tgBotTag) tgBotTag.textContent = "COMPILANDO...";
     if (waBotTag) waBotTag.textContent = "EM BREVE";
   }
+
+  // Update dynamic animated favicon for current theme
+  FaviconEngine.setTheme(theme);
 }
+
+// =========================================================================
+// DYNAMIC ANIMATED FAVICON ENGINE
+// Draws canvas frames in memory and updates <link rel="icon">
+// =========================================================================
+const FaviconEngine = (() => {
+  let timer = null;
+  let frame = 0;
+  let activeTheme = 'retro';
+  const size = 32;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  function getLink() {
+    let link = document.getElementById('dynamic-favicon');
+    if (!link) {
+      link = document.createElement('link');
+      link.id = 'dynamic-favicon';
+      link.rel = 'icon';
+      link.type = 'image/png';
+      document.head.appendChild(link);
+    }
+    return link;
+  }
+
+  function updateIcon() {
+    ctx.clearRect(0, 0, size, size);
+    frame++;
+
+    switch (activeTheme) {
+      case 'pacman': {
+        // Animated Pac-Man champing mouth + yellow glow
+        const mouthAngle = 0.2 + 0.25 * Math.abs(Math.sin(frame * 0.25));
+        ctx.fillStyle = '#FFE600';
+        ctx.beginPath();
+        ctx.arc(16, 16, 14, mouthAngle * Math.PI, (2 - mouthAngle) * Math.PI);
+        ctx.lineTo(16, 16);
+        ctx.fill();
+
+        // Pac-Man eye
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(16, 9, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pellet floating ahead
+        if (Math.sin(frame * 0.25) > 0) {
+          ctx.fillStyle = '#FFB897';
+          ctx.beginPath();
+          ctx.arc(28, 16, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        break;
+      }
+
+      case 'simpsons': {
+        // Pink Glazed Homer Donut with sprinkles spinning
+        const angle = frame * 0.08;
+        ctx.save();
+        ctx.translate(16, 16);
+        ctx.rotate(angle);
+
+        // Dough base
+        ctx.fillStyle = '#DE9B52';
+        ctx.beginPath();
+        ctx.arc(0, 0, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pink frosting
+        ctx.fillStyle = '#FF599C';
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Donut center hole
+        ctx.fillStyle = '#0f1423';
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Colorful sprinkles
+        const sprinkles = [
+          { x: -7, y: -6, color: '#00F0FF', rot: 0.4 },
+          { x: 6, y: -6, color: '#FFE600', rot: -0.3 },
+          { x: 7, y: 5, color: '#39FF14', rot: 0.6 },
+          { x: -6, y: 6, color: '#FFFFFF', rot: -0.8 },
+          { x: 0, y: -9, color: '#FF3366', rot: 0.1 },
+        ];
+        sprinkles.forEach(s => {
+          ctx.save();
+          ctx.translate(s.x, s.y);
+          ctx.rotate(s.rot);
+          ctx.fillStyle = s.color;
+          ctx.fillRect(-2, -1, 4, 2);
+          ctx.restore();
+        });
+
+        ctx.restore();
+        break;
+      }
+
+      case 'gta': {
+        // Vice City Neon Palm Tree + Pink/Cyan sunset pulse
+        const pulse = Math.sin(frame * 0.15) * 2;
+        ctx.save();
+        // Neon gradient circle background
+        const grad = ctx.createLinearGradient(0, 0, 0, size);
+        grad.addColorStop(0, '#FF1493');
+        grad.addColorStop(1, '#00F5D4');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(16, 16, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Silhouette Palm Tree
+        ctx.fillStyle = '#0a0518';
+        ctx.beginPath();
+        // Trunk
+        ctx.moveTo(15, 28);
+        ctx.quadraticCurveTo(18, 20, 16, 14);
+        ctx.lineTo(14, 14);
+        ctx.quadraticCurveTo(16, 20, 13, 28);
+        ctx.fill();
+        // Palm Fronds
+        ctx.beginPath();
+        ctx.arc(15, 14, 7 + pulse * 0.3, Math.PI, 0, false);
+        ctx.fill();
+        ctx.restore();
+        break;
+      }
+
+      case 'cs': {
+        // CS C4 Explosive blinking red diode (Beep... beep... beep!)
+        const isBlink = Math.floor(frame / 6) % 2 === 0;
+        ctx.fillStyle = '#1c2419';
+        // C4 Clay block
+        ctx.fillRect(4, 8, 24, 16);
+        ctx.strokeStyle = '#3e4a38';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(4, 8, 24, 16);
+
+        // Digital display
+        ctx.fillStyle = '#0a0d09';
+        ctx.fillRect(7, 11, 10, 10);
+        ctx.fillStyle = '#5bf336';
+        ctx.font = 'bold 7px monospace';
+        ctx.fillText('73', 8, 18);
+
+        // Blinking Red LED Light
+        ctx.beginPath();
+        ctx.arc(22, 16, isBlink ? 3.5 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = isBlink ? '#ff1a1a' : '#550000';
+        ctx.shadowColor = isBlink ? '#ff0000' : 'transparent';
+        ctx.shadowBlur = isBlink ? 8 : 0;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        break;
+      }
+
+      case 'topgear': {
+        // Spinning Sports Car Wheel / Tachometer Needle revving
+        ctx.save();
+        ctx.translate(16, 16);
+
+        // Tire outer ring
+        ctx.fillStyle = '#111';
+        ctx.beginPath();
+        ctx.arc(0, 0, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Red racing rim
+        ctx.strokeStyle = '#e60000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4 Spinning spokes
+        const wheelAngle = frame * 0.25;
+        ctx.rotate(wheelAngle);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(10, 0);
+          ctx.stroke();
+          ctx.rotate(Math.PI / 2);
+        }
+
+        // Center hub
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(0, 0, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        break;
+      }
+
+      case 'noir': {
+        // Spider-Man Noir Spider Insignia pulsing with fedora eye gleam
+        const pulse = 13 + Math.sin(frame * 0.15) * 1.5;
+        ctx.save();
+        // Dark badge
+        ctx.fillStyle = '#0a0a0c';
+        ctx.beginPath();
+        ctx.arc(16, 16, 14, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Monochrome glowing spider web / eyes
+        ctx.fillStyle = '#f0f0f0';
+        // Left Eye Angle
+        ctx.beginPath();
+        ctx.moveTo(9, 13);
+        ctx.lineTo(14, 18);
+        ctx.lineTo(13, 11);
+        ctx.closePath();
+        ctx.fill();
+        // Right Eye Angle
+        ctx.beginPath();
+        ctx.moveTo(23, 13);
+        ctx.lineTo(18, 18);
+        ctx.lineTo(19, 11);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+        break;
+      }
+
+      case 'cyber': {
+        // Cyberpunk 2077 Glitching Neon Diamond / Samurai skull pulse
+        const glitchX = (Math.random() - 0.5) * (frame % 8 === 0 ? 3 : 0);
+        ctx.save();
+        ctx.translate(16 + glitchX, 16);
+
+        // Yellow diamond background
+        ctx.fillStyle = '#FCEE09';
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.lineTo(14, 0);
+        ctx.lineTo(0, 14);
+        ctx.lineTo(-14, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cyan cyber circuit slash
+        ctx.strokeStyle = '#00F0FF';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-8, -2);
+        ctx.lineTo(8, -2);
+        ctx.moveTo(-4, 4);
+        ctx.lineTo(6, 4);
+        ctx.stroke();
+
+        // Black core dot
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(-2, -3, 4, 6);
+
+        ctx.restore();
+        break;
+      }
+
+      case 'retro':
+      default: {
+        // TRON Identity Disc Pulsing with Cyan Neon Glow
+        const pulse = 12 + Math.sin(frame * 0.12) * 1.8;
+        ctx.save();
+        ctx.translate(16, 16);
+
+        // Dark digital background
+        ctx.fillStyle = '#020b14';
+        ctx.beginPath();
+        ctx.arc(0, 0, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Neon Cyan Outer Ring
+        ctx.strokeStyle = '#00f2ff';
+        ctx.shadowColor = '#00f2ff';
+        ctx.shadowBlur = 6;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, pulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Inner Disc Core
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        break;
+      }
+    }
+
+    try {
+      const link = getLink();
+      link.href = canvas.toDataURL('image/png');
+    } catch(e) {}
+  }
+
+  function setTheme(theme) {
+    activeTheme = theme;
+    frame = 0;
+    if (timer) clearInterval(timer);
+    updateIcon();
+    // 10 FPS is smooth for browser tab icons without CPU load
+    timer = setInterval(updateIcon, 100);
+  }
+
+  return { setTheme };
+})();
 
 // Global exposure
 window.applyTheme = applyTheme;
+window.FaviconEngine = FaviconEngine;
 window.sfx = sfx;
 
 // Event Listeners for Theme Switching and Controls
