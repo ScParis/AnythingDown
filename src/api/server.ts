@@ -29,6 +29,11 @@ export function createServer() {
     app.use(express.static(srcPublicDir));
   }
 
+  // Favicon handler
+  app.get('/favicon.ico', (_req: Request, res: Response) => {
+    res.status(204).end();
+  });
+
   // Health check
   app.get('/api/health', async (_req: Request, res: Response) => {
     try {
@@ -49,11 +54,11 @@ export function createServer() {
   });
 
   // Extract Info
-  app.post('/api/info', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  app.post('/api/info', async (req: Request, res: Response): Promise<void> => {
     try {
       const { url } = req.body;
       if (!url || typeof url !== 'string' || !isValidUrl(url)) {
-        res.status(400).json({ error: 'Valid URL is required.' });
+        res.status(400).json({ success: false, error: 'Por favor, insira uma URL válida para extrair.' });
         return;
       }
 
@@ -65,8 +70,23 @@ export function createServer() {
         platform,
         data: info,
       });
-    } catch (err) {
-      next(err);
+    } catch (err: any) {
+      const rawMsg = err.message || '';
+      let userFriendlyError = rawMsg;
+
+      if (rawMsg.includes('This video is unavailable') || rawMsg.includes('Video unavailable')) {
+        userFriendlyError = 'Este vídeo não está disponível no YouTube (pode ter sido excluído, tornado privado ou restrito).';
+      } else if (rawMsg.includes('Sign in to confirm you’re not a bot') || rawMsg.includes('Sign in to confirm your age')) {
+        userFriendlyError = 'O YouTube exige login ou verificação para este conteúdo.';
+      } else if (rawMsg.includes('Failed to extract any player response') || rawMsg.includes('player response')) {
+        userFriendlyError = 'O YouTube bloqueou temporariamente a requisição para este link específico ou o vídeo foi removido.';
+      }
+
+      Logger.warn(`Metadata extraction failed for ${req.body?.url}: ${rawMsg}`);
+      res.status(422).json({
+        success: false,
+        error: userFriendlyError,
+      });
     }
   });
 
@@ -158,6 +178,10 @@ export function startApiServer(port = 3000, host = '0.0.0.0') {
   const server = app.listen(port, host, () => {
     Logger.info(`🚀 AnythingDown REST API running at http://${host}:${port}`);
     Logger.info(`📊 Health check: http://${host}:${port}/api/health`);
+
+    // Verify and update yt-dlp asynchronously on startup to keep YouTube extractors fresh
+    const downloader = new AnythingDown();
+    downloader['binaryManager'].updateYtDlp().catch(() => {});
   });
 
   server.on('error', (err: NodeJS.ErrnoException) => {
