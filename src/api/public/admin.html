@@ -41,13 +41,13 @@
       position: relative;
     }
 
-    /* Background Orbital Radar Canvas */
+    /* Background Orbital World Map Canvas */
     #orbitCanvas {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.25;
+      opacity: 0.38;
     }
 
     .hud-grid {
@@ -794,10 +794,94 @@
       if (soundEnabled) playQuindarBeep(2525);
     });
 
-    // Orbital Canvas Animation (Faint NASA Houston Radar Sweep)
+    // NASA Mission Control World Map (Mercator Ground Track Canvas)
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
-    let radarAngle = 0;
+    let orbitPhase = 0;
+    let radarX = 0;
+
+    // Simplified Continental Polygons (Degrees: Longitude -180..180, Latitude -90..90)
+    const CONTINENTS = [
+      // North America
+      [
+        [-168, 65], [-162, 71], [-140, 70], [-130, 70], [-120, 76], [-95, 75], [-82, 65],
+        [-65, 60], [-55, 52], [-60, 44], [-70, 42], [-75, 35], [-80, 25], [-82, 23],
+        [-88, 21], [-89, 15], [-84, 10], [-77, 8], [-80, 8], [-85, 13], [-97, 16],
+        [-105, 20], [-110, 23], [-115, 30], [-124, 38], [-124, 48], [-130, 55], [-140, 60],
+        [-150, 60], [-160, 56], [-168, 65]
+      ],
+      // Greenland
+      [
+        [-44, 60], [-35, 66], [-20, 75], [-20, 82], [-40, 83], [-55, 82], [-60, 76], [-50, 68], [-44, 60]
+      ],
+      // South America
+      [
+        [-77, 8], [-72, 11], [-60, 9], [-50, 0], [-35, -5], [-35, -10], [-38, -18],
+        [-43, -23], [-50, -30], [-55, -35], [-65, -42], [-68, -54], [-74, -53], [-74, -45],
+        [-71, -30], [-76, -15], [-80, -5], [-77, 8]
+      ],
+      // Europe
+      [
+        [-9, 36], [-9, 43], [-1, 44], [-5, 48], [-1, 51], [5, 53], [8, 55], [10, 58],
+        [5, 62], [15, 68], [25, 71], [30, 70], [38, 66], [40, 60], [30, 55], [25, 45],
+        [23, 40], [28, 41], [25, 35], [20, 37], [15, 38], [15, 42], [10, 44], [0, 42],
+        [-2, 37], [-9, 36]
+      ],
+      // UK & Ireland
+      [
+        [-5, 50], [1, 51], [0, 53], [-2, 57], [-5, 58], [-6, 55], [-3, 53], [-5, 50]
+      ],
+      // Africa
+      [
+        [-5, 36], [10, 37], [25, 32], [32, 31], [35, 28], [43, 12], [51, 11], [45, 0],
+        [40, -10], [35, -20], [32, -28], [28, -33], [20, -35], [18, -34], [12, -20],
+        [12, -5], [8, 4], [3, 6], [-5, 5], [-12, 5], [-17, 15], [-17, 21], [-13, 28],
+        [-9, 32], [-5, 36]
+      ],
+      // Madagascar
+      [
+        [49, -12], [50, -16], [47, -25], [44, -25], [44, -18], [49, -12]
+      ],
+      // Asia
+      [
+        [30, 70], [50, 70], [70, 73], [100, 76], [140, 73], [170, 68], [178, 65],
+        [160, 55], [155, 50], [140, 48], [130, 42], [128, 38], [122, 30], [118, 22],
+        [108, 18], [105, 10], [100, 5], [98, 15], [90, 22], [80, 16], [77, 8],
+        [72, 20], [68, 25], [60, 25], [55, 25], [50, 15], [43, 12], [35, 28],
+        [35, 35], [45, 40], [50, 45], [60, 55], [75, 55], [90, 50], [110, 50],
+        [120, 55], [120, 65], [80, 65], [40, 65], [30, 70]
+      ],
+      // Japan
+      [
+        [130, 32], [136, 35], [141, 41], [145, 44], [141, 43], [138, 37], [131, 33], [130, 32]
+      ],
+      // Australia
+      [
+        [114, -22], [122, -18], [130, -12], [136, -12], [142, -11], [145, -15],
+        [153, -28], [150, -37], [140, -38], [135, -34], [120, -34], [115, -34],
+        [113, -26], [114, -22]
+      ],
+      // New Zealand
+      [
+        [174, -36], [178, -38], [175, -41], [172, -44], [167, -46], [170, -43], [174, -36]
+      ],
+      // Antarctica band
+      [
+        [-180, -70], [-120, -72], [-60, -68], [-40, -74], [0, -70], [60, -68], [120, -66], [180, -70],
+        [180, -90], [-180, -90], [-180, -70]
+      ]
+    ];
+
+    const GROUND_STATIONS = [
+      { name: 'MCC-HOUSTON', lon: -95.36, lat: 29.76, primary: true },
+      { name: 'KSC CANAVERAL', lon: -80.60, lat: 28.57 },
+      { name: 'DSN GOLDSTONE', lon: -116.89, lat: 35.42 },
+      { name: 'DSN MADRID', lon: -4.25, lat: 40.43 },
+      { name: 'DSN CANBERRA', lon: 148.98, lat: -35.40 },
+      { name: 'SÃO PAULO (BR)', lon: -46.63, lat: -23.55, primary: true },
+      { name: 'SVALBARD RELAY', lon: 15.40, lat: 78.22 },
+      { name: 'TOKYO STATION', lon: 139.69, lat: 35.68 }
+    ];
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -806,42 +890,181 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    function drawOrbitRadar() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const maxR = Math.min(cx, cy) * 0.95;
+    function toMapCoords(lon, lat, w, h) {
+      const x = ((lon + 180) / 360) * w;
+      const y = ((90 - lat) / 180) * h;
+      return { x, y };
+    }
 
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+    function drawNasaWorldMap() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // 1. Grid of Latitudes and Longitudes (NASA Houston Spec)
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.07)';
       ctx.lineWidth = 1;
+      ctx.setLineDash([2, 4]);
 
-      // Concentric orbital distance rings
-      [0.2, 0.4, 0.6, 0.8, 1.0].forEach(factor => {
+      // Longitude Meridians every 30 degrees
+      for (let lon = -180; lon <= 180; lon += 30) {
+        const pt = toMapCoords(lon, 0, w, h);
         ctx.beginPath();
-        ctx.arc(cx, cy, maxR * factor, 0, Math.PI * 2);
+        ctx.moveTo(pt.x, 0);
+        ctx.lineTo(pt.x, h);
+        ctx.stroke();
+
+        // Meridian labels
+        if (w > 800) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+          ctx.font = '9px Space Mono, monospace';
+          ctx.fillText(`${Math.abs(lon)}°${lon < 0 ? 'W' : lon > 0 ? 'E' : ''}`, pt.x + 3, 18);
+        }
+      }
+
+      // Latitude Parallels every 30 degrees
+      for (let lat = -60; lat <= 60; lat += 30) {
+        const pt = toMapCoords(0, lat, w, h);
+        ctx.beginPath();
+        ctx.moveTo(0, pt.y);
+        ctx.lineTo(w, pt.y);
+        ctx.stroke();
+
+        if (w > 800) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+          ctx.font = '9px Space Mono, monospace';
+          ctx.fillText(`${Math.abs(lat)}°${lat < 0 ? 'S' : lat > 0 ? 'N' : ''}`, 8, pt.y - 4);
+        }
+      }
+      ctx.setLineDash([]);
+
+      // Highlight Equator
+      const eqPt = toMapCoords(0, 0, w, h);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(0, eqPt.y);
+      ctx.lineTo(w, eqPt.y);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.font = 'bold 9px Space Mono, monospace';
+      ctx.fillText('0° EQUATORIAL PLANE', 40, eqPt.y - 5);
+
+      // 2. Draw World Continents
+      ctx.fillStyle = 'rgba(11, 61, 145, 0.16)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 1.2;
+
+      CONTINENTS.forEach(polygon => {
+        ctx.beginPath();
+        polygon.forEach((coord, i) => {
+          const pt = toMapCoords(coord[0], coord[1], w, h);
+          if (i === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.closePath();
+        ctx.fill();
         ctx.stroke();
       });
 
-      // Axis Crosshairs
-      ctx.beginPath();
-      ctx.moveTo(cx - maxR, cy);
-      ctx.lineTo(cx + maxR, cy);
-      ctx.moveTo(cx, cy - maxR);
-      ctx.lineTo(cx, cy + maxR);
-      ctx.stroke();
+      // 3. Ground Stations (Houston, Cape Canaveral, São Paulo, Madrid, etc.)
+      const pulse = (Math.sin(Date.now() / 300) + 1) / 2;
+      GROUND_STATIONS.forEach(st => {
+        const pt = toMapCoords(st.lon, st.lat, w, h);
 
-      // Sweeping Radar Line
-      radarAngle += 0.006;
+        // Outer beacon ring
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, (st.primary ? 8 : 6) + pulse * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = st.primary ? 'rgba(245, 158, 11, 0.7)' : 'rgba(56, 189, 248, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Inner solid core
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, st.primary ? 3.5 : 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = st.primary ? '#f59e0b' : '#38bdf8';
+        ctx.fill();
+
+        // Station Label
+        if (w > 700) {
+          ctx.fillStyle = st.primary ? '#f59e0b' : 'rgba(255, 255, 255, 0.75)';
+          ctx.font = 'bold 9px Orbitron, sans-serif';
+          ctx.fillText(st.name, pt.x + 8, pt.y + 3);
+        }
+      });
+
+      // 4. Sinusoidal Satellite Ground Track (ISS / Artemis Orbit Simulation)
+      orbitPhase += 0.003;
       ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + Math.cos(radarAngle) * maxR, cy + Math.sin(radarAngle) * maxR);
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.55)'; // Apollo amber track
       ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 5]);
+
+      for (let px = 0; px <= w; px += 5) {
+        const lon = (px / w) * 360 - 180;
+        // Sinusoidal wave with 51.6° orbital inclination
+        const lat = Math.sin(((lon + orbitPhase * 180) * Math.PI) / 180 * 1.5) * 51.6;
+        const pt = toMapCoords(lon, lat, w, h);
+        if (px === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 5. Active Satellite Craft traversing the Orbit Track
+      const satLon = ((orbitPhase * 180) % 360) - 180;
+      const satLat = Math.sin(((satLon + orbitPhase * 180) * Math.PI) / 180 * 1.5) * 51.6;
+      const satPt = toMapCoords(satLon, satLat, w, h);
+
+      // Satellite Footprint Coverage Circle
+      ctx.beginPath();
+      ctx.arc(satPt.x, satPt.y, 45, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.2)';
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.04)';
+      ctx.fill();
       ctx.stroke();
 
-      requestAnimationFrame(drawOrbitRadar);
+      // Satellite Icon / Core
+      ctx.beginPath();
+      ctx.arc(satPt.x, satPt.y, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Satellite Wings (Solar Arrays)
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(satPt.x - 12, satPt.y);
+      ctx.lineTo(satPt.x + 12, satPt.y);
+      ctx.stroke();
+
+      // Satellite Tag
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 9px Orbitron, sans-serif';
+      ctx.fillText('SAT-ANYDOWN [DOWNLINK ACTIVE]', satPt.x + 10, satPt.y - 10);
+
+      // 6. Slow Vertical NASA Scan Line
+      radarX = (radarX + 1.2) % w;
+      const grad = ctx.createLinearGradient(radarX - 40, 0, radarX, 0);
+      grad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+      grad.addColorStop(1, 'rgba(56, 189, 248, 0.12)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(radarX - 40, 0, 40, h);
+
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(radarX, 0);
+      ctx.lineTo(radarX, h);
+      ctx.stroke();
+
+      requestAnimationFrame(drawNasaWorldMap);
     }
-    drawOrbitRadar();
+    drawNasaWorldMap();
 
     // Mission Control Data Management
     let adminKey = localStorage.getItem('anythingdown_admin_key') || '';
