@@ -200,6 +200,10 @@ export class YtDlpExtractor extends BaseExtractor {
         friendlyError = 'Esta mídia não está mais disponível ou foi removida da plataforma.';
       } else if (friendlyError.includes("This content isn't available to everyone") || friendlyError.includes("can't be seen by certain audiences")) {
         friendlyError = 'Este post possui restrição de audiência (idade, região ou conteúdo sensível) definida pelo autor da postagem.';
+      } else if (friendlyError.includes('redirected to the login page') || friendlyError.includes('exceeded the rate-limit for accessing posts anonymously')) {
+        friendlyError = 'O Instagram bloqueou o acesso anônimo no servidor para este conteúdo. É necessário atualizar os cookies de sessão no painel.';
+      } else if (friendlyError.includes('Failed to parse JSON')) {
+        friendlyError = 'Falha temporária de comunicação com a plataforma. Tente novamente em instantes.';
       }
       return {
         success: false,

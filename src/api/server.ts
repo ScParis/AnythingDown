@@ -251,8 +251,16 @@ export function createServer() {
         userFriendlyError = 'O YouTube bloqueou temporariamente a requisição para este link específico ou o vídeo foi removido.';
       } else if (rawMsg.includes("This content isn't available to everyone") || rawMsg.includes("can't be seen by certain audiences")) {
         userFriendlyError = 'Este post do Instagram possui restrição de audiência (idade, região ou conteúdo sensível) definida pelo autor da postagem.';
-      } else if (rawMsg.includes('empty media response') || rawMsg.includes('login required') || rawMsg.includes('Rate-limit reached')) {
-        userFriendlyError = 'O Instagram exige login para visualizar este conteúdo específico (perfil privado ou restrito).';
+      } else if (
+        rawMsg.includes('redirected to the login page') ||
+        rawMsg.includes('exceeded the rate-limit for accessing posts anonymously') ||
+        rawMsg.includes('empty media response') ||
+        rawMsg.includes('login required') ||
+        rawMsg.includes('Rate-limit reached')
+      ) {
+        userFriendlyError = 'O Instagram bloqueou o acesso anônimo no servidor para este conteúdo. É necessário atualizar os cookies de sessão no painel.';
+      } else if (rawMsg.includes('Failed to parse JSON')) {
+        userFriendlyError = 'Falha temporária de comunicação com a plataforma. Tente novamente em instantes.';
       }
 
       const platform = req.body?.url ? detectPlatform(req.body.url) : 'unknown';
@@ -371,6 +379,10 @@ export function createServer() {
       let errMsg = err.message || 'Erro interno no servidor de download.';
       if (errMsg.includes('No video formats found')) {
         errMsg = 'Este post é composto por fotos/imagens e não possui fluxo de vídeo ou áudio para download.';
+      } else if (errMsg.includes('redirected to the login page') || errMsg.includes('exceeded the rate-limit for accessing posts anonymously')) {
+        errMsg = 'O Instagram bloqueou o acesso anônimo no servidor para este conteúdo. É necessário atualizar os cookies de sessão no painel.';
+      } else if (errMsg.includes('Failed to parse JSON')) {
+        errMsg = 'Falha temporária de comunicação com a plataforma. Tente novamente em instantes.';
       }
 
       metrics.recordActivity({
