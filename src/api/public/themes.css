@@ -2577,20 +2577,21 @@ body.theme-pacman .badge-tag {
   .footer-separator { display: none; }
 }
 
-/* Reduce decorative movement, while leaving analysis and download progress active. */
+/* The app toggle controls decorative motion, while keeping functional progress active. */
+:is(body.motion-reduced, body:not(.motion-enabled)) .identity-disc,
+:is(body.motion-reduced, body:not(.motion-enabled)) .ram-block,
+:is(body.motion-reduced, body:not(.motion-enabled)) .c4-planted-flash,
+:is(body.motion-reduced, body:not(.motion-enabled)) .nitro-flame-icon,
+:is(body.motion-reduced, body:not(.motion-enabled)) .blink-dot,
+:is(body.motion-reduced, body:not(.motion-enabled)) .wanted-star.active,
+:is(body.motion-reduced, body:not(.motion-enabled)) .noir-goggles,
+:is(body.motion-reduced, body:not(.motion-enabled)) .pacman-icon-mini,
+:is(body.motion-reduced, body:not(.motion-enabled)) .glitch-hover:hover,
+:is(body.motion-reduced, body:not(.motion-enabled)) .photo-item:hover {
+  animation: none !important;
+  transform: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
-  .identity-disc,
-  .ram-block,
-  .c4-planted-flash,
-  .nitro-flame-icon,
-  .blink-dot,
-  .wanted-star.active,
-  .noir-goggles,
-  .pacman-icon-mini,
-  .glitch-hover:hover,
-  .photo-item:hover {
-    animation: none !important;
-    transform: none !important;
-  }
 }

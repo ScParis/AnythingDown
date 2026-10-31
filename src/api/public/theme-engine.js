@@ -188,6 +188,8 @@ class SoundFX {
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
     const worldMotionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const motionPreferenceStorageKey = 'anythingdown_motion_preference';
+    let worldMotionReduced = getStoredMotionPreference() ?? worldMotionPreference.matches;
     let worldAnimationFrame = null;
 
     let width = (canvas.width = window.innerWidth);
@@ -2597,8 +2599,42 @@ class SoundFX {
         drawPacmanScene();
       }
 
-      if (!worldMotionPreference.matches) {
+      if (!worldMotionReduced) {
         worldAnimationFrame = requestAnimationFrame(renderWorld);
+      }
+    }
+
+    function getStoredMotionPreference() {
+      const storedPreference = localStorage.getItem(motionPreferenceStorageKey);
+      if (storedPreference === 'reduced') return true;
+      if (storedPreference === 'full') return false;
+      return null;
+    }
+
+    function syncMotionPreference() {
+      const storedPreference = getStoredMotionPreference();
+      worldMotionReduced = storedPreference ?? worldMotionPreference.matches;
+      document.body.classList.toggle('motion-reduced', worldMotionReduced);
+      document.body.classList.toggle('motion-enabled', !worldMotionReduced);
+
+      const motionButton = getEl('btnMotionToggle');
+      const motionLabel = getEl('motionToggleLabel');
+      if (motionButton) {
+        motionButton.setAttribute('aria-pressed', String(!worldMotionReduced));
+        motionButton.setAttribute('aria-label', worldMotionReduced
+          ? 'Animações de fundo reduzidas'
+          : 'Animações de fundo ativas');
+        motionButton.title = worldMotionReduced
+          ? 'Ativar animações de fundo'
+          : 'Reduzir animações de fundo';
+      }
+      if (motionLabel) {
+        motionLabel.textContent = worldMotionReduced
+          ? 'MOVIMENTO: REDUZIDO'
+          : 'ANIMAÇÕES: ATIVAS';
+      }
+      if (window.FaviconEngine) {
+        window.FaviconEngine.setMotionEnabled(!worldMotionReduced);
       }
     }
 
@@ -2610,7 +2646,29 @@ class SoundFX {
       renderWorld();
     }
 
-    worldMotionPreference.addEventListener('change', refreshWorld);
+    function toggleWorldMotion() {
+      localStorage.setItem(
+        motionPreferenceStorageKey,
+        worldMotionReduced ? 'full' : 'reduced'
+      );
+      syncMotionPreference();
+      refreshWorld();
+    }
+
+    window.MotionEngine = {
+      get reduced() { return worldMotionReduced; },
+      sync: syncMotionPreference,
+      refresh: refreshWorld,
+      toggle: toggleWorldMotion
+    };
+
+    syncMotionPreference();
+    worldMotionPreference.addEventListener('change', () => {
+      if (getStoredMotionPreference() === null) {
+        syncMotionPreference();
+        refreshWorld();
+      }
+    });
     renderWorld();
 
 // Safe element getters
@@ -2657,6 +2715,7 @@ function applyTheme(theme) {
   const page = window.PAGE_TYPE || "home";
 
   body.className = themeConfig.className;
+  window.MotionEngine.sync();
   if (themeName) themeName.textContent = themeConfig.label;
 
   // Hide all strips and badges first
@@ -2856,10 +2915,10 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "EM BREVE";
   }
 
-  if (typeof refreshWorld === 'function') refreshWorld();
+  window.MotionEngine.refresh();
 
   // Update dynamic animated favicon for current theme
-  FaviconEngine.setTheme(theme);
+  FaviconEngine.setTheme(theme, !window.MotionEngine.reduced);
 }
 
 // =========================================================================
@@ -3170,16 +3229,26 @@ const FaviconEngine = (() => {
     } catch(e) {}
   }
 
-  function setTheme(theme) {
+  function setTheme(theme, motionEnabled = true) {
     activeTheme = theme;
     frame = 0;
     if (timer) clearInterval(timer);
+    timer = null;
     updateIcon();
-    // 10 FPS is smooth for browser tab icons without CPU load
-    timer = setInterval(updateIcon, 100);
+    if (motionEnabled) {
+      // 10 FPS is smooth for browser tab icons without CPU load
+      timer = setInterval(updateIcon, 100);
+    }
   }
 
-  return { setTheme };
+  function setMotionEnabled(enabled) {
+    if (timer) clearInterval(timer);
+    timer = null;
+    updateIcon();
+    if (enabled) timer = setInterval(updateIcon, 100);
+  }
+
+  return { setTheme, setMotionEnabled };
 })();
 
 // =========================================================================
@@ -3689,6 +3758,7 @@ window.sfx = sfx;
 document.addEventListener("DOMContentLoaded", () => {
   const btnThemeToggle = getEl("btnThemeToggle");
   const btnAudioToggle = getEl("btnAudioToggle");
+  const btnMotionToggle = getEl("btnMotionToggle");
   const btnSpawnEntity = getEl("btnSpawnEntity");
 
   if (btnThemeToggle) {
@@ -3697,6 +3767,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentIndex = THEMES.findIndex((theme) => theme.id === currentTheme);
       const nextIndex = (currentIndex + 1) % THEMES.length;
       applyTheme(THEMES[nextIndex].id);
+    });
+  }
+
+  if (btnMotionToggle) {
+    btnMotionToggle.addEventListener("click", () => {
+      window.MotionEngine.toggle();
     });
   }
 
