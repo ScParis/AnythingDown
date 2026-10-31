@@ -5,16 +5,45 @@
       padding: 0;
     }
 
+    /* Semantic design-token catalog. Theme scopes below provide each palette. */
+    :root {
+      --color-canvas: #02020a;
+      --color-text: #ffffff;
+      --color-surface-card: rgba(1, 10, 28, 0.85);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: #000814;
+      --color-border: #00f3ff;
+      --color-border-subtle: rgba(0, 243, 255, 0.3);
+      --color-accent: #00f3ff;
+      --color-accent-glow: rgba(0, 243, 255, 0.5);
+      --color-badge-surface: rgba(0, 243, 255, 0.12);
+      --color-badge-text: #00f3ff;
+      --color-focus: #ff6600;
+      --color-danger: #ff3232;
+      --color-danger-surface: rgba(255, 50, 50, 0.15);
+      --font-body: 'Share Tech Mono', monospace;
+      --font-display: 'Orbitron', monospace;
+      --radius-card: 6px;
+      --radius-button: 0px;
+      --radius-input: 0px;
+      --radius-badge: 0px;
+      --motion-control: 0.2s ease;
+    }
+
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
+      justify-content: flex-start;
+      /* Anchor the shared shell to a viewport-based baseline. Centering its
+         content height made every theme switch move the whole interface. */
+      padding: max(1.5rem, calc((100vh - 680px) / 2)) 1.5rem 1.5rem;
       position: relative;
       overflow-x: hidden;
-      background: #02020a;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
       transition: background-color 0.4s ease, color 0.4s ease;
     }
 
@@ -95,6 +124,7 @@
       line-height: 1 !important;
       padding: 0 14px !important;
       margin: 0 !important;
+      border-radius: var(--radius-button);
     }
 
     /* Main Card Layout Lock */
@@ -103,6 +133,7 @@
       padding: 1.75rem !important;
       width: 100% !important;
       position: relative !important;
+      border-radius: var(--radius-card);
     }
 
     /* Header Decorative Strips Normalized */
@@ -158,6 +189,24 @@
       font-size: 0.95rem !important;
       line-height: 50px !important;
       margin: 0 !important;
+      border-radius: var(--radius-input);
+    }
+
+    /* Shared metadata badge geometry; theme scopes retain their own palette. */
+    .badge-tag {
+      box-sizing: border-box;
+      border-radius: var(--radius-badge);
+    }
+
+    /* Shared feedback treatment for the dashboard's inline error message. */
+    #errorAlert {
+      box-sizing: border-box;
+      color: var(--color-danger);
+      background: var(--color-danger-surface);
+      border: 2px solid var(--color-danger);
+      padding: 10px 14px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
     }
 
     #btnAnalyze {
@@ -174,16 +223,21 @@
 
     /* Inner Footer Inside Main Card */
     #footerStatus {
-      height: 38px !important;
-      min-height: 38px !important;
-      display: flex !important;
-      justify-content: space-between !important;
+      height: auto !important;
+      min-height: 56px !important;
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px 12px;
       align-items: center !important;
       font-size: 0.75rem !important;
       padding-top: 0.85rem !important;
       margin-top: 1rem !important;
       box-sizing: border-box !important;
     }
+    #footerStatus > span { min-width: 0; overflow-wrap: anywhere; }
+    #footerUser { text-align: left; }
+    #footerStatus > span:nth-child(2) { text-align: center; }
+    #footerNode { text-align: right; }
 
     /* Bots Notification Card */
     #botsInfoCard {
@@ -192,13 +246,195 @@
       box-sizing: border-box !important;
     }
 
+    /* Home content structure; theme scopes provide surfaces and accents. */
+    .top-status { font-size: 0.85rem; }
+    .hud-title { font-weight: 700; font-size: 0.9rem; }
+    .hud-caption { font-size: 0.7rem; opacity: 0.7; }
+    .theme-cyber-title { font-weight: 800; color: #fcee0a; letter-spacing: 1px; }
+    .theme-topgear-title { font-weight: 900; color: #ffd700; font-size: 0.78rem; }
+    .theme-cs-title { font-weight: 900; color: #d49b29; font-size: 0.82rem; letter-spacing: 1.5px; }
+    .theme-gta-title { font-weight: 900; font-style: italic; color: #ff3399; font-size: 0.85rem; letter-spacing: 1.5px; }
+    .theme-noir-title { font-weight: 900; color: #ffffff; font-size: 0.84rem; letter-spacing: 2px; }
+    .theme-simpsons-title { font-weight: 900; color: #ffd900; font-size: 0.92rem; letter-spacing: 1px; font-family: 'Bangers', cursive; text-shadow: 2px 2px 0 #000; }
+    .theme-pacman-title { font-weight: 900; color: #ffff00; font-size: 0.76rem; letter-spacing: 1.5px; text-shadow: 2px 2px 0 #2121de; }
+    .hud-inline-note { margin-left: 4px; color: #fcee0a; }
+    .topgear-speed { color: #fff; }
+    .cs-hud-icon { flex: 0 0 auto; }
+    .cs-health-icon { color: #de3c26; }
+    .cs-armor-icon { color: #5a7742; }
+    .cs-money-icon { color: #79f243; }
+    .cs-bomb-state { display: inline-flex; align-items: center; gap: 4px; }
+    .gta-wallet-icon { color: #00f0ff; }
+    .gta-cash { color: #00ff88; }
+    .wanted-stars { letter-spacing: 2px; }
+    .gta-radio-label { font-size: 0.75rem; color: #ffcc00; }
+    .noir-city-icon { color: #aaa; }
+    .noir-goggles-group { display: inline-flex; align-items: center; gap: 4px; }
+    .noir-rubiks { color: #ff3333; }
+    .simpsons-radiation-icon { color: #39ff14; }
+    .simpsons-user-icon { color: #ffd900; }
+    .simpsons-donut-label { color: #ff69b4; font-weight: 700; }
+    .simpsons-core-label { color: #39ff14; }
+    .pacman-title-ghost { color: #ff0000; }
+    .pacman-score-group { display: inline-flex; align-items: center; gap: 4px; }
+    .pacman-score { color: #ffff00; }
+    .pacman-ghost-label { color: #00ffff; }
+    .pacman-bonus-label { color: #ffb8ae; }
+    .topgear-dash { margin-top: 4px; }
+    .cs-hud, .gta-hud, .noir-hud { margin-top: 3px; }
+    .simpsons-hud { margin-top: 2px; }
+    .pacman-hud { margin-top: 3px; }
+
+    .main-heading { text-align: center; }
+    /* Non-TRON themes show a 10px strip plus its 20px lower margin here.
+       Reserve the same slot in TRON so shared card content starts together. */
+    body.theme-retro .main-card > .main-heading { padding-top: 30px; }
+    .legal-heading { margin-bottom: 1.5rem; }
+    .legal-page-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .input-row { position: relative; margin-bottom: 1rem; }
+    .activity-stage { margin-bottom: 1.25rem; }
+    .platform-row { align-items: center; gap: 10px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .platform-tag { padding: 4px 12px; font-weight: 700; text-transform: uppercase; }
+
+    .terminal-log {
+      background: rgba(0, 4, 10, 0.95);
+      border: 1px solid var(--color-border-subtle);
+      padding: 12px;
+      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .terminal-header { opacity: 0.5; }
+    .terminal-content { margin-top: 4px; }
+
+    .media-card {
+      background: var(--color-media-surface);
+      border: 1px solid var(--color-border-subtle);
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .media-preview { display: flex; align-items: flex-start; gap: 14px; }
+    .media-thumbnail {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      flex: 0 0 120px;
+      border: 2px solid var(--color-accent);
+      box-shadow: 0 0 15px var(--color-accent-glow);
+      background: #000;
+    }
+    .media-meta { overflow: hidden; flex: 1; min-width: 0; }
+    .media-title { font-size: 1.15rem; line-height: 1.3; margin-bottom: 6px; overflow-wrap: anywhere; }
+    .media-author { font-size: 0.85rem; opacity: 0.8; margin-bottom: 4px; }
+    .media-duration { font-size: 0.8rem; opacity: 0.65; }
+    .photo-container { margin-top: 1.1rem; border-top: 1px solid var(--color-border-subtle); padding-top: 12px; }
+    .photo-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .photo-heading { font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .photo-heading i { color: var(--color-accent); }
+    .photo-hint { font-size: 0.72rem; opacity: 0.75; text-transform: uppercase; }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      padding: 6px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .photo-item { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 4px; border: 1px solid var(--color-border-subtle); background: #000; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+    .photo-item:hover { transform: translateY(-2px); border-color: var(--color-accent); }
+    .photo-item-image { width: 100%; height: 100%; object-fit: cover; }
+    .photo-item-action { position: absolute; right: 0; bottom: 0; left: 0; background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 0.68rem; padding: 2px 4px; text-align: center; }
+    .download-all-photos { width: 100%; text-align: center; }
+    .video-audio-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.1rem; }
+    .media-download-button { text-align: center; }
+
+    .footer-status { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; opacity: 0.7; padding-top: 1rem; border-top: 1px dotted rgba(255, 255, 255, 0.2); }
+    .bots-card-header { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 8px; margin-bottom: 0.85rem; }
+    .bots-card-title { font-weight: 800; letter-spacing: 1.2px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+    .bots-card-title i { color: var(--color-accent); }
+    .bots-status-tag { padding: 3px 10px; font-size: 0.7rem; border-radius: 3px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+    .bots-status-tag i { font-size: 0.65rem; }
+    .bots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    .bot-card { background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 12px 14px; position: relative; min-height: 132px; }
+    .bot-card-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .bot-card-provider { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.84rem; }
+    .bot-card-provider i { font-size: 1.2rem; }
+    .telegram-card .bot-card-provider { color: #29b6f6; }
+    .whatsapp-card .bot-card-provider { color: #25d366; }
+    .bot-status-tag { font-size: 0.65rem; padding: 2px 7px; text-transform: uppercase; }
+    .bot-card-description { margin: 0; font-size: 0.78rem; opacity: 0.85; line-height: 1.45; }
+    .bottom-credits { text-align: center; font-size: 0.75rem; margin-top: 1.25rem; opacity: 0.6; letter-spacing: 2px; }
+    .site-footer { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12); text-align: center; font-size: 0.8rem; opacity: 0.85; }
+    .footer-links { display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 0.6rem; flex-wrap: wrap; }
+    .footer-links a { color: inherit; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 0.7; }
+    .footer-links a[aria-current="page"] { font-weight: 700; }
+    .footer-separator { opacity: 0.4; }
+    .footer-attribution { font-size: 0.76rem; opacity: 0.75; letter-spacing: 0.5px; }
+    .footer-author { color: var(--color-accent); font-weight: 700; text-decoration: none; }
+    .footer-repository { color: inherit; font-weight: 700; text-decoration: underline; }
+    .copy-success-icon { color: #79f243; }
+
+    .legal-nav-bar { flex-wrap: wrap; }
+    .legal-nav-bar #topStatus { flex: 1 1 220px; }
+    .legal-card #footerStatus { margin-top: 2rem !important; }
+    .legal-card .legal-page-badge { text-align: center; }
+
+    @media (max-width: 600px) {
+      .media-preview { gap: 10px; }
+      .media-thumbnail { width: 92px; height: 92px; flex-basis: 92px; }
+      .photo-toolbar { align-items: flex-start; flex-direction: column; }
+      .video-audio-buttons { grid-template-columns: 1fr; }
+      .footer-status { height: auto !important; min-height: 38px; flex-wrap: wrap; justify-content: center !important; gap: 6px 12px; }
+      #footerStatus { height: auto !important; }
+      .footer-links { gap: 8px; }
+      .bots-grid { grid-template-columns: 1fr; }
+      .legal-card #footerStatus {
+        height: auto !important;
+        min-height: 38px;
+        flex-wrap: wrap;
+        justify-content: center !important;
+        gap: 6px 12px;
+      }
+    }
+
     /* ==========================================================================
        THEME 1: TRON '82 / THE GRID
        ========================================================================== */
     body.theme-retro {
-      background: #01040f;
-      color: #00f3ff;
-      font-family: 'Share Tech Mono', 'VT323', monospace;
+      --color-canvas: #01040f;
+      --color-text: #00f3ff;
+      --color-surface-card: rgba(1, 10, 28, 0.85);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: #000814;
+      --color-border: #00f3ff;
+      --color-border-subtle: rgba(0, 243, 255, 0.3);
+      --color-accent: #00f3ff;
+      --color-accent-glow: rgba(0, 243, 255, 0.5);
+      --color-badge-surface: rgba(0, 243, 255, 0.12);
+      --color-badge-text: #00f3ff;
+      --color-focus: #ff6600;
+      --font-body: 'Share Tech Mono', 'VT323', monospace;
+      --font-display: 'Orbitron', monospace;
+      --radius-card: 6px;
+      --radius-button: 0px;
+      --radius-input: 0px;
+      --radius-badge: 0px;
+      --motion-control: 0.2s ease;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
       letter-spacing: 1px;
     }
 
@@ -209,9 +445,9 @@
     }
 
     body.theme-retro .main-card {
-      background: rgba(1, 10, 28, 0.85);
+      background: var(--color-surface-card);
       border: 2px solid #00f3ff;
-      border-radius: 6px;
+      border-radius: var(--radius-card);
       box-shadow: 0 0 30px rgba(0, 243, 255, 0.4), inset 0 0 25px rgba(0, 243, 255, 0.15);
       backdrop-filter: blur(8px);
       position: relative;
@@ -227,7 +463,7 @@
     }
 
     body.theme-retro .title-glow {
-      font-family: 'Orbitron', monospace;
+      font-family: var(--font-display);
       font-weight: 900;
       font-size: 2.1rem;
       letter-spacing: 4px;
@@ -248,7 +484,7 @@
       box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.2s;
+      transition: all var(--motion-control);
     }
     body.theme-retro .theme-btn:hover {
       background: #00f3ff;
@@ -270,7 +506,7 @@
     }
 
     body.theme-retro .input-box {
-      background: #000814;
+      background: var(--color-surface-control);
       border: 1.5px solid #00f3ff;
       color: #00f3ff;
       font-family: 'Share Tech Mono', monospace;
@@ -279,15 +515,15 @@
     }
     body.theme-retro .input-box:focus {
       outline: none;
-      border-color: #ff6600;
+      border-color: var(--color-focus);
       box-shadow: 0 0 18px rgba(255, 102, 0, 0.7), inset 0 0 8px rgba(255, 102, 0, 0.4);
       color: #fff;
     }
 
     body.theme-retro .badge-tag {
-      background: rgba(0, 243, 255, 0.12);
-      border: 1px solid #00f3ff;
-      color: #00f3ff;
+      background: var(--color-badge-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-badge-text);
       text-shadow: 0 0 8px #00f3ff;
     }
 
@@ -319,9 +555,28 @@
        THEME 2: CYBERPUNK 2077
        ========================================================================== */
     body.theme-cyber {
-      background: #06070a;
-      color: #fcee0a;
-      font-family: 'Rajdhani', 'Share Tech Mono', sans-serif;
+      --color-canvas: #06070a;
+      --color-text: #fcee0a;
+      --color-surface-card: rgba(12, 14, 20, 0.92);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: #040507;
+      --color-border: #00f0ff;
+      --color-border-subtle: rgba(0, 240, 255, 0.3);
+      --color-accent: #fcee0a;
+      --color-accent-glow: rgba(252, 238, 10, 0.5);
+      --color-badge-surface: rgba(252, 238, 10, 0.12);
+      --color-badge-text: #fcee0a;
+      --color-focus: #fcee0a;
+      --font-body: 'Rajdhani', 'Share Tech Mono', sans-serif;
+      --font-display: 'Orbitron', sans-serif;
+      --radius-card: 0px;
+      --radius-button: 0px;
+      --radius-input: 0px;
+      --radius-badge: 0px;
+      --motion-control: 0.2s ease;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
     }
 
     body.theme-cyber .crt-overlay {
@@ -330,7 +585,7 @@
     }
 
     body.theme-cyber .main-card {
-      background: rgba(12, 14, 20, 0.92);
+      background: var(--color-surface-card);
       border: 2px solid #00f0ff;
       border-left: 6px solid #fcee0a;
       clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
@@ -358,7 +613,7 @@
     }
 
     body.theme-cyber .title-glow {
-      font-family: 'Orbitron', sans-serif;
+      font-family: var(--font-display);
       font-weight: 900;
       font-size: 2.2rem;
       color: #fcee0a;
@@ -378,7 +633,7 @@
       clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.2s;
+      transition: all var(--motion-control);
     }
     body.theme-cyber .theme-btn:hover {
       background: #00f0ff;
@@ -394,7 +649,7 @@
       clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.2s;
+      transition: all var(--motion-control);
     }
     body.theme-cyber .theme-btn-accent:hover {
       background: #ff003c;
@@ -403,25 +658,25 @@
     }
 
     body.theme-cyber .input-box {
-      background: #040507;
+      background: var(--color-surface-control);
       border: 1.5px solid #00f0ff;
       color: #fcee0a;
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.05rem;
-      border-radius: 0;
+      border-radius: var(--radius-input);
       box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.25);
     }
     body.theme-cyber .input-box:focus {
       outline: none;
-      border-color: #fcee0a;
+      border-color: var(--color-focus);
       box-shadow: 0 0 18px rgba(252, 238, 10, 0.6);
     }
 
     body.theme-cyber .badge-tag {
-      background: rgba(252, 238, 10, 0.12);
-      border: 1px solid #fcee0a;
-      color: #fcee0a;
-      border-radius: 0;
+      background: var(--color-badge-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-badge-text);
+      border-radius: var(--radius-badge);
     }
 
     .cyber-ram-bar {
@@ -448,9 +703,28 @@
        THEME 3: TOP GEAR '92 (SNES 16-BIT RETRO RACING)
        ========================================================================== */
     body.theme-topgear {
-      background: #00122e;
-      color: #ffffff;
-      font-family: 'Press Start 2P', monospace;
+      --color-canvas: #00122e;
+      --color-text: #ffffff;
+      --color-surface-card: rgba(14, 22, 45, 0.88);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: #000000;
+      --color-border: #ffffff;
+      --color-border-subtle: rgba(255, 255, 255, 0.3);
+      --color-accent: #ffd700;
+      --color-accent-glow: rgba(255, 215, 0, 0.5);
+      --color-badge-surface: #000000;
+      --color-badge-text: #ffd700;
+      --color-focus: #e60012;
+      --font-body: 'Press Start 2P', monospace;
+      --font-display: 'Press Start 2P', monospace;
+      --radius-card: 0px;
+      --radius-button: 0px;
+      --radius-input: 0px;
+      --radius-badge: 0px;
+      --motion-control: 0.1s ease;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
       letter-spacing: 0.5px;
     }
 
@@ -460,9 +734,9 @@
     }
 
     body.theme-topgear .main-card {
-      background: rgba(14, 22, 45, 0.88);
+      background: var(--color-surface-card);
       border: 4px solid #ffffff;
-      border-radius: 0px;
+      border-radius: var(--radius-card);
       box-shadow: 8px 8px 0px #e60012, -4px -4px 0px #0055ff;
       backdrop-filter: blur(6px);
       position: relative;
@@ -477,7 +751,7 @@
     }
 
     body.theme-topgear .title-glow {
-      font-family: 'Press Start 2P', monospace;
+      font-family: var(--font-display);
       font-weight: 900;
       font-size: 1.55rem;
       color: #ffd700;
@@ -495,7 +769,7 @@
       box-shadow: 4px 4px 0px #000;
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.1s;
+      transition: all var(--motion-control);
     }
     body.theme-topgear .theme-btn:hover {
       background: #ff2233;
@@ -516,24 +790,24 @@
     }
 
     body.theme-topgear .input-box {
-      background: #000000;
+      background: var(--color-surface-control);
       border: 3px solid #ffd700;
       color: #00ff66;
       font-family: 'Press Start 2P', monospace;
       font-size: 0.72rem;
-      border-radius: 0;
+      border-radius: var(--radius-input);
       box-shadow: inset 3px 3px 0px #222;
     }
     body.theme-topgear .input-box:focus {
       outline: none;
-      border-color: #e60012;
+      border-color: var(--color-focus);
       box-shadow: 0 0 10px #e60012;
     }
 
     body.theme-topgear .badge-tag {
-      background: #000;
-      border: 2px solid #ffd700;
-      color: #ffd700;
+      background: var(--color-badge-surface);
+      border: 2px solid var(--color-accent);
+      color: var(--color-badge-text);
       font-size: 0.65rem;
     }
 
@@ -541,9 +815,28 @@
        THEME 4: COUNTER-STRIKE (TACTICAL MILITARY HUD / CS:GO / CS 1.6)
        ========================================================================== */
     body.theme-cs {
-      background: #0d1109;
-      color: #b5c798;
-      font-family: 'Share Tech Mono', 'Rajdhani', monospace;
+      --color-canvas: #0d1109;
+      --color-text: #b5c798;
+      --color-surface-card: rgba(18, 24, 18, 0.94);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: #090e07;
+      --color-border: #5a7742;
+      --color-border-subtle: rgba(90, 119, 66, 0.3);
+      --color-accent: #d49b29;
+      --color-accent-glow: rgba(212, 155, 41, 0.5);
+      --color-badge-surface: rgba(90, 119, 66, 0.25);
+      --color-badge-text: #b5c798;
+      --color-focus: #d49b29;
+      --font-body: 'Share Tech Mono', 'Rajdhani', monospace;
+      --font-display: 'Black Ops One', 'Orbitron', cursive, sans-serif;
+      --radius-card: 2px;
+      --radius-button: 0px;
+      --radius-input: 2px;
+      --radius-badge: 0px;
+      --motion-control: 0.15s ease;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
       letter-spacing: 0.5px;
     }
 
@@ -553,11 +846,11 @@
     }
 
     body.theme-cs .main-card {
-      background: rgba(18, 24, 18, 0.94);
+      background: var(--color-surface-card);
       border: 2px solid #5a7742;
       border-top: 4px solid #d49b29;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(90, 119, 66, 0.2);
-      border-radius: 2px;
+      border-radius: var(--radius-card);
       position: relative;
     }
 
@@ -569,7 +862,7 @@
     }
 
     body.theme-cs .title-glow {
-      font-family: 'Black Ops One', 'Orbitron', cursive, sans-serif;
+      font-family: var(--font-display);
       font-weight: 900;
       font-size: 2.1rem;
       color: #d49b29;
@@ -589,7 +882,7 @@
       box-shadow: 2px 2px 0px #000;
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.15s;
+      transition: all var(--motion-control);
     }
     body.theme-cs .theme-btn:hover {
       background: #3e5230;
@@ -616,19 +909,19 @@
       color: #79f243;
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.05rem;
-      border-radius: 2px;
+      border-radius: var(--radius-input);
       box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
     }
     body.theme-cs .input-box:focus {
       outline: none;
-      border-color: #d49b29;
+      border-color: var(--color-focus);
       box-shadow: 0 0 12px rgba(212, 155, 41, 0.5);
     }
 
     body.theme-cs .badge-tag {
-      background: rgba(90, 119, 66, 0.25);
-      border: 1px solid #5a7742;
-      color: #b5c798;
+      background: var(--color-badge-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-badge-text);
       font-family: 'Share Tech Mono', monospace;
       font-size: 0.82rem;
     }
@@ -637,9 +930,28 @@
        THEME 6: SPIDER-MAN NOIR (1933 NEW YORK // DARK DETECTIVE VINTAGE)
        ========================================================================== */
     body.theme-noir {
-      background: #08080a;
-      color: #e0e0e0;
-      font-family: 'Special Elite', 'Share Tech Mono', monospace;
+      --color-canvas: #08080a;
+      --color-text: #e0e0e0;
+      --color-surface-card: rgba(14, 14, 16, 0.92);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: #0d0d0f;
+      --color-border: #777777;
+      --color-border-subtle: rgba(255, 255, 255, 0.3);
+      --color-accent: #ffffff;
+      --color-accent-glow: rgba(255, 255, 255, 0.5);
+      --color-badge-surface: rgba(255, 255, 255, 0.08);
+      --color-badge-text: #ffffff;
+      --color-focus: #ffffff;
+      --font-body: 'Special Elite', 'Share Tech Mono', monospace;
+      --font-display: 'Cinzel', serif;
+      --radius-card: 2px;
+      --radius-button: 2px;
+      --radius-input: 2px;
+      --radius-badge: 0px;
+      --motion-control: 0.15s ease;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
       letter-spacing: 0.8px;
     }
 
@@ -650,11 +962,11 @@
     }
 
     body.theme-noir .main-card {
-      background: rgba(14, 14, 16, 0.92);
+      background: var(--color-surface-card);
       border: 2px solid #555555;
       border-top: 4px solid #ffffff;
       border-bottom: 4px solid #222222;
-      border-radius: 2px;
+      border-radius: var(--radius-card);
       box-shadow: 0 0 35px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(255, 255, 255, 0.05);
       position: relative;
     }
@@ -668,7 +980,7 @@
     }
 
     body.theme-noir .title-glow {
-      font-family: 'Cinzel', serif;
+      font-family: var(--font-display);
       font-weight: 900;
       font-size: 2.1rem;
       color: #ffffff;
@@ -685,11 +997,11 @@
       background: #18181c;
       color: #ffffff;
       border: 1.5px solid #777777;
-      border-radius: 2px;
+      border-radius: var(--radius-button);
       box-shadow: 3px 3px 0px #000000;
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.15s;
+      transition: all var(--motion-control);
     }
     body.theme-noir .theme-btn:hover {
       background: #ffffff;
@@ -712,24 +1024,24 @@
     }
 
     body.theme-noir .input-box {
-      background: #0d0d0f;
+      background: var(--color-surface-control);
       border: 1.5px solid #666666;
       color: #f0f0f0;
       font-family: 'Special Elite', monospace;
       font-size: 1.05rem;
-      border-radius: 2px;
+      border-radius: var(--radius-input);
       box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
     }
     body.theme-noir .input-box:focus {
       outline: none;
-      border-color: #ffffff;
+      border-color: var(--color-focus);
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
     }
 
     body.theme-noir .badge-tag {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid #777777;
-      color: #ffffff;
+      background: var(--color-badge-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-badge-text);
       font-family: 'Special Elite', monospace;
       font-size: 0.8rem;
     }
@@ -762,9 +1074,28 @@
        THEME 5: GRAND THEFT AUTO VI (VICE CITY / LEONIDA SUNSET)
        ========================================================================== */
     body.theme-gta {
-      background: #120324;
-      color: #ffffff;
-      font-family: 'Montserrat', sans-serif;
+      --color-canvas: #120324;
+      --color-text: #ffffff;
+      --color-surface-card: rgba(24, 7, 38, 0.90);
+      --color-media-surface: rgba(0, 8, 20, 0.85);
+      --color-surface-control: rgba(10, 3, 20, 0.95);
+      --color-border: rgba(255, 92, 170, 0.6);
+      --color-border-subtle: rgba(255, 51, 153, 0.3);
+      --color-accent: #ff3399;
+      --color-accent-glow: rgba(255, 51, 153, 0.5);
+      --color-badge-surface: linear-gradient(90deg, rgba(255, 0, 127, 0.2), rgba(0, 240, 255, 0.2));
+      --color-badge-text: #ffffff;
+      --color-focus: #00f0ff;
+      --font-body: 'Montserrat', sans-serif;
+      --font-display: 'Montserrat', sans-serif;
+      --radius-card: 12px;
+      --radius-button: 6px;
+      --radius-input: 8px;
+      --radius-badge: 6px;
+      --motion-control: 0.2s ease;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font-body);
       letter-spacing: 0.3px;
     }
 
@@ -775,11 +1106,11 @@
     }
 
     body.theme-gta .main-card {
-      background: rgba(24, 7, 38, 0.90);
+      background: var(--color-surface-card);
       border: 2px solid rgba(255, 92, 170, 0.6);
       border-top: 5px solid #ff3399;
       border-bottom: 5px solid #00f0ff;
-      border-radius: 12px;
+      border-radius: var(--radius-card);
       box-shadow: 0 0 40px rgba(255, 51, 153, 0.35), 0 0 60px rgba(0, 240, 255, 0.2);
       backdrop-filter: blur(14px);
       position: relative;
@@ -789,13 +1120,13 @@
       height: 10px;
       width: 100%;
       background: linear-gradient(90deg, #ff007f 0%, #ff66cc 25%, #ffcc00 50%, #00f0ff 75%, #7b2cbf 100%);
-      border-radius: 6px;
+      border-radius: var(--radius-button);
       margin-bottom: 1.25rem;
       box-shadow: 0 0 15px rgba(255, 0, 127, 0.7);
     }
 
     body.theme-gta .title-glow {
-      font-family: 'Montserrat', sans-serif;
+      font-family: var(--font-display);
       font-weight: 900;
       font-style: italic;
       font-size: 2.3rem;
@@ -817,11 +1148,11 @@
       background: linear-gradient(135deg, #ff007f, #ff66cc);
       color: #ffffff;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--radius-button);
       box-shadow: 0 4px 15px rgba(255, 0, 127, 0.5);
       cursor: pointer;
       text-transform: uppercase;
-      transition: all 0.2s;
+      transition: all var(--motion-control);
     }
     body.theme-gta .theme-btn:hover {
       background: linear-gradient(135deg, #00f0ff, #7b2cbf);
@@ -834,7 +1165,7 @@
       color: #000;
       font-weight: 900;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--radius-button);
       box-shadow: 0 4px 15px rgba(0, 240, 255, 0.5);
     }
     body.theme-gta .theme-btn-accent:hover {
@@ -844,27 +1175,27 @@
     }
 
     body.theme-gta .input-box {
-      background: rgba(10, 3, 20, 0.95);
+      background: var(--color-surface-control);
       border: 2px solid #ff3399;
       color: #00f0ff;
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
       font-size: 1.02rem;
-      border-radius: 8px;
+      border-radius: var(--radius-input);
       box-shadow: inset 0 0 12px rgba(255, 51, 153, 0.3);
     }
     body.theme-gta .input-box:focus {
       outline: none;
-      border-color: #00f0ff;
+      border-color: var(--color-focus);
       box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
     }
 
     body.theme-gta .badge-tag {
-      background: linear-gradient(90deg, rgba(255, 0, 127, 0.2), rgba(0, 240, 255, 0.2));
-      border: 1px solid #ff3399;
-      color: #ffffff;
+      background: var(--color-badge-surface);
+      border: 1px solid var(--color-accent);
+      color: var(--color-badge-text);
       font-weight: 800;
-      border-radius: 6px;
+      border-radius: var(--radius-badge);
     }
 
     /* GTA VI Wanted Level Stars & Vice City HUD */
@@ -1403,9 +1734,28 @@ body.theme-noir .badge-card {
    THEME 7: THE SIMPSONS (SPRINGFIELD // NUCLEAR PLANT & DONUTS)
    ========================================================================== */
 body.theme-simpsons {
-  background: #70d1fe;
-  color: #000000;
-  font-family: 'Sniglet', 'Montserrat', cursive, sans-serif;
+  --color-canvas: #70d1fe;
+  --color-text: #000000;
+  --color-surface-card: #fed90f;
+  --color-media-surface: rgba(0, 8, 20, 0.85);
+  --color-surface-control: #ffffff;
+  --color-border: #000000;
+  --color-border-subtle: rgba(0, 0, 0, 0.3);
+  --color-accent: #ff69b4;
+  --color-accent-glow: rgba(255, 105, 180, 0.5);
+  --color-badge-surface: #ff69b4;
+  --color-badge-text: #ffffff;
+  --color-focus: #000000;
+  --font-body: 'Sniglet', 'Montserrat', cursive, sans-serif;
+  --font-display: 'Bangers', cursive;
+  --radius-card: 20px;
+  --radius-button: 12px;
+  --radius-input: 12px;
+  --radius-badge: 8px;
+  --motion-control: 0.15s ease-in-out;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-body);
   letter-spacing: 0.5px;
 }
 
@@ -1416,9 +1766,9 @@ body.theme-simpsons .crt-overlay {
 }
 
 body.theme-simpsons .main-card {
-  background: #fed90f;
+  background: var(--color-surface-card);
   border: 4px solid #000000;
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   box-shadow: 8px 8px 0px #000000, 0 10px 30px rgba(0, 0, 0, 0.2);
   color: #000000;
   position: relative;
@@ -1441,7 +1791,7 @@ body.theme-simpsons .simpsons-header-strip {
 }
 
 body.theme-simpsons .title-glow {
-  font-family: 'Bangers', cursive;
+  font-family: var(--font-display);
   font-size: 2.7rem;
   letter-spacing: 3px;
   color: #fed90f;
@@ -1464,11 +1814,11 @@ body.theme-simpsons .theme-btn {
   background: #ffffff;
   color: #000000;
   border: 3px solid #000000;
-  border-radius: 12px;
+  border-radius: var(--radius-button);
   box-shadow: 4px 4px 0px #000000;
   cursor: pointer;
   text-transform: uppercase;
-  transition: all 0.15s ease-in-out;
+  transition: all var(--motion-control);
 }
 body.theme-simpsons .theme-btn:hover {
   background: #ff69b4;
@@ -1494,30 +1844,30 @@ body.theme-simpsons .theme-btn-accent:hover {
 }
 
 body.theme-simpsons .input-box {
-  background: #ffffff;
+  background: var(--color-surface-control);
   border: 3px solid #000000;
   color: #000000;
   font-family: 'Sniglet', cursive;
   font-weight: 800;
   font-size: 1.05rem;
-  border-radius: 12px;
+  border-radius: var(--radius-input);
   box-shadow: 4px 4px 0px #000000;
 }
 body.theme-simpsons .input-box:focus {
   outline: none;
-  border-color: #000000;
+  border-color: var(--color-focus);
   background: #fffde7;
   box-shadow: 5px 5px 0px #000000;
 }
 
 body.theme-simpsons .badge-tag {
-  background: #ff69b4;
+  background: var(--color-badge-surface);
   border: 2px solid #000000;
-  color: #ffffff;
+  color: var(--color-badge-text);
   font-family: 'Bangers', cursive;
   font-size: 0.95rem;
   letter-spacing: 1px;
-  border-radius: 8px;
+  border-radius: var(--radius-badge);
   box-shadow: 3px 3px 0px #000000;
   text-shadow: 1px 1px 0 #000000;
 }
@@ -1603,9 +1953,28 @@ body.theme-simpsons .badge-card {
    THEME 8: PAC-MAN (1980 MIDWAY / NAMCO RETRO ARCADE CLASSIC)
    ========================================================================== */
 body.theme-pacman {
-  background: #000000;
-  color: #ffff00;
-  font-family: 'Press Start 2P', monospace;
+  --color-canvas: #000000;
+  --color-text: #ffff00;
+  --color-surface-card: rgba(0, 0, 0, 0.94);
+  --color-media-surface: rgba(0, 8, 20, 0.85);
+  --color-surface-control: #000000;
+  --color-border: #2121de;
+  --color-border-subtle: rgba(33, 33, 222, 0.3);
+  --color-accent: #ffff00;
+  --color-accent-glow: rgba(255, 255, 0, 0.5);
+  --color-badge-surface: rgba(33, 33, 222, 0.3);
+  --color-badge-text: #ffff00;
+  --color-focus: #ffff00;
+  --font-body: 'Press Start 2P', monospace;
+  --font-display: 'Press Start 2P', monospace;
+  --radius-card: 8px;
+  --radius-button: 0px;
+  --radius-input: 0px;
+  --radius-badge: 0px;
+  --motion-control: 0.15s ease;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-body);
   letter-spacing: 0.5px;
 }
 
@@ -1617,9 +1986,9 @@ body.theme-pacman .crt-overlay {
 }
 
 body.theme-pacman .main-card {
-  background: rgba(0, 0, 0, 0.94);
+  background: var(--color-surface-card);
   border: 3px solid #2121de;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow: 0 0 25px rgba(33, 33, 222, 0.6), inset 0 0 20px rgba(33, 33, 222, 0.25);
   position: relative;
 }
@@ -1647,7 +2016,7 @@ body.theme-pacman .pacman-header-strip {
 }
 
 body.theme-pacman .title-glow {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-display);
   font-weight: 900;
   font-size: 1.85rem;
   letter-spacing: 2px;
@@ -1673,7 +2042,7 @@ body.theme-pacman .theme-btn {
   box-shadow: 3px 3px 0px #2121de;
   cursor: pointer;
   text-transform: uppercase;
-  transition: all 0.15s;
+  transition: all var(--motion-control);
 }
 body.theme-pacman .theme-btn:hover {
   background: #ffff00;
@@ -1706,14 +2075,14 @@ body.theme-pacman .input-box {
 }
 body.theme-pacman .input-box:focus {
   outline: none;
-  border-color: #ffff00;
+  border-color: var(--color-focus);
   box-shadow: 0 0 18px rgba(255, 255, 0, 0.8), inset 0 0 8px rgba(255, 255, 0, 0.3);
 }
 
 body.theme-pacman .badge-tag {
-  background: rgba(33, 33, 222, 0.3);
-  border: 1px solid #ffff00;
-  color: #ffff00;
+  background: var(--color-badge-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-badge-text);
   font-family: 'Press Start 2P', monospace;
   font-size: 0.65rem;
 }
@@ -1779,7 +2148,7 @@ body.theme-pacman .legal-card code {
   border: 1px solid #2121de;
   padding: 2px 6px;
 }
-body.theme-pacman .legal-box {
+    body.theme-pacman .legal-box {
   background: rgba(5, 5, 20, 0.9);
   border: 2px solid #2121de;
   color: #ffffff;
@@ -1791,6 +2160,14 @@ body.theme-pacman .license-box {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.7rem;
 }
+
+/* Shared keyboard-focus state; theme-specific focus colors come from tokens. */
+body:is(.theme-retro, .theme-cyber, .theme-topgear, .theme-cs, .theme-gta, .theme-noir, .theme-simpsons, .theme-pacman)
+  :is(.theme-btn, .input-box, .site-footer a, .photo-item):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
 /* ==========================================================================
    ACTIVITY STAGE BOX & THEMATIC PROGRESS BAR
    ========================================================================== */
@@ -1850,6 +2227,19 @@ body.theme-pacman .license-box {
   background: #00f3ff;
   border-radius: 4px;
   transition: width 0.2s linear;
+}
+
+/* Accessible label that remains available to assistive technology. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 .activity-status-text {
@@ -1947,4 +2337,260 @@ body.theme-pacman .activity-progress-track { background: #111; border: 2px solid
 body.theme-pacman .activity-progress-fill { background: #FFE600; }
 body.theme-pacman .activity-status-text { color: #FFE600; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; }
 
+/* Keep display lettering for theme identity, while reading text uses a legible face. */
+body.theme-topgear {
+  --font-body: 'Montserrat', Arial, sans-serif;
+}
+body.theme-pacman {
+  --font-body: Arial, sans-serif;
+}
+body.theme-topgear .topgear-dash,
+body.theme-pacman .pacman-hud {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+body.theme-pacman .top-status .hud-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+body.theme-topgear .input-box,
+body.theme-pacman .input-box,
+body.theme-pacman #subTitle,
+body.theme-topgear .activity-status-text,
+body.theme-pacman .activity-status-text {
+  font-family: var(--font-body) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.45 !important;
+}
+body.theme-topgear .badge-tag,
+body.theme-pacman .badge-tag {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
 
+/* Let the HUD and its controls flow cleanly on tablets and phones. */
+@media (max-width: 760px) {
+  body {
+    justify-content: flex-start;
+    padding: 1rem;
+  }
+
+  .app-container,
+  .main-card,
+  #botsInfoCard,
+  .legal-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .top-nav-bar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    width: 100%;
+  }
+
+  #topStatus {
+    width: 100%;
+    height: auto !important;
+    /* Keep the HUD slot aligned across themes, while allowing wrapped copy to grow. */
+    min-height: 58px !important;
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+    gap: 6px 10px;
+    overflow-wrap: anywhere;
+  }
+
+  #topStatus > div {
+    height: auto;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .top-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 8px;
+  }
+
+  .top-controls .theme-btn {
+    height: auto !important;
+    min-height: 44px !important;
+    max-height: none !important;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 6px !important;
+    line-height: 1.2 !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  #btnThemeToggle {
+    grid-column: 1 / -1;
+  }
+
+  .input-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .input-box {
+    min-width: 0;
+    padding: 0 12px !important;
+    line-height: normal !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.9rem !important;
+    max-width: 100%;
+  }
+
+  #btnAnalyze {
+    position: static !important;
+    inset: auto !important;
+    width: 100%;
+    height: auto !important;
+    min-height: 50px !important;
+    max-height: none !important;
+    padding: 10px 12px !important;
+    line-height: 1.2 !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .title-glow {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 4px 0;
+    font-size: clamp(1.2rem, 6vw, 1.8rem) !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.08em !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  #subTitle {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    display: block !important;
+    line-height: 1.5 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .main-card { padding: 1.25rem !important; }
+  .topgear-dash,
+  .cs-hud,
+  .gta-hud,
+  .noir-hud,
+  .simpsons-hud,
+  .pacman-hud,
+  .cyber-ram-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 5px;
+    max-width: 100%;
+  }
+
+  .media-preview { align-items: flex-start; }
+  .media-meta { min-width: 0; }
+  .media-title { font-size: 1rem; overflow-wrap: anywhere; }
+  .media-author,
+  .media-duration { overflow-wrap: anywhere; }
+  .bot-card-header { align-items: flex-start; flex-wrap: wrap; }
+  .bot-card-provider { min-width: 0; flex-wrap: wrap; }
+  .bot-card-description { overflow-wrap: anywhere; }
+  .bot-card { min-height: 0; }
+  .bots-grid { grid-template-columns: minmax(0, 1fr); }
+  .legal-card #footerStatus {
+    height: auto !important;
+    min-height: 0 !important;
+    flex-wrap: wrap;
+    justify-content: center !important;
+    gap: 6px 12px;
+  }
+  .footer-status,
+  #footerStatus,
+  .footer-status > span {
+    min-width: 0;
+    min-height: 0 !important;
+    max-width: 100%;
+    height: auto !important;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+  #footerStatus { grid-template-columns: minmax(0, 1fr); }
+  .site-footer,
+  .footer-attribution,
+  .bottom-credits,
+  .legal-card h1,
+  .legal-card h2,
+  .legal-card p,
+  .legal-card li {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .legal-card h2 { align-items: flex-start; flex-wrap: wrap; }
+  .legal-card ul { margin-left: 1.25rem; }
+  .site-footer a { display: inline-flex; align-items: center; min-height: 44px; }
+}
+
+@media (max-width: 420px) {
+  body { padding: 0.75rem; }
+  .main-card { padding: 0.875rem !important; }
+  .top-status { font-size: 0.78rem; }
+  .theme-simpsons-title,
+  body.theme-pacman .top-status .hud-title,
+  body.theme-topgear .topgear-dash { font-size: 0.72rem; }
+  .title-glow { font-size: clamp(1.1rem, 6vw, 1.45rem) !important; }
+  .top-controls { grid-template-columns: minmax(0, 1fr); }
+  #btnThemeToggle { grid-column: auto; }
+  .main-card h1,
+  .main-card h2,
+  .main-card p,
+  .main-card li,
+  .main-card code { overflow-wrap: anywhere; }
+  .media-card { padding: 0.75rem; }
+  .media-thumbnail { width: 80px; height: 80px; flex-basis: 80px; }
+  .bots-card-title { flex: 1 1 100%; }
+  .bots-card-header,
+  .bot-card-header { align-items: flex-start; }
+  .bot-card { min-width: 0; padding: 10px; }
+  .bot-status-tag,
+  .bots-status-tag { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .footer-status { flex-direction: column; align-items: stretch; }
+  #footerStatus { grid-template-columns: minmax(0, 1fr); }
+  .footer-links { gap: 4px 8px; }
+  .footer-separator { display: none; }
+}
+
+/* Reduce decorative movement, while leaving analysis and download progress active. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  .identity-disc,
+  .ram-block,
+  .c4-planted-flash,
+  .nitro-flame-icon,
+  .blink-dot,
+  .wanted-star.active,
+  .noir-goggles,
+  .pacman-icon-mini,
+  .glitch-hover:hover,
+  .photo-item:hover {
+    animation: none !important;
+    transform: none !important;
+  }
+}

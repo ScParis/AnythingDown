@@ -24,7 +24,7 @@
   <div class="app-container">
 
     <!-- Top Navigation / Status / Switcher -->
-    <div class="top-nav-bar">
+    <div class="top-nav-bar legal-nav-bar">
       
       <!-- Back Home Button -->
       <a href="/" class="theme-btn btn-back-home" title="Retornar à tela inicial">
@@ -32,47 +32,47 @@
       </a>
 
       <!-- Themed HUD Status -->
-      <div id="topStatus" style="font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+      <div id="topStatus" class="top-status">
         
         <!-- TRON IDENTIFIER -->
         <div class="identity-disc" id="identityDiscIcon"></div>
         <div id="tronStatusText">
-          <div style="font-weight: bold; font-size: 0.9rem;">TRON // SECTOR 7G</div>
-          <div style="font-size: 0.7rem; opacity: 0.7;">LIGHTCYCLE ARENA: ACTIVE</div>
+          <div class="hud-title">TRON // SECTOR 7G</div>
+          <div class="hud-caption">LIGHTCYCLE ARENA: ACTIVE</div>
         </div>
 
         <!-- CYBERPUNK IDENTIFIER -->
         <div id="cyberdeckBadge" style="display: none;">
-          <div style="font-weight: 800; color: #fcee0a; font-size: 0.9rem; letter-spacing: 1px;">NETRUNNER // CYBERDECK</div>
+          <div class="hud-title theme-cyber-title">NETRUNNER // CYBERDECK</div>
           <div class="cyber-ram-bar">
             <span>RAM:</span>
             <div class="ram-block"></div><div class="ram-block"></div><div class="ram-block"></div>
             <div class="ram-block"></div><div class="ram-block"></div><div class="ram-block"></div>
             <div class="ram-block"></div><div class="ram-block"></div>
-            <span style="margin-left: 4px; color: #fcee0a;">16/16 // ICE: OFF</span>
+            <span class="hud-inline-note">16/16 // ICE: OFF</span>
           </div>
         </div>
 
         <!-- TOP GEAR 1992 IDENTIFIER -->
         <div id="topgearBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffd700; font-size: 0.78rem;">TOP GEAR // SPEEDWAY</div>
-          <div class="topgear-dash" style="margin-top: 4px;">
+          <div class="hud-title theme-topgear-title">TOP GEAR // SPEEDWAY</div>
+          <div class="topgear-dash">
             <span>POS: 1ST</span>
-            <span>SPEED: <b id="tgSpeedometer" style="color: #fff;">278</b> KM/H</span>
+            <span>SPEED: <b id="tgSpeedometer" class="topgear-speed">278</b> KM/H</span>
             <span class="nitro-flame-icon"><i class="fa-solid fa-fire"></i> <b id="nitroText">NITRO x3</b></span>
           </div>
         </div>
 
         <!-- COUNTER-STRIKE IDENTIFIER -->
         <div id="csBadge" style="display: none;">
-          <div style="font-weight: 900; color: #d49b29; font-size: 0.82rem; letter-spacing: 1.5px;">
+          <div class="hud-title theme-cs-title">
             <i class="fa-solid fa-crosshairs"></i> COUNTER-STRIKE // DE_DUST2
           </div>
-          <div class="cs-hud" style="margin-top: 3px;">
-            <span><i class="fa-solid fa-heart" style="color:#de3c26;"></i> <span id="csHealth" class="cs-hud-val">100</span></span>
-            <span><i class="fa-solid fa-shield-halved" style="color:#5a7742;"></i> <span id="csArmor" class="cs-hud-val">100</span></span>
-            <span><i class="fa-solid fa-dollar-sign" style="color:#79f243;"></i> <span id="csMoney" class="cs-hud-val">16000</span></span>
-            <span id="csBombState" class="c4-planted-flash" style="display: inline-flex; align-items: center; gap: 4px;">
+          <div class="cs-hud">
+            <span><i class="fa-solid fa-heart cs-health-icon"></i> <span id="csHealth" class="cs-hud-val">100</span></span>
+            <span><i class="fa-solid fa-shield-halved cs-armor-icon"></i> <span id="csArmor" class="cs-hud-val">100</span></span>
+            <span><i class="fa-solid fa-dollar-sign cs-money-icon"></i> <span id="csMoney" class="cs-hud-val">16000</span></span>
+            <span id="csBombState" class="c4-planted-flash cs-bomb-state">
               <i class="fa-solid fa-bomb"></i> <span id="bombTimer">C4: 35s</span>
             </span>
           </div>
@@ -80,12 +80,12 @@
 
         <!-- GTA VI IDENTIFIER -->
         <div id="gtaBadge" style="display: none;">
-          <div style="font-weight: 900; font-style: italic; color: #ff3399; font-size: 0.85rem; letter-spacing: 1.5px;">
+          <div class="hud-title theme-gta-title">
             <i class="fa-solid fa-gem"></i> VICE CITY // LEONIDA
           </div>
-          <div class="gta-hud" style="margin-top: 3px;">
-            <span><i class="fa-solid fa-wallet" style="color:#00f0ff;"></i> <b id="gtaCash" style="color: #00ff88;">$2,450,890</b></span>
-            <span id="wantedStars" style="letter-spacing: 2px;">
+          <div class="gta-hud">
+            <span><i class="fa-solid fa-wallet gta-wallet-icon"></i> <b id="gtaCash" class="gta-cash">$2,450,890</b></span>
+            <span id="wantedStars" class="wanted-stars">
               <i class="fa-solid fa-star wanted-star active"></i>
               <i class="fa-solid fa-star wanted-star active"></i>
               <i class="fa-solid fa-star wanted-star active"></i>
@@ -97,12 +97,12 @@
 
         <!-- SPIDER-MAN NOIR IDENTIFIER -->
         <div id="noirBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffffff; font-size: 0.84rem; letter-spacing: 2px;">
+          <div class="hud-title theme-noir-title">
             <i class="fa-solid fa-spider"></i> SPIDER-MAN NOIR // 1933
           </div>
-          <div class="noir-hud" style="margin-top: 3px;">
-            <span><i class="fa-solid fa-city" style="color:#aaa;"></i> NEW YORK CITY</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <div class="noir-hud">
+            <span><i class="fa-solid fa-city noir-city-icon"></i> NEW YORK CITY</span>
+            <span class="noir-goggles-group">
               <span class="noir-goggles"></span>
               <span class="noir-goggles"></span>
             </span>
@@ -111,32 +111,31 @@
 
         <!-- THE SIMPSONS IDENTIFIER -->
         <div id="simpsonsBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffd900; font-size: 0.92rem; letter-spacing: 1px; font-family: 'Bangers', cursive; text-shadow: 2px 2px 0 #000;">
-            <i class="fa-solid fa-radiation" style="color: #39ff14;"></i> SPRINGFIELD // SECTOR 7G
+          <div class="hud-title theme-simpsons-title">
+            <i class="fa-solid fa-radiation simpsons-radiation-icon"></i> SPRINGFIELD // SECTOR 7G
           </div>
-          <div class="simpsons-hud" style="margin-top: 2px;">
-            <span><i class="fa-solid fa-user" style="color: #ffd900;"></i> HOMER: WORKING (?)</span>
-            <span style="color: #ff69b4; font-weight: bold;"><i class="fa-solid fa-circle-dot"></i> DONUTS: &infin;</span>
-            <span style="color: #39ff14;"><i class="fa-solid fa-bolt"></i> CORE: 98% OK</span>
+          <div class="simpsons-hud">
+            <span><i class="fa-solid fa-user simpsons-user-icon"></i> HOMER: WORKING (?)</span>
+            <span class="simpsons-donut-label"><i class="fa-solid fa-circle-dot"></i> DONUTS: &infin;</span>
+            <span class="simpsons-core-label"><i class="fa-solid fa-bolt"></i> CORE: 98% OK</span>
           </div>
         </div>
 
         <!-- PAC-MAN 1980 IDENTIFIER -->
         <div id="pacmanBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffff00; font-size: 0.76rem; letter-spacing: 1.5px; text-shadow: 2px 2px 0 #2121de;">
-            <i class="fa-solid fa-ghost" style="color: #ff0000;"></i> PAC-MAN // ARCADE 1980
+          <div class="hud-title theme-pacman-title">
+            <i class="fa-solid fa-ghost pacman-title-ghost"></i> PAC-MAN // ARCADE 1980
           </div>
-          <div class="pacman-hud" style="margin-top: 3px;">
-            <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <div class="pacman-hud">
+            <span class="pacman-score-group">
               <span class="pacman-icon-mini"></span>
-              <span style="color: #ffff00;">1UP: <b id="pacScore">24500</b></span>
+              <span class="pacman-score">1UP: <b id="pacScore">24500</b></span>
             </span>
-            <span style="color: #00ffff;"><i class="fa-solid fa-ghost"></i> INKY</span>
-            <span style="color: #ffb8ae;"><i class="fa-solid fa-apple-whole"></i> BONUS: 100</span>
+            <span class="pacman-ghost-label"><i class="fa-solid fa-ghost"></i> INKY</span>
+            <span class="pacman-bonus-label"><i class="fa-solid fa-apple-whole"></i> BONUS: 100</span>
           </div>
         </div>
       </div>
-
       <!-- Controls -->
       <div class="top-controls">
         <button id="btnSpawnEntity" class="theme-btn" title="Ação do Tema">
@@ -176,14 +175,14 @@
       <div id="pacmanStrip" class="pacman-header-strip" style="display: none;"></div>
 
       <!-- Header Title -->
-      <div style="text-align: center; margin-bottom: 1.5rem;">
-        <h1 class="title-glow glitch-hover" style="margin-bottom: 0.4rem;">TERMOS // DE USO</h1>
-        <p id="subTitle" style="font-size: 0.88rem; opacity: 0.85; letter-spacing: 1.5px;">
+      <div class="main-heading legal-heading">
+        <h1 class="title-glow glitch-hover">TERMOS // DE USO</h1>
+        <p id="subTitle">
           THE GRID &bull; ENCOM MAINFRAME RECOGNIZER &bull; MEDIA EXTRACTION UNIT
         </p>
       </div>
 
-      <div class="badge-tag" style="display: inline-block; padding: 4px 12px; margin-bottom: 1.5rem; font-weight: bold; text-transform: uppercase;">
+      <div class="badge-tag legal-page-badge">
         VERSÃO 1.0.0 &bull; ATUALIZAÇÃO OUTUBRO 2026
       </div>
 
@@ -227,7 +226,7 @@
       </p>
 
       <!-- Card Footer Status -->
-      <div id="footerStatus" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; opacity: 0.7; padding-top: 1rem; border-top: 1px dotted rgba(255, 255, 255, 0.2); margin-top: 2rem;">
+      <div id="footerStatus" class="footer-status">
         <span id="footerUser">USER: <b>FLYNN // ACTIVE</b></span>
         <span>DOC: <b>TERMOS DE USO V1.0</b></span>
         <span id="footerNode">MCP GRID: <b>I/O TOWER 3001</b></span>
@@ -236,25 +235,25 @@
     </div>
 
     <!-- Thematic Quote -->
-    <div id="bottomCredits" style="text-align: center; font-size: 0.75rem; margin-top: 1.25rem; opacity: 0.6; letter-spacing: 2px;">
+    <div id="bottomCredits" class="bottom-credits">
       "THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026
     </div>
 
     <!-- Legal Navigation & Author Signature -->
-    <footer style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12); text-align: center; font-size: 0.8rem; opacity: 0.85;">
-      <div style="display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 0.6rem; flex-wrap: wrap;">
-        <a href="/" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-house"></i> Início</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="/terms.html" style="color: inherit; text-decoration: none; font-weight: bold;"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="/privacy.html" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="/license.html" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;"><i class="fa-brands fa-github"></i> Repositório</a>
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="/"><i class="fa-solid fa-house"></i> Início</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="/terms.html" aria-current="page"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="/privacy.html"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="/license.html"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Repositório</a>
       </div>
-      <div style="font-size: 0.76rem; opacity: 0.75; letter-spacing: 0.5px;">
-        Desenvolvido com ⚡ por <a href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer" style="color: #00f3ff; font-weight: bold; text-decoration: none;">ScParis</a> &bull; Código Aberto no <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: bold; text-decoration: underline;">GitHub</a>
+      <div class="footer-attribution">
+        Desenvolvido com ⚡ por <a href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer" class="footer-author">ScParis</a> &bull; Código Aberto no <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" class="footer-repository">GitHub</a>
       </div>
     </footer>
 

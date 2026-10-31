@@ -3,7 +3,20 @@
 // Shared across Home, Terms, Privacy, and License pages
 // =========================================================================
 
-let currentTheme = localStorage.getItem("anythingdown_theme") || "retro";
+const THEMES = [
+  { id: "retro", label: "TRON '82", className: "theme-retro" },
+  { id: "cyber", label: "CYBERPUNK 2077", className: "theme-cyber" },
+  { id: "topgear", label: "TOP GEAR '92", className: "theme-topgear" },
+  { id: "cs", label: "CS 1.6 / DUST II", className: "theme-cs" },
+  { id: "gta", label: "GTA VI // LEONIDA", className: "theme-gta" },
+  { id: "noir", label: "SPIDER-NOIR '33", className: "theme-noir" },
+  { id: "simpsons", label: "THE SIMPSONS", className: "theme-simpsons" },
+  { id: "pacman", label: "PAC-MAN '80", className: "theme-pacman" },
+];
+const DEFAULT_THEME = THEMES[0].id;
+const THEME_BY_ID = new Map(THEMES.map((theme) => [theme.id, theme]));
+const storedTheme = localStorage.getItem("anythingdown_theme");
+let currentTheme = THEME_BY_ID.has(storedTheme) ? storedTheme : DEFAULT_THEME;
 
 class SoundFX {
       constructor() {
@@ -170,10 +183,12 @@ class SoundFX {
     const sfx = new SoundFX();
 
     // =========================================================================
-    // CANVAS WORLD: THEME 1 (TRON), THEME 2 (CYBERPUNK), THEME 3 (TOP GEAR '92)
+    // Canvas worlds for all eight themes are rendered in the shared engine.
     // =========================================================================
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
+    const worldMotionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let worldAnimationFrame = null;
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
@@ -182,6 +197,7 @@ class SoundFX {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       initNightCityBuildings();
+      refreshWorld();
     });
 
     // -------------------------------------------------------------------------
@@ -2419,6 +2435,7 @@ class SoundFX {
     // MASTER RENDER LOOP
     // -------------------------------------------------------------------------
     function renderWorld() {
+      worldAnimationFrame = null;
       ctx.clearRect(0, 0, width, height);
 
       if (currentTheme === 'retro') {
@@ -2580,9 +2597,20 @@ class SoundFX {
         drawPacmanScene();
       }
 
-      requestAnimationFrame(renderWorld);
+      if (!worldMotionPreference.matches) {
+        worldAnimationFrame = requestAnimationFrame(renderWorld);
+      }
     }
 
+    function refreshWorld() {
+      if (worldAnimationFrame !== null) {
+        cancelAnimationFrame(worldAnimationFrame);
+        worldAnimationFrame = null;
+      }
+      renderWorld();
+    }
+
+    worldMotionPreference.addEventListener('change', refreshWorld);
     renderWorld();
 
 // Safe element getters
@@ -2591,11 +2619,13 @@ function getEl(id) {
 }
 
 function applyTheme(theme) {
+  if (!THEME_BY_ID.has(theme)) theme = DEFAULT_THEME;
   currentTheme = theme;
   localStorage.setItem("anythingdown_theme", theme);
 
   const body = document.body;
   const themeName = getEl("themeName");
+  const themeConfig = THEME_BY_ID.get(theme);
   const hazardLine = getEl("hazardLine");
   const topgearStrip = getEl("topgearStrip");
   const csStrip = getEl("csStrip");
@@ -2626,6 +2656,9 @@ function applyTheme(theme) {
 
   const page = window.PAGE_TYPE || "home";
 
+  body.className = themeConfig.className;
+  if (themeName) themeName.textContent = themeConfig.label;
+
   // Hide all strips and badges first
   if (hazardLine) hazardLine.style.display = "none";
   if (topgearStrip) topgearStrip.style.display = "none";
@@ -2646,8 +2679,6 @@ function applyTheme(theme) {
   if (pacmanBadge) pacmanBadge.style.display = "none";
 
   if (theme === "pacman") {
-    body.className = "theme-pacman";
-    if (themeName) themeName.textContent = "PAC-MAN '80";
     if (pacmanStrip) pacmanStrip.style.display = "block";
     if (pacmanBadge) pacmanBadge.style.display = "block";
 
@@ -2670,8 +2701,6 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "WAKA BOT";
 
   } else if (theme === "simpsons") {
-    body.className = "theme-simpsons";
-    if (themeName) themeName.textContent = "THE SIMPSONS";
     if (simpsonsStrip) simpsonsStrip.style.display = "block";
     if (simpsonsBadge) simpsonsBadge.style.display = "block";
 
@@ -2694,8 +2723,6 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "KWIK-E-MART";
 
   } else if (theme === "noir") {
-    body.className = "theme-noir";
-    if (themeName) themeName.textContent = "SPIDER-NOIR '33";
     if (noirStrip) noirStrip.style.display = "block";
     if (noirBadge) noirBadge.style.display = "block";
 
@@ -2718,8 +2745,6 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "CONFIDENCIAL";
 
   } else if (theme === "gta") {
-    body.className = "theme-gta";
-    if (themeName) themeName.textContent = "GTA VI // LEONIDA";
     if (gtaStrip) gtaStrip.style.display = "block";
     if (gtaBadge) gtaBadge.style.display = "block";
 
@@ -2742,8 +2767,6 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "EM BREVE";
 
   } else if (theme === "cs") {
-    body.className = "theme-cs";
-    if (themeName) themeName.textContent = "CS 1.6 / DUST II";
     if (csStrip) csStrip.style.display = "block";
     if (csBadge) csBadge.style.display = "block";
 
@@ -2766,8 +2789,6 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "STANDBY CT";
 
   } else if (theme === "topgear") {
-    body.className = "theme-topgear";
-    if (themeName) themeName.textContent = "TOP GEAR '92";
     if (topgearStrip) topgearStrip.style.display = "block";
     if (topgearBadge) topgearBadge.style.display = "block";
 
@@ -2790,8 +2811,6 @@ function applyTheme(theme) {
     if (waBotTag) waBotTag.textContent = "BLOQUEADO";
 
   } else if (theme === "cyber") {
-    body.className = "theme-cyber";
-    if (themeName) themeName.textContent = "CYBERPUNK 2077";
     if (hazardLine) hazardLine.style.display = "block";
     if (cyberdeckBadge) cyberdeckBadge.style.display = "block";
 
@@ -2815,8 +2834,6 @@ function applyTheme(theme) {
 
   } else {
     // TRON '82 (Default)
-    body.className = "theme-retro";
-    if (themeName) themeName.textContent = "TRON '82";
     if (identityDiscIcon) identityDiscIcon.style.display = "inline-flex";
     if (tronStatusText) tronStatusText.style.display = "block";
 
@@ -2833,11 +2850,13 @@ function applyTheme(theme) {
     if (terminalHeader) terminalHeader.textContent = "> MCP.DEREZ // REQUISITANDO ACESSO AO I/O TOWER...";
     if (footerUser) footerUser.innerHTML = "USER: <b>FLYNN // ACTIVE</b>";
     if (footerNode) footerNode.innerHTML = "MCP GRID: <b>I/O TOWER 3001</b>";
-    if (bottomCredits) bottomCredits.innerHTML = '"THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026';
+  if (bottomCredits) bottomCredits.innerHTML = '"THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026';
     if (botsStatusText) botsStatusText.textContent = "EM BREVE // SECTOR 7G COMPILING";
     if (tgBotTag) tgBotTag.textContent = "COMPILANDO...";
     if (waBotTag) waBotTag.textContent = "EM BREVE";
   }
+
+  if (typeof refreshWorld === 'function') refreshWorld();
 
   // Update dynamic animated favicon for current theme
   FaviconEngine.setTheme(theme);
@@ -3675,16 +3694,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnThemeToggle) {
     btnThemeToggle.addEventListener("click", () => {
       sfx.playTurn();
-      let nextTheme = "retro";
-      if (currentTheme === "retro") nextTheme = "cyber";
-      else if (currentTheme === "cyber") nextTheme = "topgear";
-      else if (currentTheme === "topgear") nextTheme = "cs";
-      else if (currentTheme === "cs") nextTheme = "gta";
-      else if (currentTheme === "gta") nextTheme = "noir";
-      else if (currentTheme === "noir") nextTheme = "simpsons";
-      else if (currentTheme === "simpsons") nextTheme = "pacman";
-      else if (currentTheme === "pacman") nextTheme = "retro";
-      applyTheme(nextTheme);
+      const currentIndex = THEMES.findIndex((theme) => theme.id === currentTheme);
+      const nextIndex = (currentIndex + 1) % THEMES.length;
+      applyTheme(THEMES[nextIndex].id);
     });
   }
 

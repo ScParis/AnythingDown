@@ -25,47 +25,47 @@
 
     <!-- Top Navigation / Status / Switcher -->
     <div class="top-nav-bar">
-      <div id="topStatus" style="font-size: 0.85rem;">
+      <div id="topStatus" class="top-status">
         
         <!-- TRON IDENTIFIER -->
         <div class="identity-disc" id="identityDiscIcon"></div>
         <div id="tronStatusText">
-          <div style="font-weight: bold; font-size: 0.9rem;">TRON // SECTOR 7G</div>
-          <div style="font-size: 0.7rem; opacity: 0.7;">LIGHTCYCLE ARENA: ACTIVE</div>
+          <div class="hud-title">TRON // SECTOR 7G</div>
+          <div class="hud-caption">LIGHTCYCLE ARENA: ACTIVE</div>
         </div>
 
         <!-- CYBERPUNK IDENTIFIER -->
         <div id="cyberdeckBadge" style="display: none;">
-          <div style="font-weight: 800; color: #fcee0a; font-size: 0.9rem; letter-spacing: 1px;">NETRUNNER // CYBERDECK</div>
+          <div class="hud-title theme-cyber-title">NETRUNNER // CYBERDECK</div>
           <div class="cyber-ram-bar">
             <span>RAM:</span>
             <div class="ram-block"></div><div class="ram-block"></div><div class="ram-block"></div>
             <div class="ram-block"></div><div class="ram-block"></div><div class="ram-block"></div>
             <div class="ram-block"></div><div class="ram-block"></div>
-            <span style="margin-left: 4px; color: #fcee0a;">16/16 // ICE: OFF</span>
+            <span class="hud-inline-note">16/16 // ICE: OFF</span>
           </div>
         </div>
 
         <!-- TOP GEAR 1992 IDENTIFIER -->
         <div id="topgearBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffd700; font-size: 0.78rem;">TOP GEAR // SPEEDWAY</div>
-          <div class="topgear-dash" style="margin-top: 4px;">
+          <div class="hud-title theme-topgear-title">TOP GEAR // SPEEDWAY</div>
+          <div class="topgear-dash">
             <span>POS: 1ST</span>
-            <span>SPEED: <b id="tgSpeedometer" style="color: #fff;">278</b> KM/H</span>
+            <span>SPEED: <b id="tgSpeedometer" class="topgear-speed">278</b> KM/H</span>
             <span class="nitro-flame-icon"><i class="fa-solid fa-fire"></i> <b id="nitroText">NITRO x3</b></span>
           </div>
         </div>
 
         <!-- COUNTER-STRIKE IDENTIFIER -->
         <div id="csBadge" style="display: none;">
-          <div style="font-weight: 900; color: #d49b29; font-size: 0.82rem; letter-spacing: 1.5px;">
+          <div class="hud-title theme-cs-title">
             <i class="fa-solid fa-crosshairs"></i> COUNTER-STRIKE // DE_DUST2
           </div>
-          <div class="cs-hud" style="margin-top: 3px;">
-            <span><i class="fa-solid fa-heart" style="color:#de3c26;"></i> <span id="csHealth" class="cs-hud-val">100</span></span>
-            <span><i class="fa-solid fa-shield-halved" style="color:#5a7742;"></i> <span id="csArmor" class="cs-hud-val">100</span></span>
-            <span><i class="fa-solid fa-dollar-sign" style="color:#79f243;"></i> <span id="csMoney" class="cs-hud-val">16000</span></span>
-            <span id="csBombState" class="c4-planted-flash" style="display: inline-flex; align-items: center; gap: 4px;">
+          <div class="cs-hud">
+            <span><i class="fa-solid fa-heart cs-health-icon"></i> <span id="csHealth" class="cs-hud-val">100</span></span>
+            <span><i class="fa-solid fa-shield-halved cs-armor-icon"></i> <span id="csArmor" class="cs-hud-val">100</span></span>
+            <span><i class="fa-solid fa-dollar-sign cs-money-icon"></i> <span id="csMoney" class="cs-hud-val">16000</span></span>
+            <span id="csBombState" class="c4-planted-flash cs-bomb-state">
               <i class="fa-solid fa-bomb"></i> <span id="bombTimer">C4: 35s</span>
             </span>
           </div>
@@ -73,61 +73,61 @@
 
         <!-- GTA VI IDENTIFIER -->
         <div id="gtaBadge" style="display: none;">
-          <div style="font-weight: 900; font-style: italic; color: #ff3399; font-size: 0.85rem; letter-spacing: 1.5px;">
+          <div class="hud-title theme-gta-title">
             <i class="fa-solid fa-gem"></i> VICE CITY // LEONIDA
           </div>
-          <div class="gta-hud" style="margin-top: 3px;">
-            <span><i class="fa-solid fa-wallet" style="color:#00f0ff;"></i> <b id="gtaCash" style="color: #00ff88;">$2,450,890</b></span>
-            <span id="wantedStars" style="letter-spacing: 2px;">
+          <div class="gta-hud">
+            <span><i class="fa-solid fa-wallet gta-wallet-icon"></i> <b id="gtaCash" class="gta-cash">$2,450,890</b></span>
+            <span id="wantedStars" class="wanted-stars">
               <i class="fa-solid fa-star wanted-star active"></i>
               <i class="fa-solid fa-star wanted-star active"></i>
               <i class="fa-solid fa-star wanted-star active"></i>
               <i class="fa-solid fa-star wanted-star"></i>
               <i class="fa-solid fa-star wanted-star"></i>
             </span>
-            <span style="font-size: 0.75rem; color: #ffcc00;"><i class="fa-solid fa-radio"></i> <span id="gtaRadio">FLASH FM</span></span>
+            <span class="gta-radio-label"><i class="fa-solid fa-radio"></i> <span id="gtaRadio">FLASH FM</span></span>
           </div>
         </div>
 
         <!-- SPIDER-MAN NOIR IDENTIFIER -->
         <div id="noirBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffffff; font-size: 0.84rem; letter-spacing: 2px;">
+          <div class="hud-title theme-noir-title">
             <i class="fa-solid fa-spider"></i> SPIDER-MAN NOIR // 1933
           </div>
-          <div class="noir-hud" style="margin-top: 3px;">
-            <span><i class="fa-solid fa-city" style="color:#aaa;"></i> NEW YORK CITY</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <div class="noir-hud">
+            <span><i class="fa-solid fa-city noir-city-icon"></i> NEW YORK CITY</span>
+            <span class="noir-goggles-group">
               <span class="noir-goggles"></span>
               <span class="noir-goggles"></span>
             </span>
-            <span style="color: #ff3333;"><i class="fa-solid fa-cube"></i> RUBIK'S: SOLVED</span>
+            <span class="noir-rubiks"><i class="fa-solid fa-cube"></i> RUBIK'S: SOLVED</span>
           </div>
         </div>
 
         <!-- THE SIMPSONS IDENTIFIER -->
         <div id="simpsonsBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffd900; font-size: 0.92rem; letter-spacing: 1px; font-family: 'Bangers', cursive; text-shadow: 2px 2px 0 #000;">
-            <i class="fa-solid fa-radiation" style="color: #39ff14;"></i> SPRINGFIELD // SECTOR 7G
+          <div class="hud-title theme-simpsons-title">
+            <i class="fa-solid fa-radiation simpsons-radiation-icon"></i> SPRINGFIELD // SECTOR 7G
           </div>
-          <div class="simpsons-hud" style="margin-top: 2px;">
-            <span><i class="fa-solid fa-user" style="color: #ffd900;"></i> HOMER: WORKING (?)</span>
-            <span style="color: #ff69b4; font-weight: bold;"><i class="fa-solid fa-circle-dot"></i> DONUTS: &infin;</span>
-            <span style="color: #39ff14;"><i class="fa-solid fa-bolt"></i> CORE: 98% OK</span>
+          <div class="simpsons-hud">
+            <span><i class="fa-solid fa-user simpsons-user-icon"></i> HOMER: WORKING (?)</span>
+            <span class="simpsons-donut-label"><i class="fa-solid fa-circle-dot"></i> DONUTS: &infin;</span>
+            <span class="simpsons-core-label"><i class="fa-solid fa-bolt"></i> CORE: 98% OK</span>
           </div>
         </div>
 
         <!-- PAC-MAN 1980 IDENTIFIER -->
         <div id="pacmanBadge" style="display: none;">
-          <div style="font-weight: 900; color: #ffff00; font-size: 0.76rem; letter-spacing: 1.5px; text-shadow: 2px 2px 0 #2121de;">
-            <i class="fa-solid fa-ghost" style="color: #ff0000;"></i> PAC-MAN // ARCADE 1980
+          <div class="hud-title theme-pacman-title">
+            <i class="fa-solid fa-ghost pacman-title-ghost"></i> PAC-MAN // ARCADE 1980
           </div>
-          <div class="pacman-hud" style="margin-top: 3px;">
-            <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <div class="pacman-hud">
+            <span class="pacman-score-group">
               <span class="pacman-icon-mini"></span>
-              <span style="color: #ffff00;">1UP: <b id="pacScore">24500</b></span>
+              <span class="pacman-score">1UP: <b id="pacScore">24500</b></span>
             </span>
-            <span style="color: #00ffff;"><i class="fa-solid fa-ghost"></i> INKY</span>
-            <span style="color: #ffb8ae;"><i class="fa-solid fa-apple-whole"></i> BONUS: 100</span>
+            <span class="pacman-ghost-label"><i class="fa-solid fa-ghost"></i> INKY</span>
+            <span class="pacman-bonus-label"><i class="fa-solid fa-apple-whole"></i> BONUS: 100</span>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@
       <div id="pacmanStrip" class="pacman-header-strip" style="display: none;"></div>
 
       <!-- Header Title -->
-      <div style="text-align: center;">
+      <div class="main-heading">
         <h1 class="title-glow glitch-hover">ANYTHING // DOWN</h1>
         <p id="subTitle">
           THE GRID &bull; ENCOM MAINFRAME RECOGNIZER &bull; MEDIA EXTRACTION UNIT
@@ -178,7 +178,8 @@
       </div>
 
       <!-- Input Bar -->
-      <div style="position: relative; margin-bottom: 1rem;">
+      <div class="input-row">
+        <label class="visually-hidden" for="urlInput">URL do vídeo ou conteúdo de mídia</label>
         <input id="urlInput" type="url" class="input-box" placeholder="Cole o link aqui (Instagram Reels, TikTok, YouTube, Facebook)...">
         <button id="btnAnalyze" class="theme-btn">
           <i class="fa-solid fa-bolt"></i> EXTRAIR
@@ -186,7 +187,7 @@
       </div>
 
       <!-- Activity Stage Animation Box (Analyze & Download) -->
-      <div id="activityStage" style="display: none; margin-bottom: 1.25rem;">
+      <div id="activityStage" class="activity-stage" style="display: none;">
         <div id="activityBox" class="activity-stage-box">
           <div class="activity-header">
             <span id="activityTitle" class="activity-title">ANALISANDO MÍDIA</span>
@@ -203,60 +204,60 @@
       </div>
 
       <!-- Detected Platform Tag -->
-      <div id="platformRow" style="display: none; align-items: center; gap: 10px; margin-bottom: 1rem; font-size: 0.85rem;">
+      <div id="platformRow" class="platform-row" style="display: none;">
         <span>SINAL DE REDE IDENTIFICADO:</span>
-        <span id="platformTag" class="badge-tag" style="padding: 4px 12px; font-weight: bold; text-transform: uppercase;"></span>
+        <span id="platformTag" class="badge-tag platform-tag"></span>
       </div>
 
       <!-- Terminal Logs -->
-      <div id="terminalLog" style="display: none; background: rgba(0, 4, 10, 0.95); border: 1px solid rgba(0, 243, 255, 0.3); padding: 12px; margin-bottom: 1.25rem; font-size: 0.82rem; max-height: 120px; overflow-y: auto;">
-        <div id="terminalHeader" style="opacity: 0.5;">> MCP.DEREZ // REQUISITANDO ACESSO AO I/O TOWER...</div>
-        <div id="terminalContent" style="margin-top: 4px;"></div>
+      <div id="terminalLog" class="terminal-log" style="display: none;">
+        <div id="terminalHeader" class="terminal-header">&gt; MCP.DEREZ // REQUISITANDO ACESSO AO I/O TOWER...</div>
+        <div id="terminalContent" class="terminal-content"></div>
       </div>
 
       <!-- Media Preview Card -->
-      <div id="mediaCard" style="display: none; background: rgba(0, 8, 20, 0.85); border: 1px solid rgba(0, 243, 255, 0.3); padding: 1rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; gap: 14px; align-items: flex-start;">
-          <img id="mediaThumb" src="" alt="Thumbnail" style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #00f3ff; box-shadow: 0 0 15px rgba(0,243,255,0.5); background: #000; flex-shrink: 0;">
-          <div style="overflow: hidden; flex: 1;">
-            <h3 id="mediaTitle" style="font-size: 1.15rem; line-height: 1.3; margin-bottom: 6px; word-break: break-word;"></h3>
-            <p id="mediaAuthor" style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 4px;"></p>
-            <p id="mediaDuration" style="font-size: 0.8rem; opacity: 0.65;"></p>
+      <div id="mediaCard" class="media-card" style="display: none;">
+        <div class="media-preview">
+          <img id="mediaThumb" class="media-thumbnail" src="" alt="Thumbnail">
+          <div class="media-meta">
+            <h3 id="mediaTitle" class="media-title"></h3>
+            <p id="mediaAuthor" class="media-author"></p>
+            <p id="mediaDuration" class="media-duration"></p>
           </div>
         </div>
 
         <!-- Photos Download Section (for Instagram carousels / image posts) -->
-        <div id="photosContainer" style="display: none; margin-top: 1.1rem; border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <span style="font-size: 0.88rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-images" style="color: #00f3ff;"></i> CARROSSEL DE FOTOS (<span id="photoCount">0</span>)
+        <div id="photosContainer" class="photo-container" style="display: none;">
+          <div class="photo-toolbar">
+            <span class="photo-heading">
+              <i class="fa-solid fa-images"></i> CARROSSEL DE FOTOS (<span id="photoCount">0</span>)
             </span>
-            <span style="font-size: 0.72rem; opacity: 0.75; text-transform: uppercase;">CLIQUE NA FOTO PARA BAIXAR</span>
+            <span class="photo-hint">CLIQUE NA FOTO PARA BAIXAR</span>
           </div>
-          <div id="photoGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding: 6px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; margin-bottom: 12px;"></div>
-          <button id="btnDownloadAllPhotos" class="theme-btn" style="width: 100%; padding: 12px; text-align: center;">
+          <div id="photoGrid" class="photo-grid"></div>
+          <button id="btnDownloadAllPhotos" class="theme-btn download-all-photos">
             <i class="fa-solid fa-cloud-arrow-down"></i> BAIXAR TODAS AS FOTOS DO ÁLBUM
           </button>
         </div>
 
         <!-- Download Buttons -->
-        <div id="videoAudioButtons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.1rem;">
-          <button id="btnDownloadVideo" class="theme-btn" style="padding: 13px 14px; text-align: center;">
+        <div id="videoAudioButtons" class="video-audio-buttons">
+          <button id="btnDownloadVideo" class="theme-btn media-download-button">
             <i class="fa-solid fa-film"></i> BAIXAR VÍDEO (MP4)
           </button>
-          <button id="btnDownloadAudio" class="theme-btn theme-btn-accent" style="padding: 13px 14px; text-align: center;">
+          <button id="btnDownloadAudio" class="theme-btn theme-btn-accent media-download-button">
             <i class="fa-solid fa-music"></i> EXTRAIR ÁUDIO (MP3)
           </button>
         </div>
       </div>
 
       <!-- Error Box -->
-      <div id="errorAlert" style="display: none; background: rgba(255, 50, 50, 0.15); border: 2px solid #ff3232; color: #ff5555; padding: 10px 14px; font-size: 0.9rem; margin-bottom: 1rem;">
+      <div id="errorAlert" class="error-alert" style="display: none;">
         <i class="fa-solid fa-triangle-exclamation"></i> <span id="errorMsg"></span>
       </div>
 
       <!-- Status Footer Inside Card -->
-      <div id="footerStatus" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; opacity: 0.7; padding-top: 1rem; border-top: 1px dotted rgba(255, 255, 255, 0.2);">
+      <div id="footerStatus" class="footer-status">
         <span id="footerUser">USER: <b>FLYNN // ACTIVE</b></span>
         <span>STREAM ENGINE: <b>YT-DLP &bull; FFMPEG</b></span>
         <span id="footerNode">MCP GRID: <b>I/O TOWER 3001</b></span>
@@ -266,40 +267,40 @@
 
     <!-- Bots & Cloud Status Notification Card -->
     <div id="botsInfoCard" class="main-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 8px;">
-        <span style="font-weight: 800; letter-spacing: 1.2px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem;">
-          <i class="fa-solid fa-robot" style="color: #00f3ff;"></i> ROBÔS & INTEGRAÇÕES MULTI-PLATAFORMA
+      <div class="bots-card-header">
+        <span class="bots-card-title">
+          <i class="fa-solid fa-robot"></i> ROBÔS & INTEGRAÇÕES MULTI-PLATAFORMA
         </span>
-        <span id="botsStatusTag" class="badge-tag" style="padding: 3px 10px; font-size: 0.7rem; border-radius: 3px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
-          <i class="fa-solid fa-clock" style="font-size: 0.65rem;"></i> <span id="botsStatusText">EM BREVE</span>
+        <span id="botsStatusTag" class="badge-tag bots-status-tag">
+          <i class="fa-solid fa-clock"></i> <span id="botsStatusText">EM BREVE</span>
         </span>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+      <div class="bots-grid">
         <!-- Telegram Bot Info -->
-        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 12px 14px; position: relative;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.84rem; color: #29b6f6;">
-              <i class="fa-brands fa-telegram" style="font-size: 1.2rem;"></i>
+        <div class="bot-card telegram-card">
+          <div class="bot-card-header">
+            <div class="bot-card-provider">
+              <i class="fa-brands fa-telegram"></i>
               <span>Telegram Bot</span>
             </div>
-            <span id="tgBotTag" class="badge-tag" style="font-size: 0.65rem; padding: 2px 7px; text-transform: uppercase;">EM BREVE</span>
+            <span id="tgBotTag" class="badge-tag bot-status-tag">EM BREVE</span>
           </div>
-          <p style="margin: 0; font-size: 0.78rem; opacity: 0.85; line-height: 1.45;">
+          <p class="bot-card-description">
             Integração nativa no Telegram para você encaminhar reels, vídeos e áudios com download instantâneo e direto no chat.
           </p>
         </div>
 
         <!-- WhatsApp Bot Info -->
-        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 12px 14px; position: relative;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.84rem; color: #25d366;">
-              <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
+        <div class="bot-card whatsapp-card">
+          <div class="bot-card-header">
+            <div class="bot-card-provider">
+              <i class="fa-brands fa-whatsapp"></i>
               <span>WhatsApp Bot</span>
             </div>
-            <span id="waBotTag" class="badge-tag" style="font-size: 0.65rem; padding: 2px 7px; text-transform: uppercase;">EM BREVE</span>
+            <span id="waBotTag" class="badge-tag bot-status-tag">EM BREVE</span>
           </div>
-          <p style="margin: 0; font-size: 0.78rem; opacity: 0.85; line-height: 1.45;">
+          <p class="bot-card-description">
             Envie links em conversas ou grupos do WhatsApp e receba os arquivos MP4/MP3 convertidos em tempo real via pareamento seguro.
           </p>
         </div>
@@ -307,23 +308,23 @@
     </div>
 
     <!-- Bottom Credits -->
-    <div id="bottomCredits" style="text-align: center; font-size: 0.75rem; margin-top: 1.25rem; opacity: 0.6; letter-spacing: 2px;">
+    <div id="bottomCredits" class="bottom-credits">
       "THE GRID. A DIGITAL FRONTIER." &bull; ANYTHING // DOWN &copy; 2026
     </div>
 
     <!-- Legal Navigation & Author Signature -->
-    <footer style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12); text-align: center; font-size: 0.8rem; opacity: 0.85;">
-      <div style="display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 0.6rem; flex-wrap: wrap;">
-        <a href="/terms.html" style="color: inherit; text-decoration: none; transition: opacity 0.2s;"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="/privacy.html" style="color: inherit; text-decoration: none; transition: opacity 0.2s;"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="/license.html" style="color: inherit; text-decoration: none; transition: opacity 0.2s;"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
-        <span style="opacity: 0.4;">&bull;</span>
-        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; transition: opacity 0.2s;"><i class="fa-brands fa-github"></i> Repositório</a>
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="/terms.html"><i class="fa-solid fa-scale-balanced"></i> Termos de Uso</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="/privacy.html"><i class="fa-solid fa-user-shield"></i> Privacidade</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="/license.html"><i class="fa-solid fa-certificate"></i> Licença MIT</a>
+        <span class="footer-separator">&bull;</span>
+        <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Repositório</a>
       </div>
-      <div style="font-size: 0.76rem; opacity: 0.75; letter-spacing: 0.5px;">
-        Desenvolvido com ⚡ por <a href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer" style="color: #00f3ff; font-weight: bold; text-decoration: none;">ScParis</a> &bull; Código Aberto no <a href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: bold; text-decoration: underline;">GitHub</a>
+      <div class="footer-attribution">
+        Desenvolvido com ⚡ por <a class="footer-author" href="https://github.com/ScParis" target="_blank" rel="noopener noreferrer">ScParis</a> &bull; Código Aberto no <a class="footer-repository" href="https://github.com/ScParis/AnythingDown" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </footer>
 
@@ -455,16 +456,25 @@
             photoGrid.innerHTML = '';
             currentMediaItems.forEach((item, index) => {
               const itemDiv = document.createElement('div');
-              itemDiv.style.cssText = 'position: relative; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 243, 255, 0.3); aspect-ratio: 1; background: #000; cursor: pointer; transition: transform 0.2s, border-color 0.2s;';
+              itemDiv.className = 'photo-item';
+              itemDiv.setAttribute('role', 'button');
+              itemDiv.tabIndex = 0;
+              itemDiv.setAttribute('aria-label', `Baixar foto ${index + 1} em alta resolução`);
               itemDiv.innerHTML = `
-                <img src="${item.url}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
-                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.75); font-size: 0.68rem; padding: 2px 4px; text-align: center; color: #fff;">
+                <img class="photo-item-image" src="${item.url}" alt="Foto ${index + 1}">
+                <div class="photo-item-action">
                   #${index + 1} <i class="fa-solid fa-download"></i>
                 </div>
               `;
               itemDiv.title = `Clique para baixar a Foto #${index + 1} em alta resolução`;
               itemDiv.addEventListener('click', () => {
                 downloadSinglePhoto(item.url, `foto_${index + 1}.jpg`);
+              });
+              itemDiv.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  downloadSinglePhoto(item.url, `foto_${index + 1}.jpg`);
+                }
               });
               photoGrid.appendChild(itemDiv);
             });
@@ -594,7 +604,7 @@
     if (btnCopyWaCmd) {
       btnCopyWaCmd.addEventListener('click', () => {
         navigator.clipboard.writeText('npm run start:bot:whatsapp').then(() => {
-          btnCopyWaCmd.innerHTML = '<i class="fa-solid fa-check" style="color: #79f243;"></i>';
+          btnCopyWaCmd.innerHTML = '<i class="fa-solid fa-check copy-success-icon"></i>';
           sfx.playSuccess();
           setTimeout(() => {
             btnCopyWaCmd.innerHTML = '<i class="fa-regular fa-copy"></i>';
