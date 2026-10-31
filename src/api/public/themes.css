@@ -1955,7 +1955,7 @@ body.theme-simpsons .badge-card {
 body.theme-pacman {
   --color-canvas: #000000;
   --color-text: #ffff00;
-  --color-surface-card: rgba(0, 0, 0, 0.94);
+  --color-surface-card: rgba(0, 0, 0, 0.78);
   --color-media-surface: rgba(0, 8, 20, 0.85);
   --color-surface-control: #000000;
   --color-border: #2121de;
@@ -2036,7 +2036,7 @@ body.theme-pacman .theme-btn {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.65rem;
   letter-spacing: 1px;
-  background: #000000;
+  background: rgba(0, 0, 0, 0.76);
   color: #ffff00;
   border: 2px solid #2121de;
   box-shadow: 3px 3px 0px #2121de;
@@ -2053,7 +2053,7 @@ body.theme-pacman .theme-btn:hover {
 }
 
 body.theme-pacman .theme-btn-accent {
-  background: #ff0000;
+  background: rgba(255, 0, 0, 0.78);
   color: #ffffff;
   border: 2px solid #ffffff;
   box-shadow: 3px 3px 0px #2121de;

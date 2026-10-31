@@ -199,6 +199,9 @@ class SoundFX {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       initNightCityBuildings();
+      if (currentTheme === 'pacman' && window.MotionEngine) {
+        window.MotionEngine.resetPacman();
+      }
       refreshWorld();
     });
 
@@ -1810,50 +1813,153 @@ class SoundFX {
     // =========================================================================
     // 8. PAC-MAN 1980 (NAMCO / MIDWAY NEON RETRO ARCADE MAZE) ENGINE
     // =========================================================================
-    let pacmanX = 0;
-    let pacmanY = 120;
-    let pacmanDir = 1; // 1 = right, -1 = left
     let pacmanSpeed = 3.6;
     let pacmanMouthAngle = 0.2;
     let pacmanMouthDir = 0.04;
+    let pacmanRoute = [];
+    let pacmanRouteLength = 0;
+    let pacmanRouteGeometry = null;
+    let pacmanRouteDistance = 0;
     let pacmanDots = [];
     let pacmanGhosts = [];
     let pacmanFruits = [];
     let pacmanScore = 24500;
 
-    function initPacmanTheme() {
-      pacmanX = -50;
-      pacmanY = height * 0.78;
-      pacmanDir = 1;
+    function tracePacmanRoundedRect(left, top, right, bottom, radius) {
+      ctx.beginPath();
+      ctx.moveTo(left + radius, top);
+      ctx.lineTo(right - radius, top);
+      ctx.quadraticCurveTo(right, top, right, top + radius);
+      ctx.lineTo(right, bottom - radius);
+      ctx.quadraticCurveTo(right, bottom, right - radius, bottom);
+      ctx.lineTo(left + radius, bottom);
+      ctx.quadraticCurveTo(left, bottom, left, bottom - radius);
+      ctx.lineTo(left, top + radius);
+      ctx.quadraticCurveTo(left, top, left + radius, top);
+      ctx.closePath();
+    }
 
-      // Generate rows of neon pellets / energizers across the viewport
-      pacmanDots = [];
-      const dotSpacing = 36;
-      const count = Math.ceil(width / dotSpacing) + 2;
-      for (let i = 0; i < count; i++) {
-        const isEnergizer = (i % 12 === 0);
-        pacmanDots.push({
-          x: i * dotSpacing,
-          y: pacmanY,
-          isEnergizer: isEnergizer,
-          radius: isEnergizer ? 7 : 3.5,
-          eaten: false
-        });
+    function buildPacmanRoute() {
+      const laneWidth = Math.max(17, Math.min(30, width * 0.055));
+      const outerLeft = Math.max(8, Math.min(130, width * 0.07));
+      const outerRight = width - outerLeft;
+      const outerTop = Math.max(54, height * 0.11);
+      const outerBottom = height - outerTop;
+      const centerLeft = outerLeft + laneWidth;
+      const centerRight = outerRight - laneWidth;
+      const centerTop = outerTop + laneWidth;
+      const centerBottom = outerBottom - laneWidth;
+      const radius = Math.max(12, Math.min(laneWidth * 1.55, (centerRight - centerLeft) / 4, (centerBottom - centerTop) / 4));
+
+      pacmanRouteGeometry = {
+        outer: { left: outerLeft, top: outerTop, right: outerRight, bottom: outerBottom, radius: radius + laneWidth },
+        inner: { left: centerLeft + laneWidth, top: centerTop + laneWidth, right: centerRight - laneWidth, bottom: centerBottom - laneWidth, radius: Math.max(8, radius - laneWidth) },
+        center: { left: centerLeft, top: centerTop, right: centerRight, bottom: centerBottom, radius }
+      };
+
+      pacmanRoute = [];
+      const addPoint = (x, y) => pacmanRoute.push({ x, y, distance: 0 });
+      let current = { x: centerLeft + radius, y: centerTop };
+      addPoint(current.x, current.y);
+
+      const addLine = (x, y) => {
+        const start = current;
+        const length = Math.hypot(x - start.x, y - start.y);
+        const steps = Math.max(1, Math.ceil(length / 18));
+        for (let step = 1; step <= steps; step++) {
+          const progress = step / steps;
+          addPoint(start.x + (x - start.x) * progress, start.y + (y - start.y) * progress);
+        }
+        current = { x, y };
+      };
+      const addCurve = (controlX, controlY, x, y) => {
+        const start = current;
+        const steps = 14;
+        for (let step = 1; step <= steps; step++) {
+          const t = step / steps;
+          const inverse = 1 - t;
+          addPoint(
+            inverse * inverse * start.x + 2 * inverse * t * controlX + t * t * x,
+            inverse * inverse * start.y + 2 * inverse * t * controlY + t * t * y
+          );
+        }
+        current = { x, y };
+      };
+
+      addLine(centerRight - radius, centerTop);
+      addCurve(centerRight, centerTop, centerRight, centerTop + radius);
+      addLine(centerRight, centerBottom - radius);
+      addCurve(centerRight, centerBottom, centerRight - radius, centerBottom);
+      addLine(centerLeft + radius, centerBottom);
+      addCurve(centerLeft, centerBottom, centerLeft, centerBottom - radius);
+      addLine(centerLeft, centerTop + radius);
+      addCurve(centerLeft, centerTop, centerLeft + radius, centerTop);
+
+      pacmanRouteLength = 0;
+      for (let index = 1; index < pacmanRoute.length; index++) {
+        const previous = pacmanRoute[index - 1];
+        const point = pacmanRoute[index];
+        pacmanRouteLength += Math.hypot(point.x - previous.x, point.y - previous.y);
+        point.distance = pacmanRouteLength;
       }
 
-      // 4 Famous Ghosts: Blinky (Red), Pinky (Pink), Inky (Cyan), Clyde (Orange)
+      const dotsPerLap = Math.max(24, Math.floor(pacmanRouteLength / 36));
+      pacmanDots = Array.from({ length: dotsPerLap }, (_, index) => {
+        const isEnergizer = index % 12 === 0;
+        const point = getPacmanRoutePoint(index * pacmanRouteLength / dotsPerLap);
+        return {
+          x: point.x,
+          y: point.y,
+          isEnergizer,
+          radius: isEnergizer ? 7 : 3.5,
+          eaten: false
+        };
+      });
+
+      pacmanRouteDistance = 0;
       pacmanGhosts = [
-        { name: 'Blinky', color: '#ff0000', x: -140, y: pacmanY, dir: 1, speed: 3.4, eyeDir: 1 },
-        { name: 'Pinky',  color: '#ffb8de', x: -190, y: pacmanY, dir: 1, speed: 3.3, eyeDir: 1 },
-        { name: 'Inky',   color: '#00ffff', x: -240, y: pacmanY, dir: 1, speed: 3.2, eyeDir: 1 },
-        { name: 'Clyde',  color: '#ffb852', x: -290, y: pacmanY, dir: 1, speed: 3.1, eyeDir: 1 }
+        { name: 'Blinky', color: '#ff0000', distance: pacmanRouteLength - 54, speed: 3.4, eyeDir: 1 },
+        { name: 'Pinky', color: '#ffb8de', distance: pacmanRouteLength - 104, speed: 3.3, eyeDir: 1 },
+        { name: 'Inky', color: '#00ffff', distance: pacmanRouteLength - 154, speed: 3.2, eyeDir: 1 },
+        { name: 'Clyde', color: '#ffb852', distance: pacmanRouteLength - 204, speed: 3.1, eyeDir: 1 }
       ];
+    }
+
+    function getPacmanRoutePoint(distance) {
+      if (pacmanRoute.length < 2 || pacmanRouteLength <= 0) return { x: 0, y: 0, angle: 0 };
+      const wrappedDistance = ((distance % pacmanRouteLength) + pacmanRouteLength) % pacmanRouteLength;
+      let low = 1;
+      let high = pacmanRoute.length - 1;
+      while (low < high) {
+        const middle = Math.floor((low + high) / 2);
+        if (pacmanRoute[middle].distance < wrappedDistance) low = middle + 1;
+        else high = middle;
+      }
+      const end = pacmanRoute[low];
+      const start = pacmanRoute[low - 1];
+      const segmentLength = end.distance - start.distance || 1;
+      const progress = (wrappedDistance - start.distance) / segmentLength;
+      return {
+        x: start.x + (end.x - start.x) * progress,
+        y: start.y + (end.y - start.y) * progress,
+        angle: Math.atan2(end.y - start.y, end.x - start.x)
+      };
+    }
+
+    function initPacmanTheme() {
+      buildPacmanRoute();
+      pacmanSpeed = 3.6;
+      pacmanMouthAngle = 0.2;
+      pacmanMouthDir = 0.04;
 
       // Floating Arcade Fruit / Cherry Bonuses
       pacmanFruits = [
-        { x: width * 0.25, y: height * 0.32, type: 'cherry', floatOffset: 0 },
-        { x: width * 0.75, y: height * 0.28, type: 'strawberry', floatOffset: Math.PI }
+        { x: width * 0.4, y: height * 0.43, type: 'cherry', floatOffset: 0 },
+        { x: width * 0.6, y: height * 0.57, type: 'strawberry', floatOffset: Math.PI }
       ];
+
+      const scoreEl = getEl('pacScore');
+      if (scoreEl) scoreEl.textContent = pacmanScore;
     }
 
     initPacmanTheme();
@@ -1863,31 +1969,33 @@ class SoundFX {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, width, height);
 
-      // Neon Arcade Maze Border Lines (Top, Middle, Bottom)
+      if (!pacmanRouteGeometry) initPacmanTheme();
+
+      // Closed neon circuit walls; the lane and rounded corners scale with the viewport.
       ctx.save();
       ctx.strokeStyle = '#2121de';
       ctx.lineWidth = 4;
       ctx.shadowColor = '#2121de';
       ctx.shadowBlur = 10;
-
-      // Upper Maze Arch
-      const mazeY = pacmanY;
-      ctx.beginPath();
-      ctx.moveTo(0, mazeY - 35);
-      ctx.lineTo(width, mazeY - 35);
+      const { outer, inner, center } = pacmanRouteGeometry;
+      tracePacmanRoundedRect(outer.left, outer.top, outer.right, outer.bottom, outer.radius);
+      ctx.stroke();
+      ctx.strokeStyle = '#4b5cff';
+      ctx.shadowColor = '#4b5cff';
+      tracePacmanRoundedRect(inner.left, inner.top, inner.right, inner.bottom, inner.radius);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(110, 120, 255, 0.45)';
+      ctx.shadowBlur = 5;
+      ctx.lineWidth = 1;
+      tracePacmanRoundedRect(center.left, center.top, center.right, center.bottom, center.radius);
       ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(0, mazeY + 35);
-      ctx.lineTo(width, mazeY + 35);
-      ctx.stroke();
-
-      // Occasional maze block obstacles in background
+      // Discrete maze islands remain inside the loop and clear the fruit lane.
       ctx.fillStyle = 'rgba(33, 33, 222, 0.12)';
-      ctx.fillRect(width * 0.15, mazeY - 110, 80, 50);
-      ctx.strokeRect(width * 0.15, mazeY - 110, 80, 50);
-      ctx.fillRect(width * 0.55, mazeY - 110, 100, 50);
-      ctx.strokeRect(width * 0.55, mazeY - 110, 100, 50);
+      ctx.fillRect(width * 0.18, height * 0.34, width * 0.16, 18);
+      ctx.strokeRect(width * 0.18, height * 0.34, width * 0.16, 18);
+      ctx.fillRect(width * 0.66, height * 0.64, width * 0.16, 18);
+      ctx.strokeRect(width * 0.66, height * 0.64, width * 0.16, 18);
       ctx.restore();
 
       // 2. Draw Pac-Dots / Energizers
@@ -1910,7 +2018,7 @@ class SoundFX {
       ctx.restore();
 
       // 3. Draw Pac-Man with Chomp Animation
-      pacmanX += pacmanSpeed * pacmanDir;
+      const pacmanPosition = getPacmanRoutePoint(pacmanRouteDistance);
       pacmanMouthAngle += pacmanMouthDir;
       if (pacmanMouthAngle > 0.45 || pacmanMouthAngle < 0.04) {
         pacmanMouthDir = -pacmanMouthDir;
@@ -1918,7 +2026,7 @@ class SoundFX {
 
       // Check dot consumption
       for (const dot of pacmanDots) {
-        if (!dot.eaten && Math.abs(pacmanX - dot.x) < 18) {
+        if (!dot.eaten && Math.hypot(pacmanPosition.x - dot.x, pacmanPosition.y - dot.y) < 23) {
           dot.eaten = true;
           pacmanScore += dot.isEnergizer ? 50 : 10;
           const scoreEl = getEl("pacScore");
@@ -1926,21 +2034,17 @@ class SoundFX {
         }
       }
 
-      // Wrap around screen
-      if (pacmanDir === 1 && pacmanX > width + 100) {
-        pacmanX = -80;
+      // Complete laps restore pellets; the cumulative score remains untouched.
+      const nextPacmanDistance = pacmanRouteDistance + pacmanSpeed;
+      if (nextPacmanDistance >= pacmanRouteLength) {
+        pacmanRouteDistance = nextPacmanDistance % pacmanRouteLength;
         for (const dot of pacmanDots) dot.eaten = false;
-      } else if (pacmanDir === -1 && pacmanX < -100) {
-        pacmanX = width + 80;
-        for (const dot of pacmanDots) dot.eaten = false;
-      }
+      } else pacmanRouteDistance = nextPacmanDistance;
 
       // Render Pac-Man Body
       ctx.save();
-      ctx.translate(pacmanX, pacmanY);
-      if (pacmanDir === -1) {
-        ctx.scale(-1, 1);
-      }
+      ctx.translate(pacmanPosition.x, pacmanPosition.y);
+      ctx.rotate(pacmanPosition.angle);
       ctx.fillStyle = '#ffff00';
       ctx.shadowColor = '#ffff00';
       ctx.shadowBlur = 12;
@@ -1954,12 +2058,10 @@ class SoundFX {
 
       // 4. Draw The 4 Ghosts Chasing Pac-Man
       for (const ghost of pacmanGhosts) {
-        ghost.x += ghost.speed * ghost.dir;
-        if (ghost.dir === 1 && ghost.x > width + 150) {
-          ghost.x = -150 - Math.random() * 80;
-        }
-
-        drawArcadeGhost(ghost.x, ghost.y, ghost.color, ghost.eyeDir);
+        ghost.distance = (ghost.distance + ghost.speed) % pacmanRouteLength;
+        const ghostPosition = getPacmanRoutePoint(ghost.distance);
+        const eyeDirection = Math.cos(ghostPosition.angle) >= 0 ? 1 : -1;
+        drawArcadeGhost(ghostPosition.x, ghostPosition.y, ghost.color, eyeDirection);
       }
 
       // 5. Draw Floating Arcade Fruit Bonuses (Cherries & Strawberries)
@@ -2659,7 +2761,8 @@ class SoundFX {
       get reduced() { return worldMotionReduced; },
       sync: syncMotionPreference,
       refresh: refreshWorld,
-      toggle: toggleWorldMotion
+      toggle: toggleWorldMotion,
+      resetPacman: initPacmanTheme
     };
 
     syncMotionPreference();
@@ -2716,6 +2819,7 @@ function applyTheme(theme) {
 
   body.className = themeConfig.className;
   window.MotionEngine.sync();
+  if (theme === 'pacman') window.MotionEngine.resetPacman();
   if (themeName) themeName.textContent = themeConfig.label;
 
   // Hide all strips and badges first
