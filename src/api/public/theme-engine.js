@@ -1813,87 +1813,103 @@ class SoundFX {
     // =========================================================================
     // 8. PAC-MAN 1980 (NAMCO / MIDWAY NEON RETRO ARCADE MAZE) ENGINE
     // =========================================================================
-    let pacmanSpeed = 3.6;
+    let pacmanSpeed = 2.2;
     let pacmanMouthAngle = 0.2;
     let pacmanMouthDir = 0.04;
     let pacmanRoute = [];
     let pacmanRouteLength = 0;
-    let pacmanRouteGeometry = null;
+    let pacmanMaze = null;
     let pacmanRouteDistance = 0;
     let pacmanDots = [];
     let pacmanGhosts = [];
     let pacmanFruits = [];
     let pacmanScore = 24500;
 
-    function tracePacmanRoundedRect(left, top, right, bottom, radius) {
-      ctx.beginPath();
-      ctx.moveTo(left + radius, top);
-      ctx.lineTo(right - radius, top);
-      ctx.quadraticCurveTo(right, top, right, top + radius);
-      ctx.lineTo(right, bottom - radius);
-      ctx.quadraticCurveTo(right, bottom, right - radius, bottom);
-      ctx.lineTo(left + radius, bottom);
-      ctx.quadraticCurveTo(left, bottom, left, bottom - radius);
-      ctx.lineTo(left, top + radius);
-      ctx.quadraticCurveTo(left, top, left + radius, top);
-      ctx.closePath();
-    }
-
     function buildPacmanRoute() {
-      const laneWidth = Math.max(17, Math.min(30, width * 0.055));
-      const outerLeft = Math.max(8, Math.min(130, width * 0.07));
-      const outerRight = width - outerLeft;
-      const outerTop = Math.max(54, height * 0.11);
-      const outerBottom = height - outerTop;
-      const centerLeft = outerLeft + laneWidth;
-      const centerRight = outerRight - laneWidth;
-      const centerTop = outerTop + laneWidth;
-      const centerBottom = outerBottom - laneWidth;
-      const radius = Math.max(12, Math.min(laneWidth * 1.55, (centerRight - centerLeft) / 4, (centerBottom - centerTop) / 4));
-
-      pacmanRouteGeometry = {
-        outer: { left: outerLeft, top: outerTop, right: outerRight, bottom: outerBottom, radius: radius + laneWidth },
-        inner: { left: centerLeft + laneWidth, top: centerTop + laneWidth, right: centerRight - laneWidth, bottom: centerBottom - laneWidth, radius: Math.max(8, radius - laneWidth) },
-        center: { left: centerLeft, top: centerTop, right: centerRight, bottom: centerBottom, radius }
+      // Grid tile size follows viewport width while row/column counts fill the canvas.
+      const tile = Math.max(22, Math.min(44, Math.min(width / 11, height / 13)));
+      const columns = Math.max(6, Math.floor((width - tile * 0.8) / tile));
+      const rows = Math.max(8, Math.floor((height - tile * 2.2) / tile));
+      const left = (width - (columns - 1) * tile) / 2;
+      const top = Math.max(tile * 1.4, (height - (rows - 1) * tile) / 2);
+      const node = (column, row) => ({ x: left + column * tile, y: top + row * tile });
+      const last = columns - 2;
+      const lower = rows - 2;
+      const center = node(Math.floor(columns / 2), Math.floor(rows / 2));
+      const middleRow = Math.floor(rows / 2);
+      const travelRows = Array.from({ length: lower - 1 }, (_, index) => index + 1)
+        .filter((row) => Math.abs(row - middleRow) > 1);
+      if (travelRows.length % 2) travelRows.pop();
+      const routeNodes = [node(1, travelRows[0])];
+      travelRows.forEach((row, index) => {
+        const edgeColumn = index % 2 === 0 ? last : 1;
+        routeNodes.push(node(edgeColumn, row));
+        if (index < travelRows.length - 1) routeNodes.push(node(edgeColumn, travelRows[index + 1]));
+      });
+      const penWidth = Math.min(tile * 3.2, width * 0.34);
+      const penHeight = tile * 1.45;
+      pacmanMaze = {
+        tile, columns, rows, left, top,
+        width: (columns - 1) * tile,
+        height: (rows - 1) * tile,
+        routeNodes,
+        pen: { x: center.x - penWidth / 2, y: center.y - penHeight / 2, width: penWidth, height: penHeight },
+        branches: []
       };
 
+      // Add short dead-end corridors to make the full-screen grid read as a maze.
+      for (let column = 3; column < columns - 2; column += 4) {
+        const branchDepth = (column % 2 ? 2 : 1) * tile;
+        pacmanMaze.branches.push([node(column, 1), node(column, 1).y < center.y ? { x: node(column, 1).x, y: node(column, 1).y + branchDepth } : { x: node(column, 1).x, y: node(column, 1).y - branchDepth }]);
+      }
+      for (let column = 4; column < columns - 2; column += 5) {
+        const branchStart = node(column, lower);
+        pacmanMaze.branches.push([branchStart, { x: branchStart.x, y: branchStart.y - tile * 1.5 }]);
+      }
+
+      // The actor route is one closed orthogonal circuit. Rounded corners are sampled
+      // as quadratic arcs so positions and tangents remain continuous through turns.
       pacmanRoute = [];
       const addPoint = (x, y) => pacmanRoute.push({ x, y, distance: 0 });
-      let current = { x: centerLeft + radius, y: centerTop };
-      addPoint(current.x, current.y);
-
-      const addLine = (x, y) => {
-        const start = current;
-        const length = Math.hypot(x - start.x, y - start.y);
-        const steps = Math.max(1, Math.ceil(length / 18));
+      const round = Math.min(tile * 0.22, 9);
+      const trimmed = routeNodes.map((point, index) => {
+        const previous = routeNodes[(index - 1 + routeNodes.length) % routeNodes.length];
+        const next = routeNodes[(index + 1) % routeNodes.length];
+        const incomingLength = Math.hypot(point.x - previous.x, point.y - previous.y);
+        const outgoingLength = Math.hypot(next.x - point.x, next.y - point.y);
+        const radius = Math.min(round, incomingLength / 3, outgoingLength / 3);
+        return {
+          radius,
+          entry: { x: point.x - (point.x - previous.x) / incomingLength * radius, y: point.y - (point.y - previous.y) / incomingLength * radius },
+          exit: { x: point.x + (next.x - point.x) / outgoingLength * radius, y: point.y + (next.y - point.y) / outgoingLength * radius },
+          corner: point
+        };
+      });
+      const addLine = (from, to) => {
+        const length = Math.hypot(to.x - from.x, to.y - from.y);
+        const steps = Math.max(1, Math.ceil(length / 5));
         for (let step = 1; step <= steps; step++) {
-          const progress = step / steps;
-          addPoint(start.x + (x - start.x) * progress, start.y + (y - start.y) * progress);
+          const t = step / steps;
+          addPoint(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
         }
-        current = { x, y };
       };
-      const addCurve = (controlX, controlY, x, y) => {
-        const start = current;
-        const steps = 14;
+      const addCorner = (turn) => {
+        const start = turn.entry;
+        const end = turn.exit;
+        const steps = 8;
         for (let step = 1; step <= steps; step++) {
           const t = step / steps;
           const inverse = 1 - t;
-          addPoint(
-            inverse * inverse * start.x + 2 * inverse * t * controlX + t * t * x,
-            inverse * inverse * start.y + 2 * inverse * t * controlY + t * t * y
-          );
+          addPoint(inverse * inverse * start.x + 2 * inverse * t * turn.corner.x + t * t * end.x,
+            inverse * inverse * start.y + 2 * inverse * t * turn.corner.y + t * t * end.y);
         }
-        current = { x, y };
       };
-
-      addLine(centerRight - radius, centerTop);
-      addCurve(centerRight, centerTop, centerRight, centerTop + radius);
-      addLine(centerRight, centerBottom - radius);
-      addCurve(centerRight, centerBottom, centerRight - radius, centerBottom);
-      addLine(centerLeft + radius, centerBottom);
-      addCurve(centerLeft, centerBottom, centerLeft, centerBottom - radius);
-      addLine(centerLeft, centerTop + radius);
-      addCurve(centerLeft, centerTop, centerLeft + radius, centerTop);
+      for (let index = 0; index < trimmed.length; index++) {
+        const turn = trimmed[index];
+        const nextTurn = trimmed[(index + 1) % trimmed.length];
+        addLine(turn.exit, nextTurn.entry);
+        addCorner(nextTurn);
+      }
 
       pacmanRouteLength = 0;
       for (let index = 1; index < pacmanRoute.length; index++) {
@@ -1903,9 +1919,9 @@ class SoundFX {
         point.distance = pacmanRouteLength;
       }
 
-      const dotsPerLap = Math.max(24, Math.floor(pacmanRouteLength / 36));
+      const dotsPerLap = Math.max(24, Math.floor(pacmanRouteLength / (tile * 0.62)));
       pacmanDots = Array.from({ length: dotsPerLap }, (_, index) => {
-        const isEnergizer = index % 12 === 0;
+        const isEnergizer = index % Math.max(8, Math.floor(dotsPerLap / 8)) === 0;
         const point = getPacmanRoutePoint(index * pacmanRouteLength / dotsPerLap);
         return {
           x: point.x,
@@ -1917,11 +1933,12 @@ class SoundFX {
       });
 
       pacmanRouteDistance = 0;
+      const gap = Math.max(tile * 1.5, 42);
       pacmanGhosts = [
-        { name: 'Blinky', color: '#ff0000', distance: pacmanRouteLength - 54, speed: 3.4, eyeDir: 1 },
-        { name: 'Pinky', color: '#ffb8de', distance: pacmanRouteLength - 104, speed: 3.3, eyeDir: 1 },
-        { name: 'Inky', color: '#00ffff', distance: pacmanRouteLength - 154, speed: 3.2, eyeDir: 1 },
-        { name: 'Clyde', color: '#ffb852', distance: pacmanRouteLength - 204, speed: 3.1, eyeDir: 1 }
+        { name: 'Blinky', color: '#ff0000', distance: pacmanRouteLength - gap, speed: 2.12, eyeDir: 1 },
+        { name: 'Pinky', color: '#ffb8de', distance: pacmanRouteLength - gap * 2, speed: 2.08, eyeDir: 1 },
+        { name: 'Inky', color: '#00ffff', distance: pacmanRouteLength - gap * 3, speed: 2.04, eyeDir: 1 },
+        { name: 'Clyde', color: '#ffb852', distance: pacmanRouteLength - gap * 4, speed: 2, eyeDir: 1 }
       ];
     }
 
@@ -1939,23 +1956,27 @@ class SoundFX {
       const start = pacmanRoute[low - 1];
       const segmentLength = end.distance - start.distance || 1;
       const progress = (wrappedDistance - start.distance) / segmentLength;
+      const before = pacmanRoute[(low - 2 + pacmanRoute.length) % pacmanRoute.length];
+      const after = pacmanRoute[(low + 1) % pacmanRoute.length];
       return {
         x: start.x + (end.x - start.x) * progress,
         y: start.y + (end.y - start.y) * progress,
-        angle: Math.atan2(end.y - start.y, end.x - start.x)
+        angle: Math.atan2(after.y - before.y, after.x - before.x)
       };
     }
 
     function initPacmanTheme() {
       buildPacmanRoute();
-      pacmanSpeed = 3.6;
+      pacmanSpeed = 2.2;
       pacmanMouthAngle = 0.2;
       pacmanMouthDir = 0.04;
 
       // Floating Arcade Fruit / Cherry Bonuses
+      const tile = pacmanMaze.tile;
+      const center = { x: pacmanMaze.left + (pacmanMaze.columns - 1) * tile / 2, y: pacmanMaze.top + (pacmanMaze.rows - 1) * tile / 2 };
       pacmanFruits = [
-        { x: width * 0.4, y: height * 0.43, type: 'cherry', floatOffset: 0 },
-        { x: width * 0.6, y: height * 0.57, type: 'strawberry', floatOffset: Math.PI }
+        { x: center.x - tile * 2.2, y: center.y, type: 'cherry', floatOffset: 0 },
+        { x: center.x + tile * 2.2, y: center.y, type: 'strawberry', floatOffset: Math.PI }
       ];
 
       const scoreEl = getEl('pacScore');
@@ -1969,33 +1990,47 @@ class SoundFX {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, width, height);
 
-      if (!pacmanRouteGeometry) initPacmanTheme();
+      if (!pacmanMaze) initPacmanTheme();
 
-      // Closed neon circuit walls; the lane and rounded corners scale with the viewport.
+      // Full-screen orthogonal maze corridors use the same grid nodes as the route.
       ctx.save();
-      ctx.strokeStyle = '#2121de';
-      ctx.lineWidth = 4;
-      ctx.shadowColor = '#2121de';
-      ctx.shadowBlur = 10;
-      const { outer, inner, center } = pacmanRouteGeometry;
-      tracePacmanRoundedRect(outer.left, outer.top, outer.right, outer.bottom, outer.radius);
-      ctx.stroke();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const strokeCorridor = (points, lineWidth = pacmanMaze.tile * 0.62) => {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let index = 1; index < points.length; index++) ctx.lineTo(points[index].x, points[index].y);
+        ctx.strokeStyle = '#2121de';
+        ctx.lineWidth = lineWidth;
+        ctx.shadowColor = '#2121de';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.strokeStyle = '#080b2d';
+        ctx.lineWidth = Math.max(5, lineWidth - 5);
+        ctx.shadowBlur = 0;
+        ctx.stroke();
+      };
+      strokeCorridor(pacmanRoute.map(({ x, y }) => ({ x, y })));
+      pacmanMaze.branches.forEach((branch) => strokeCorridor(branch));
+      // Central ghost pen with a bright gate; it remains clear of the moving circuit.
+      const { pen } = pacmanMaze;
+      ctx.fillStyle = 'rgba(4, 5, 28, 0.95)';
       ctx.strokeStyle = '#4b5cff';
+      ctx.lineWidth = 2;
       ctx.shadowColor = '#4b5cff';
-      tracePacmanRoundedRect(inner.left, inner.top, inner.right, inner.bottom, inner.radius);
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.roundRect(pen.x, pen.y, pen.width, pen.height, Math.min(8, pacmanMaze.tile * 0.18));
+      ctx.fill();
       ctx.stroke();
-      ctx.strokeStyle = 'rgba(110, 120, 255, 0.45)';
-      ctx.shadowBlur = 5;
-      ctx.lineWidth = 1;
-      tracePacmanRoundedRect(center.left, center.top, center.right, center.bottom, center.radius);
-      ctx.stroke();
-
-      // Discrete maze islands remain inside the loop and clear the fruit lane.
-      ctx.fillStyle = 'rgba(33, 33, 222, 0.12)';
-      ctx.fillRect(width * 0.18, height * 0.34, width * 0.16, 18);
-      ctx.strokeRect(width * 0.18, height * 0.34, width * 0.16, 18);
-      ctx.fillRect(width * 0.66, height * 0.64, width * 0.16, 18);
-      ctx.strokeRect(width * 0.66, height * 0.64, width * 0.16, 18);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#ffb8de';
+      ctx.lineWidth = 2;
+      const gateX = pen.x + pen.width * 0.38;
+      for (let bar = 0; bar < 4; bar++) {
+        const x = gateX + bar * pacmanMaze.tile * 0.12;
+        ctx.beginPath(); ctx.moveTo(x, pen.y + pen.height - 4); ctx.lineTo(x, pen.y + pen.height + pacmanMaze.tile * 0.16); ctx.stroke();
+      }
       ctx.restore();
 
       // 2. Draw Pac-Dots / Energizers
