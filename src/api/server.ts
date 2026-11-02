@@ -136,6 +136,19 @@ export function createServer() {
     }
   });
 
+  // Public status page (consumes /api/health)
+  app.get('/status', (_req: Request, res: Response) => {
+    const statusPath = path.join(publicDir, 'status.html');
+    const srcStatusPath = path.join(srcPublicDir, 'status.html');
+    if (fs.existsSync(statusPath)) {
+      res.sendFile(statusPath);
+    } else if (fs.existsSync(srcStatusPath)) {
+      res.sendFile(srcStatusPath);
+    } else {
+      res.status(404).send('Página de status não encontrada.');
+    }
+  });
+
   // Serve Admin Dashboard
   app.get('/admin', (_req: Request, res: Response) => {
     const adminPath = path.join(publicDir, 'admin.html');
