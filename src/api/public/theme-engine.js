@@ -131,23 +131,102 @@ class SoundFX {
         setTimeout(() => this.playTone(739.99, 'triangle', 0.18, 0.22), 340); // F#5
         setTimeout(() => this.playTone(880.00, 'triangle', 0.35, 0.26), 510); // A5
       }
+      playPacmanIntro() {
+        // Authentic Namco 1980 Pac-Man Game Start Theme / Jingle
+        if (!this.ctx || !this.enabled) return;
+        this.init();
+        const notes = [
+          // Bar 1
+          { f: 493.88, d: 0.12 }, // B4
+          { f: 987.77, d: 0.12 }, // B5
+          { f: 739.99, d: 0.12 }, // F#5
+          { f: 622.25, d: 0.12 }, // D#5
+          { f: 987.77, d: 0.08 }, // B5
+          { f: 739.99, d: 0.16 }, // F#5
+          { f: 622.25, d: 0.22 }, // D#5
+          // Bar 2
+          { f: 523.25, d: 0.12 }, // C5
+          { f: 1046.50, d: 0.12 },// C6
+          { f: 783.99, d: 0.12 }, // G5
+          { f: 659.25, d: 0.12 }, // E5
+          { f: 1046.50, d: 0.08 },// C6
+          { f: 783.99, d: 0.16 }, // G5
+          { f: 659.25, d: 0.22 }, // E5
+          // Bar 3
+          { f: 493.88, d: 0.12 }, // B4
+          { f: 987.77, d: 0.12 }, // B5
+          { f: 739.99, d: 0.12 }, // F#5
+          { f: 622.25, d: 0.12 }, // D#5
+          { f: 987.77, d: 0.08 }, // B5
+          { f: 739.99, d: 0.16 }, // F#5
+          { f: 622.25, d: 0.22 }, // D#5
+          // Bar 4 (cadence)
+          { f: 622.25, d: 0.07 }, // D#5
+          { f: 659.25, d: 0.07 }, // E5
+          { f: 698.46, d: 0.07 }, // F5
+          { f: 698.46, d: 0.07 }, // F5
+          { f: 739.99, d: 0.07 }, // F#5
+          { f: 783.99, d: 0.07 }, // G5
+          { f: 830.61, d: 0.07 }, // G#5
+          { f: 880.00, d: 0.07 }, // A5
+          { f: 987.77, d: 0.32 }  // B5
+        ];
+        let t = 0;
+        notes.forEach(n => {
+          setTimeout(() => {
+            this.playTone(n.f, 'square', n.d * 0.88, 0.15);
+          }, t * 1000);
+          t += n.d;
+        });
+      }
       playPacmanWaka() {
-        // Iconic 1980 arcade "Waka-Waka" dual-tone chirp
-        this.playTone(493.88, 'triangle', 0.07, 0.18); // B4
-        setTimeout(() => this.playTone(261.63, 'sawtooth', 0.08, 0.16), 65); // C4
+        // True Namco 1980 dual-tone frequency modulation "WAK-A"
+        if (!this.ctx || !this.enabled) return;
+        this.init();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(260, now + 0.07);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.08);
+
+          setTimeout(() => {
+            if (!this.ctx || !this.enabled) return;
+            const now2 = this.ctx.currentTime;
+            const osc2 = this.ctx.createOscillator();
+            const gain2 = this.ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(280, now2);
+            osc2.frequency.exponentialRampToValueAtTime(460, now2 + 0.07);
+            gain2.gain.setValueAtTime(0.18, now2);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now2 + 0.075);
+            osc2.connect(gain2);
+            gain2.connect(this.ctx.destination);
+            osc2.start(now2);
+            osc2.stop(now2 + 0.08);
+          }, 80);
+        } catch(e) {}
       }
       playPacmanFruit() {
         // Arcade bonus fruit capture / cherry ding
-        this.playTone(1046.50, 'square', 0.09, 0.2);
-        setTimeout(() => this.playTone(1318.51, 'square', 0.09, 0.2), 80);
-        setTimeout(() => this.playTone(1567.98, 'square', 0.16, 0.25), 160);
+        this.playTone(1046.50, 'square', 0.07, 0.2);
+        setTimeout(() => this.playTone(1318.51, 'square', 0.07, 0.2), 60);
+        setTimeout(() => this.playTone(1567.98, 'square', 0.09, 0.2), 120);
+        setTimeout(() => this.playTone(2093.00, 'square', 0.16, 0.22), 180);
       }
       playPacmanGhostEat() {
         // Ghost eaten sound (rapid ascending sequence)
-        this.playTone(300, 'square', 0.06, 0.22);
-        setTimeout(() => this.playTone(600, 'square', 0.06, 0.22), 50);
-        setTimeout(() => this.playTone(900, 'square', 0.08, 0.25), 100);
-        setTimeout(() => this.playTone(1200, 'square', 0.12, 0.25), 150);
+        this.playTone(280, 'square', 0.05, 0.22);
+        setTimeout(() => this.playTone(480, 'square', 0.05, 0.22), 45);
+        setTimeout(() => this.playTone(720, 'square', 0.06, 0.25), 90);
+        setTimeout(() => this.playTone(1100, 'square', 0.10, 0.25), 135);
       }
       playSuccess() {
         if (currentTheme === 'cs') {
@@ -1813,171 +1892,251 @@ class SoundFX {
     // =========================================================================
     // 8. PAC-MAN 1980 (NAMCO / MIDWAY NEON RETRO ARCADE MAZE) ENGINE
     // =========================================================================
-    let pacmanSpeed = 2.2;
-    let pacmanMouthAngle = 0.2;
-    let pacmanMouthDir = 0.04;
-    let pacmanRoute = [];
-    let pacmanRouteLength = 0;
     let pacmanMaze = null;
-    let pacmanRouteDistance = 0;
-    let pacmanDots = [];
+    let pacmanActor = null;
     let pacmanGhosts = [];
-    let pacmanFruits = [];
+    let pacmanDots = [];
     let pacmanScore = 24500;
+    let pacmanFrightenedTimer = 0;
+    let pacmanFruit = null;
+    let pacmanFruitTimer = 0;
 
-    function buildPacmanRoute() {
-      // Grid tile size follows viewport width while row/column counts fill the canvas.
-      const tile = Math.max(22, Math.min(44, Math.min(width / 11, height / 13)));
-      const columns = Math.max(6, Math.floor((width - tile * 0.8) / tile));
-      const rows = Math.max(8, Math.floor((height - tile * 2.2) / tile));
-      const left = (width - (columns - 1) * tile) / 2;
-      const top = Math.max(tile * 1.4, (height - (rows - 1) * tile) / 2);
-      const node = (column, row) => ({ x: left + column * tile, y: top + row * tile });
-      const last = columns - 2;
-      const lower = rows - 2;
-      const center = node(Math.floor(columns / 2), Math.floor(rows / 2));
-      const middleRow = Math.floor(rows / 2);
-      const travelRows = Array.from({ length: lower - 1 }, (_, index) => index + 1)
-        .filter((row) => Math.abs(row - middleRow) > 1);
-      if (travelRows.length % 2) travelRows.pop();
-      const routeNodes = [node(1, travelRows[0])];
-      travelRows.forEach((row, index) => {
-        const edgeColumn = index % 2 === 0 ? last : 1;
-        routeNodes.push(node(edgeColumn, row));
-        if (index < travelRows.length - 1) routeNodes.push(node(edgeColumn, travelRows[index + 1]));
-      });
-      const penWidth = Math.min(tile * 3.2, width * 0.34);
-      const penHeight = tile * 1.45;
-      pacmanMaze = {
-        tile, columns, rows, left, top,
-        width: (columns - 1) * tile,
-        height: (rows - 1) * tile,
-        routeNodes,
-        pen: { x: center.x - penWidth / 2, y: center.y - penHeight / 2, width: penWidth, height: penHeight },
-        branches: []
-      };
-
-      // Add short dead-end corridors to make the full-screen grid read as a maze.
-      for (let column = 3; column < columns - 2; column += 4) {
-        const branchDepth = (column % 2 ? 2 : 1) * tile;
-        pacmanMaze.branches.push([node(column, 1), node(column, 1).y < center.y ? { x: node(column, 1).x, y: node(column, 1).y + branchDepth } : { x: node(column, 1).x, y: node(column, 1).y - branchDepth }]);
-      }
-      for (let column = 4; column < columns - 2; column += 5) {
-        const branchStart = node(column, lower);
-        pacmanMaze.branches.push([branchStart, { x: branchStart.x, y: branchStart.y - tile * 1.5 }]);
-      }
-
-      // The actor route is one closed orthogonal circuit. Rounded corners are sampled
-      // as quadratic arcs so positions and tangents remain continuous through turns.
-      pacmanRoute = [];
-      const addPoint = (x, y) => pacmanRoute.push({ x, y, distance: 0 });
-      const round = Math.min(tile * 0.22, 9);
-      const trimmed = routeNodes.map((point, index) => {
-        const previous = routeNodes[(index - 1 + routeNodes.length) % routeNodes.length];
-        const next = routeNodes[(index + 1) % routeNodes.length];
-        const incomingLength = Math.hypot(point.x - previous.x, point.y - previous.y);
-        const outgoingLength = Math.hypot(next.x - point.x, next.y - point.y);
-        const radius = Math.min(round, incomingLength / 3, outgoingLength / 3);
-        return {
-          radius,
-          entry: { x: point.x - (point.x - previous.x) / incomingLength * radius, y: point.y - (point.y - previous.y) / incomingLength * radius },
-          exit: { x: point.x + (next.x - point.x) / outgoingLength * radius, y: point.y + (next.y - point.y) / outgoingLength * radius },
-          corner: point
-        };
-      });
-      const addLine = (from, to) => {
-        const length = Math.hypot(to.x - from.x, to.y - from.y);
-        const steps = Math.max(1, Math.ceil(length / 5));
-        for (let step = 1; step <= steps; step++) {
-          const t = step / steps;
-          addPoint(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
-        }
-      };
-      const addCorner = (turn) => {
-        const start = turn.entry;
-        const end = turn.exit;
-        const steps = 8;
-        for (let step = 1; step <= steps; step++) {
-          const t = step / steps;
-          const inverse = 1 - t;
-          addPoint(inverse * inverse * start.x + 2 * inverse * t * turn.corner.x + t * t * end.x,
-            inverse * inverse * start.y + 2 * inverse * t * turn.corner.y + t * t * end.y);
-        }
-      };
-      for (let index = 0; index < trimmed.length; index++) {
-        const turn = trimmed[index];
-        const nextTurn = trimmed[(index + 1) % trimmed.length];
-        addLine(turn.exit, nextTurn.entry);
-        addCorner(nextTurn);
-      }
-
-      pacmanRouteLength = 0;
-      for (let index = 1; index < pacmanRoute.length; index++) {
-        const previous = pacmanRoute[index - 1];
-        const point = pacmanRoute[index];
-        pacmanRouteLength += Math.hypot(point.x - previous.x, point.y - previous.y);
-        point.distance = pacmanRouteLength;
-      }
-
-      const dotsPerLap = Math.max(24, Math.floor(pacmanRouteLength / (tile * 0.62)));
-      pacmanDots = Array.from({ length: dotsPerLap }, (_, index) => {
-        const isEnergizer = index % Math.max(8, Math.floor(dotsPerLap / 8)) === 0;
-        const point = getPacmanRoutePoint(index * pacmanRouteLength / dotsPerLap);
-        return {
-          x: point.x,
-          y: point.y,
-          isEnergizer,
-          radius: isEnergizer ? 7 : 3.5,
-          eaten: false
-        };
-      });
-
-      pacmanRouteDistance = 0;
-      const gap = Math.max(tile * 1.5, 42);
-      pacmanGhosts = [
-        { name: 'Blinky', color: '#ff0000', distance: pacmanRouteLength - gap, speed: 2.12, eyeDir: 1 },
-        { name: 'Pinky', color: '#ffb8de', distance: pacmanRouteLength - gap * 2, speed: 2.08, eyeDir: 1 },
-        { name: 'Inky', color: '#00ffff', distance: pacmanRouteLength - gap * 3, speed: 2.04, eyeDir: 1 },
-        { name: 'Clyde', color: '#ffb852', distance: pacmanRouteLength - gap * 4, speed: 2, eyeDir: 1 }
-      ];
-    }
-
-    function getPacmanRoutePoint(distance) {
-      if (pacmanRoute.length < 2 || pacmanRouteLength <= 0) return { x: 0, y: 0, angle: 0 };
-      const wrappedDistance = ((distance % pacmanRouteLength) + pacmanRouteLength) % pacmanRouteLength;
-      let low = 1;
-      let high = pacmanRoute.length - 1;
-      while (low < high) {
-        const middle = Math.floor((low + high) / 2);
-        if (pacmanRoute[middle].distance < wrappedDistance) low = middle + 1;
-        else high = middle;
-      }
-      const end = pacmanRoute[low];
-      const start = pacmanRoute[low - 1];
-      const segmentLength = end.distance - start.distance || 1;
-      const progress = (wrappedDistance - start.distance) / segmentLength;
-      const before = pacmanRoute[(low - 2 + pacmanRoute.length) % pacmanRoute.length];
-      const after = pacmanRoute[(low + 1) % pacmanRoute.length];
-      return {
-        x: start.x + (end.x - start.x) * progress,
-        y: start.y + (end.y - start.y) * progress,
-        angle: Math.atan2(after.y - before.y, after.x - before.x)
-      };
-    }
-
+    // Authentic 1980 Arcade Maze Layout representation
+    // 0 = empty space, 1 = dot path, 2 = energizer (power pellet), 3 = ghost pen, 4 = fruit/tunnel
     function initPacmanTheme() {
-      buildPacmanRoute();
-      pacmanSpeed = 2.2;
-      pacmanMouthAngle = 0.2;
-      pacmanMouthDir = 0.04;
+      // Create an authentic arcade maze scaled to the canvas
+      // Arcade aspect ratio is roughly 28 tiles wide by 31 tiles high
+      const maxMazeW = Math.min(width * 0.94, 920);
+      const maxMazeH = Math.min(height * 0.88, 860);
+      const cols = 28;
+      const rows = 31;
+      const tileSize = Math.max(12, Math.min(32, Math.floor(Math.min(maxMazeW / cols, maxMazeH / rows))));
+      const mazeW = cols * tileSize;
+      const mazeH = rows * tileSize;
+      const left = Math.floor((width - mazeW) / 2);
+      const top = Math.max(15, Math.floor((height - mazeH) / 2));
 
-      // Floating Arcade Fruit / Cherry Bonuses
-      const tile = pacmanMaze.tile;
-      const center = { x: pacmanMaze.left + (pacmanMaze.columns - 1) * tile / 2, y: pacmanMaze.top + (pacmanMaze.rows - 1) * tile / 2 };
-      pacmanFruits = [
-        { x: center.x - tile * 2.2, y: center.y, type: 'cherry', floatOffset: 0 },
-        { x: center.x + tile * 2.2, y: center.y, type: 'strawberry', floatOffset: Math.PI }
+      // Ghost House / Pen in center (cols 10 to 17, rows 12 to 16)
+      const penX = left + 10 * tileSize;
+      const penY = top + 12 * tileSize;
+      const penW = 8 * tileSize;
+      const penH = 5 * tileSize;
+
+      // Authentic maze blocks (symmetric rounded blue double-wall shapes)
+      const blocks = [
+        // Top outer border & obstacles
+        { x: 2, y: 2, w: 4, h: 3 },
+        { x: 7, y: 2, w: 5, h: 3 },
+        { x: 13, y: 1, w: 2, h: 4 }, // Center top divider
+        { x: 16, y: 2, w: 5, h: 3 },
+        { x: 22, y: 2, w: 4, h: 3 },
+
+        // Row 2 obstacles
+        { x: 2, y: 6, w: 4, h: 2 },
+        { x: 7, y: 6, w: 2, h: 8 },
+        { x: 10, y: 6, w: 8, h: 2 }, // T-top bar
+        { x: 13, y: 8, w: 2, h: 4 }, // T-stem
+        { x: 19, y: 6, w: 2, h: 8 },
+        { x: 22, y: 6, w: 4, h: 2 },
+
+        // Side tunnels / blanking zones
+        { x: 0, y: 9, w: 6, h: 5 },
+        { x: 22, y: 9, w: 6, h: 5 },
+        { x: 0, y: 15, w: 6, h: 5 },
+        { x: 22, y: 15, w: 6, h: 5 },
+
+        // Lower obstacles
+        { x: 7, y: 15, w: 2, h: 5 },
+        { x: 19, y: 15, w: 2, h: 5 },
+        { x: 10, y: 18, w: 8, h: 2 },
+        { x: 13, y: 20, w: 2, h: 4 },
+
+        { x: 2, y: 21, w: 4, h: 2 },
+        { x: 4, y: 23, w: 2, h: 4 },
+        { x: 7, y: 21, w: 5, h: 2 },
+        { x: 16, y: 21, w: 5, h: 2 },
+        { x: 22, y: 21, w: 4, h: 2 },
+        { x: 22, y: 23, w: 2, h: 4 },
+
+        // Bottom T & bars
+        { x: 2, y: 28, w: 10, h: 1 },
+        { x: 10, y: 24, w: 8, h: 2 },
+        { x: 13, y: 26, w: 2, h: 3 },
+        { x: 16, y: 28, w: 10, h: 1 }
       ];
+
+      // Convert grid coords to pixel rects
+      const mazeBlocks = blocks.map(b => ({
+        x: left + b.x * tileSize,
+        y: top + b.y * tileSize,
+        w: b.w * tileSize,
+        h: b.h * tileSize
+      }));
+
+      // Generate authentic arcade dot tracks
+      pacmanDots = [];
+      const dotRows = [1, 5, 8, 20, 23, 27, 30];
+      dotRows.forEach(r => {
+        for (let c = 1; c < cols - 1; c++) {
+          // Check collision with obstacles or ghost house
+          const px = left + c * tileSize + tileSize / 2;
+          const py = top + r * tileSize + tileSize / 2;
+          const inPen = (px >= penX && px <= penX + penW && py >= penY - tileSize && py <= penY + penH + tileSize);
+          let inBlock = false;
+          for (const b of mazeBlocks) {
+            if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
+              inBlock = true;
+              break;
+            }
+          }
+          if (!inPen && !inBlock) {
+            // Power Pellets (Energizers) at original 4 corners
+            const isEnergizer = (c === 1 || c === cols - 2) && (r === 2 || r === 23);
+            pacmanDots.push({
+              x: px,
+              y: py,
+              isEnergizer,
+              eaten: false
+            });
+          }
+        }
+      });
+
+      // Also add vertical dot tracks on key columns
+      [1, 6, 12, 15, 21, 26].forEach(c => {
+        for (let r = 1; r < rows - 1; r++) {
+          const px = left + c * tileSize + tileSize / 2;
+          const py = top + r * tileSize + tileSize / 2;
+          const inPen = (px >= penX && px <= penX + penW && py >= penY - tileSize && py <= penY + penH + tileSize);
+          let inBlock = false;
+          for (const b of mazeBlocks) {
+            if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
+              inBlock = true;
+              break;
+            }
+          }
+          if (!inPen && !inBlock && !pacmanDots.some(d => Math.hypot(d.x - px, d.y - py) < tileSize * 0.6)) {
+            const isEnergizer = (c === 1 || c === cols - 2) && (r === 2 || r === 23);
+            pacmanDots.push({
+              x: px,
+              y: py,
+              isEnergizer,
+              eaten: false
+            });
+          }
+        }
+      });
+
+      // Define authentic circular & rectangular movement circuit for Pac-Man
+      // Pac-Man travels through lower corridor, loops round and returns
+      const waypoints = [
+        { x: left + 1 * tileSize + tileSize / 2, y: top + 23 * tileSize + tileSize / 2 },
+        { x: left + 6 * tileSize + tileSize / 2, y: top + 23 * tileSize + tileSize / 2 },
+        { x: left + 6 * tileSize + tileSize / 2, y: top + 20 * tileSize + tileSize / 2 },
+        { x: left + 12 * tileSize + tileSize / 2, y: top + 20 * tileSize + tileSize / 2 },
+        { x: left + 12 * tileSize + tileSize / 2, y: top + 23 * tileSize + tileSize / 2 },
+        { x: left + 15 * tileSize + tileSize / 2, y: top + 23 * tileSize + tileSize / 2 },
+        { x: left + 15 * tileSize + tileSize / 2, y: top + 20 * tileSize + tileSize / 2 },
+        { x: left + 21 * tileSize + tileSize / 2, y: top + 20 * tileSize + tileSize / 2 },
+        { x: left + 21 * tileSize + tileSize / 2, y: top + 23 * tileSize + tileSize / 2 },
+        { x: left + (cols - 2) * tileSize + tileSize / 2, y: top + 23 * tileSize + tileSize / 2 },
+        { x: left + (cols - 2) * tileSize + tileSize / 2, y: top + 27 * tileSize + tileSize / 2 },
+        { x: left + 15 * tileSize + tileSize / 2, y: top + 27 * tileSize + tileSize / 2 },
+        { x: left + 15 * tileSize + tileSize / 2, y: top + 30 * tileSize + tileSize / 2 },
+        { x: left + 12 * tileSize + tileSize / 2, y: top + 30 * tileSize + tileSize / 2 },
+        { x: left + 12 * tileSize + tileSize / 2, y: top + 27 * tileSize + tileSize / 2 },
+        { x: left + 1 * tileSize + tileSize / 2, y: top + 27 * tileSize + tileSize / 2 }
+      ];
+
+      pacmanActor = {
+        x: waypoints[0].x,
+        y: waypoints[0].y,
+        radius: Math.max(8, tileSize * 0.72),
+        speed: Math.max(1.8, tileSize * 0.12),
+        mouthAngle: 0.25,
+        mouthDir: 0.05,
+        angle: 0,
+        targetIdx: 1,
+        waypoints
+      };
+
+      // 4 Famous Ghosts with authentic AI personality styling:
+      // Blinky: Red (Shadow) - aggressive direct pursuer
+      // Pinky: Pink (Speedy) - ambush
+      // Inky: Cyan (Bashful) - whimsical
+      // Clyde: Orange (Pokey) - cowardly / wanderer
+      pacmanGhosts = [
+        {
+          name: 'Blinky',
+          color: '#ff0000',
+          x: left + 14 * tileSize,
+          y: top + 11 * tileSize, // Above ghost pen
+          speed: Math.max(1.6, tileSize * 0.10),
+          targetIdx: 0,
+          dx: 1,
+          dy: 0,
+          inPen: false
+        },
+        {
+          name: 'Pinky',
+          color: '#ffb8de',
+          x: penX + penW * 0.35,
+          y: penY + penH * 0.55,
+          speed: Math.max(1.5, tileSize * 0.09),
+          targetIdx: 3,
+          dx: 0,
+          dy: -1,
+          inPen: true,
+          penBounce: 0
+        },
+        {
+          name: 'Inky',
+          color: '#00ffff',
+          x: penX + penW * 0.5,
+          y: penY + penH * 0.55,
+          speed: Math.max(1.4, tileSize * 0.085),
+          targetIdx: 6,
+          dx: 0,
+          dy: 1,
+          inPen: true,
+          penBounce: Math.PI / 2
+        },
+        {
+          name: 'Clyde',
+          color: '#ffb852',
+          x: penX + penW * 0.65,
+          y: penY + penH * 0.55,
+          speed: Math.max(1.3, tileSize * 0.08),
+          targetIdx: 9,
+          dx: 0,
+          dy: -1,
+          inPen: true,
+          penBounce: Math.PI
+        }
+      ];
+
+      pacmanMaze = {
+        left,
+        top,
+        width: mazeW,
+        height: mazeH,
+        cols,
+        rows,
+        tileSize,
+        penX,
+        penY,
+        penW,
+        penH,
+        blocks: mazeBlocks
+      };
+
+      // Authentic Fruit (Cherry) bonus beneath ghost pen
+      pacmanFruit = {
+        x: left + 14 * tileSize,
+        y: top + 17 * tileSize + tileSize / 2,
+        active: true,
+        type: 'cherry'
+      };
 
       const scoreEl = getEl('pacScore');
       if (scoreEl) scoreEl.textContent = pacmanScore;
@@ -1986,206 +2145,320 @@ class SoundFX {
     initPacmanTheme();
 
     function drawPacmanScene() {
-      // 1. Deep Arcade Black Background with Blue Neon Maze Grid Outline
+      if (!pacmanMaze) initPacmanTheme();
+
+      // 1. Deep CRT Arcade Black Canvas
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, width, height);
 
-      if (!pacmanMaze) initPacmanTheme();
+      const m = pacmanMaze;
+      if (!m) return;
 
-      // Full-screen orthogonal maze corridors use the same grid nodes as the route.
+      // 2. Draw Authentic Double-Line Blue Neon Maze Walls
       ctx.save();
-      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#2121ff';
+      ctx.lineWidth = Math.max(2.5, m.tileSize * 0.16);
       ctx.lineJoin = 'round';
-      const strokeCorridor = (points, lineWidth = pacmanMaze.tile * 0.62) => {
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let index = 1; index < points.length; index++) ctx.lineTo(points[index].x, points[index].y);
-        ctx.strokeStyle = '#2121de';
-        ctx.lineWidth = lineWidth;
-        ctx.shadowColor = '#2121de';
-        ctx.shadowBlur = 10;
-        ctx.stroke();
-        ctx.strokeStyle = '#080b2d';
-        ctx.lineWidth = Math.max(5, lineWidth - 5);
-        ctx.shadowBlur = 0;
-        ctx.stroke();
-      };
-      strokeCorridor(pacmanRoute.map(({ x, y }) => ({ x, y })));
-      pacmanMaze.branches.forEach((branch) => strokeCorridor(branch));
-      // Central ghost pen with a bright gate; it remains clear of the moving circuit.
-      const { pen } = pacmanMaze;
-      ctx.fillStyle = 'rgba(4, 5, 28, 0.95)';
-      ctx.strokeStyle = '#4b5cff';
-      ctx.lineWidth = 2;
-      ctx.shadowColor = '#4b5cff';
-      ctx.shadowBlur = 12;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = '#2121ff';
+      ctx.shadowBlur = 8;
+
+      // Outer Perimeter Border with side escape tunnels
       ctx.beginPath();
-      ctx.roundRect(pen.x, pen.y, pen.width, pen.height, Math.min(8, pacmanMaze.tile * 0.18));
-      ctx.fill();
+      // Top wall
+      ctx.moveTo(m.left, m.top);
+      ctx.lineTo(m.left + m.width, m.top);
+      // Right wall with tunnel break
+      ctx.lineTo(m.left + m.width, m.top + 9 * m.tileSize);
+      ctx.lineTo(m.left + m.width - 4 * m.tileSize, m.top + 9 * m.tileSize);
+      ctx.lineTo(m.left + m.width - 4 * m.tileSize, m.top + 14 * m.tileSize);
+      ctx.lineTo(m.left + m.width, m.top + 14 * m.tileSize);
+      ctx.moveTo(m.left + m.width, m.top + 15 * m.tileSize);
+      ctx.lineTo(m.left + m.width - 4 * m.tileSize, m.top + 15 * m.tileSize);
+      ctx.lineTo(m.left + m.width - 4 * m.tileSize, m.top + 20 * m.tileSize);
+      ctx.lineTo(m.left + m.width, m.top + 20 * m.tileSize);
+      ctx.lineTo(m.left + m.width, m.top + m.height);
+      // Bottom wall
+      ctx.lineTo(m.left, m.top + m.height);
+      // Left wall with tunnel break
+      ctx.lineTo(m.left, m.top + 20 * m.tileSize);
+      ctx.lineTo(m.left + 4 * m.tileSize, m.top + 20 * m.tileSize);
+      ctx.lineTo(m.left + 4 * m.tileSize, m.top + 15 * m.tileSize);
+      ctx.lineTo(m.left, m.top + 15 * m.tileSize);
+      ctx.moveTo(m.left, m.top + 14 * m.tileSize);
+      ctx.lineTo(m.left + 4 * m.tileSize, m.top + 14 * m.tileSize);
+      ctx.lineTo(m.left + 4 * m.tileSize, m.top + 9 * m.tileSize);
+      ctx.lineTo(m.left, m.top + 9 * m.tileSize);
+      ctx.lineTo(m.left, m.top);
       ctx.stroke();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#ffb8de';
-      ctx.lineWidth = 2;
-      const gateX = pen.x + pen.width * 0.38;
-      for (let bar = 0; bar < 4; bar++) {
-        const x = gateX + bar * pacmanMaze.tile * 0.12;
-        ctx.beginPath(); ctx.moveTo(x, pen.y + pen.height - 4); ctx.lineTo(x, pen.y + pen.height + pacmanMaze.tile * 0.16); ctx.stroke();
+
+      // Interior Obstacle Blocks (Authentic Rounded Rectangles)
+      for (const b of m.blocks) {
+        ctx.beginPath();
+        const rad = Math.min(b.w, b.h) * 0.35;
+        ctx.roundRect(b.x + 2, b.y + 2, b.w - 4, b.h - 4, rad);
+        ctx.stroke();
       }
+
+      // 3. Draw Authentic Ghost House / Pen with White/Pink Exit Door
+      ctx.beginPath();
+      ctx.strokeStyle = '#2121ff';
+      ctx.lineWidth = Math.max(3, m.tileSize * 0.18);
+      ctx.strokeRect(m.penX, m.penY, m.penW, m.penH);
+
+      // Ghost House Door (Pink / White escape door on top center)
+      ctx.beginPath();
+      ctx.strokeStyle = '#ffb8de';
+      ctx.lineWidth = Math.max(3, m.tileSize * 0.2);
+      ctx.moveTo(m.penX + m.penW * 0.32, m.penY);
+      ctx.lineTo(m.penX + m.penW * 0.68, m.penY);
+      ctx.stroke();
       ctx.restore();
 
-      // 2. Draw Pac-Dots / Energizers
+      // 4. "READY!" Yellow Text below Ghost Pen (Iconic 1980 arcade touch)
+      ctx.save();
+      ctx.font = `${Math.max(10, Math.floor(m.tileSize * 0.85))}px "Press Start 2P", monospace`;
+      ctx.fillStyle = '#ffff00';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(255, 255, 0, 0.6)';
+      ctx.shadowBlur = 6;
+      ctx.fillText('READY!', m.left + m.width / 2, m.penY + m.penH + m.tileSize * 0.8);
+      ctx.restore();
+
+      // 5. Draw Pac-Dots & Flashing Power Pellets
       ctx.save();
       const now = performance.now() * 0.005;
+      const energizerBlink = (Math.sin(now * 4) > -0.2);
       for (const dot of pacmanDots) {
         if (dot.eaten) continue;
-        ctx.fillStyle = dot.isEnergizer ? '#ffff00' : '#ffb8ae';
-        const r = dot.isEnergizer ? (dot.radius + Math.sin(now * 3) * 1.5) : dot.radius;
         if (dot.isEnergizer) {
-          ctx.shadowColor = '#ffff00';
-          ctx.shadowBlur = 8;
+          if (energizerBlink) {
+            ctx.fillStyle = '#ffb8ae';
+            ctx.shadowColor = '#ffff00';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(dot.x, dot.y, m.tileSize * 0.42, 0, Math.PI * 2);
+            ctx.fill();
+          }
         } else {
+          ctx.fillStyle = '#ffb8ae';
           ctx.shadowBlur = 0;
+          ctx.beginPath();
+          ctx.arc(dot.x, dot.y, Math.max(2, m.tileSize * 0.14), 0, Math.PI * 2);
+          ctx.fill();
         }
-        ctx.beginPath();
-        ctx.arc(dot.x, dot.y, r, 0, Math.PI * 2);
-        ctx.fill();
       }
       ctx.restore();
 
-      // 3. Draw Pac-Man with Chomp Animation
-      const pacmanPosition = getPacmanRoutePoint(pacmanRouteDistance);
-      pacmanMouthAngle += pacmanMouthDir;
-      if (pacmanMouthAngle > 0.45 || pacmanMouthAngle < 0.04) {
-        pacmanMouthDir = -pacmanMouthDir;
+      // 6. Draw Bonus Fruit (Cherries)
+      if (pacmanFruit && pacmanFruit.active) {
+        drawArcadeCherries(pacmanFruit.x, pacmanFruit.y, m.tileSize);
       }
 
-      // Check dot consumption
-      for (const dot of pacmanDots) {
-        if (!dot.eaten && Math.hypot(pacmanPosition.x - dot.x, pacmanPosition.y - dot.y) < 23) {
-          dot.eaten = true;
-          pacmanScore += dot.isEnergizer ? 50 : 10;
+      // 7. Update & Draw Pac-Man
+      if (pacmanActor) {
+        const p = pacmanActor;
+        const target = p.waypoints[p.targetIdx];
+        const dist = Math.hypot(target.x - p.x, target.y - p.y);
+
+        if (dist < p.speed + 1) {
+          p.x = target.x;
+          p.y = target.y;
+          p.targetIdx = (p.targetIdx + 1) % p.waypoints.length;
+        } else {
+          const moveAngle = Math.atan2(target.y - p.y, target.x - p.x);
+          p.x += Math.cos(moveAngle) * p.speed;
+          p.y += Math.sin(moveAngle) * p.speed;
+          p.angle = moveAngle;
+        }
+
+        // Chomp Animation
+        p.mouthAngle += p.mouthDir;
+        if (p.mouthAngle > 0.46 || p.mouthAngle < 0.04) {
+          p.mouthDir = -p.mouthDir;
+        }
+
+        // Dot Eating detection
+        for (const dot of pacmanDots) {
+          if (!dot.eaten && Math.hypot(p.x - dot.x, p.y - dot.y) < p.radius) {
+            dot.eaten = true;
+            pacmanScore += dot.isEnergizer ? 50 : 10;
+            if (dot.isEnergizer) {
+              pacmanFrightenedTimer = 360; // Frightened mode ~6 seconds
+              if (sfx) sfx.playPacmanFruit();
+            }
+            const scoreEl = getEl("pacScore");
+            if (scoreEl) scoreEl.textContent = pacmanScore;
+          }
+        }
+
+        // Fruit eating detection
+        if (pacmanFruit && pacmanFruit.active && Math.hypot(p.x - pacmanFruit.x, p.y - pacmanFruit.y) < p.radius + 6) {
+          pacmanFruit.active = false;
+          pacmanScore += 100;
+          if (sfx) sfx.playPacmanFruit();
           const scoreEl = getEl("pacScore");
           if (scoreEl) scoreEl.textContent = pacmanScore;
         }
+
+        // Respawn dots if almost all eaten
+        if (pacmanDots.filter(d => !d.eaten).length < 5) {
+          pacmanDots.forEach(d => { d.eaten = false; });
+          if (pacmanFruit) pacmanFruit.active = true;
+        }
+
+        // Render Pac-Man Body
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = '#ffff00';
+        ctx.shadowColor = '#ffff00';
+        ctx.shadowBlur = 10;
+
+        ctx.beginPath();
+        ctx.arc(0, 0, p.radius, p.mouthAngle * Math.PI, (2 - p.mouthAngle) * Math.PI, false);
+        ctx.lineTo(0, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
       }
 
-      // Complete laps restore pellets; the cumulative score remains untouched.
-      const nextPacmanDistance = pacmanRouteDistance + pacmanSpeed;
-      if (nextPacmanDistance >= pacmanRouteLength) {
-        pacmanRouteDistance = nextPacmanDistance % pacmanRouteLength;
-        for (const dot of pacmanDots) dot.eaten = false;
-      } else pacmanRouteDistance = nextPacmanDistance;
+      // 8. Update & Draw Ghosts (Blinky, Pinky, Inky, Clyde)
+      if (pacmanFrightenedTimer > 0) pacmanFrightenedTimer--;
 
-      // Render Pac-Man Body
-      ctx.save();
-      ctx.translate(pacmanPosition.x, pacmanPosition.y);
-      ctx.rotate(pacmanPosition.angle);
-      ctx.fillStyle = '#ffff00';
-      ctx.shadowColor = '#ffff00';
-      ctx.shadowBlur = 12;
+      for (const g of pacmanGhosts) {
+        if (g.inPen) {
+          // Bob up and down inside ghost house
+          g.penBounce += 0.05;
+          const bobY = m.penY + m.penH * 0.55 + Math.sin(g.penBounce) * (m.tileSize * 0.4);
+          drawArcadeGhost(g.x, bobY, g.color, g.dx, m.tileSize, pacmanFrightenedTimer);
+        } else {
+          // Pursue Pac-Man along waypoints
+          const wp = pacmanActor.waypoints;
+          const target = wp[g.targetIdx];
+          const dist = Math.hypot(target.x - g.x, target.y - g.y);
+          if (dist < g.speed + 1) {
+            g.x = target.x;
+            g.y = target.y;
+            // Next waypoint chasing pacman
+            g.targetIdx = (g.targetIdx + 1) % wp.length;
+          } else {
+            const moveAngle = Math.atan2(target.y - g.y, target.x - g.x);
+            g.x += Math.cos(moveAngle) * g.speed;
+            g.y += Math.sin(moveAngle) * g.speed;
+            g.dx = Math.cos(moveAngle) >= 0 ? 1 : -1;
+          }
 
-      ctx.beginPath();
-      ctx.arc(0, 0, 22, pacmanMouthAngle * Math.PI, (2 - pacmanMouthAngle) * Math.PI, false);
-      ctx.lineTo(0, 0);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // 4. Draw The 4 Ghosts Chasing Pac-Man
-      for (const ghost of pacmanGhosts) {
-        ghost.distance = (ghost.distance + ghost.speed) % pacmanRouteLength;
-        const ghostPosition = getPacmanRoutePoint(ghost.distance);
-        const eyeDirection = Math.cos(ghostPosition.angle) >= 0 ? 1 : -1;
-        drawArcadeGhost(ghostPosition.x, ghostPosition.y, ghost.color, eyeDirection);
+          drawArcadeGhost(g.x, g.y, g.color, g.dx, m.tileSize, pacmanFrightenedTimer);
+        }
       }
-
-      // 5. Draw Floating Arcade Fruit Bonuses (Cherries & Strawberries)
-      drawPacmanFruits();
     }
 
-    // Helper: Draw Authentic Arcade Ghost with skirt ruffles and googly eyes
-    function drawArcadeGhost(x, y, color, eyeDir) {
+    // Helper: Draw Authentic Namco Ghost with Scalloped Ruffles and Directional Eyes
+    function drawArcadeGhost(x, y, color, eyeDir, tileSize, frightenedTimer) {
       ctx.save();
       ctx.translate(x, y);
 
-      const R = 18;
-      ctx.fillStyle = color;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 8;
+      const R = Math.max(9, tileSize * 0.68);
+      const isFrightened = frightenedTimer > 0;
+      const isFlashing = isFrightened && (frightenedTimer < 100) && (Math.floor(frightenedTimer / 12) % 2 === 0);
+
+      const ghostColor = isFrightened ? (isFlashing ? '#ffffff' : '#2121ff') : color;
+      ctx.fillStyle = ghostColor;
+      ctx.shadowColor = ghostColor;
+      ctx.shadowBlur = 6;
 
       ctx.beginPath();
       // Round top dome
-      ctx.arc(0, -4, R, Math.PI, 0, false);
+      ctx.arc(0, -R * 0.25, R, Math.PI, 0, false);
       // Sides down
-      ctx.lineTo(R, 16);
+      ctx.lineTo(R, R * 0.85);
 
-      // Wavy Skirt feet (3 ruffles)
-      const ruffWidth = (R * 2) / 3;
-      ctx.quadraticCurveTo(R - ruffWidth * 0.5, 10, R - ruffWidth, 16);
-      ctx.quadraticCurveTo(R - ruffWidth * 1.5, 10, R - ruffWidth * 2, 16);
-      ctx.quadraticCurveTo(-R + ruffWidth * 0.5, 10, -R, 16);
-      ctx.lineTo(-R, -4);
+      // 3 Authentic Triangular / Scalloped Feet
+      const step = (R * 2) / 3;
+      ctx.lineTo(R - step * 0.5, R * 0.5);
+      ctx.lineTo(R - step, R * 0.85);
+      ctx.lineTo(R - step * 1.5, R * 0.5);
+      ctx.lineTo(R - step * 2, R * 0.85);
+      ctx.lineTo(-R + step * 0.5, R * 0.5);
+      ctx.lineTo(-R, R * 0.85);
+      ctx.lineTo(-R, -R * 0.25);
       ctx.closePath();
       ctx.fill();
 
-      // Ghost Eyes (White sclera)
+      // Eyes
       ctx.shadowBlur = 0;
-      ctx.fillStyle = '#ffffff';
-      const eyeOffsetX = eyeDir * 3;
-      ctx.beginPath();
-      ctx.arc(-6 + eyeOffsetX, -6, 5, 0, Math.PI * 2);
-      ctx.arc(6 + eyeOffsetX, -6, 5, 0, Math.PI * 2);
-      ctx.fill();
+      if (isFrightened) {
+        // Scared Face: tiny orange/white eyes & wavy mouth
+        ctx.fillStyle = isFlashing ? '#ff0000' : '#ffb8ae';
+        ctx.beginPath();
+        ctx.arc(-R * 0.35, -R * 0.2, R * 0.16, 0, Math.PI * 2);
+        ctx.arc(R * 0.35, -R * 0.2, R * 0.16, 0, Math.PI * 2);
+        ctx.fill();
+        // Wavy mouth
+        ctx.strokeStyle = isFlashing ? '#ff0000' : '#ffb8ae';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-R * 0.5, R * 0.3);
+        ctx.lineTo(-R * 0.25, R * 0.15);
+        ctx.lineTo(0, R * 0.3);
+        ctx.lineTo(R * 0.25, R * 0.15);
+        ctx.lineTo(R * 0.5, R * 0.3);
+        ctx.stroke();
+      } else {
+        // Authentic White Sclera
+        ctx.fillStyle = '#ffffff';
+        const eyeXOffset = (eyeDir >= 0 ? 1 : -1) * (R * 0.18);
+        ctx.beginPath();
+        ctx.ellipse(-R * 0.35 + eyeXOffset, -R * 0.25, R * 0.28, R * 0.38, 0, 0, Math.PI * 2);
+        ctx.ellipse(R * 0.35 + eyeXOffset, -R * 0.25, R * 0.28, R * 0.38, 0, 0, Math.PI * 2);
+        ctx.fill();
 
-      // Ghost Pupils (Deep Blue Looking Forward)
-      ctx.fillStyle = '#0000aa';
-      ctx.beginPath();
-      ctx.arc(-5 + eyeOffsetX * 1.3, -6, 2.8, 0, Math.PI * 2);
-      ctx.arc(7 + eyeOffsetX * 1.3, -6, 2.8, 0, Math.PI * 2);
-      ctx.fill();
+        // Authentic Blue Pupils Looking Forward
+        ctx.fillStyle = '#0000aa';
+        const pupilXOffset = eyeXOffset * 1.35;
+        ctx.beginPath();
+        ctx.arc(-R * 0.35 + pupilXOffset, -R * 0.25, R * 0.16, 0, Math.PI * 2);
+        ctx.arc(R * 0.35 + pupilXOffset, -R * 0.25, R * 0.16, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       ctx.restore();
     }
 
-    // Helper: Draw Classic 1980 Pixelated Cherries
-    function drawPacmanFruits() {
+    // Helper: Draw Authentic 1980 Pixelated Cherries
+    function drawArcadeCherries(x, y, tileSize) {
       ctx.save();
-      const t = performance.now() * 0.003;
-      for (const fruit of pacmanFruits) {
-        fruit.floatOffset += 0.03;
-        const fy = fruit.y + Math.sin(fruit.floatOffset) * 8;
+      ctx.translate(x, y);
+      const s = Math.max(0.6, tileSize / 20);
 
-        ctx.save();
-        ctx.translate(fruit.x, fy);
+      // Brown Stems
+      ctx.strokeStyle = '#8b5a2b';
+      ctx.lineWidth = 2 * s;
+      ctx.beginPath();
+      ctx.moveTo(0, -14 * s);
+      ctx.quadraticCurveTo(-5 * s, -6 * s, -6 * s, 2 * s);
+      ctx.moveTo(0, -14 * s);
+      ctx.quadraticCurveTo(5 * s, -6 * s, 7 * s, 3 * s);
+      ctx.stroke();
 
-        // Brown Stems
-        ctx.strokeStyle = '#8b5a2b';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(0, -16);
-        ctx.quadraticCurveTo(-6, -8, -8, 2);
-        ctx.moveTo(0, -16);
-        ctx.quadraticCurveTo(6, -8, 8, 4);
-        ctx.stroke();
+      // Twin Bright Red Cherries
+      ctx.fillStyle = '#ff0000';
+      ctx.shadowColor = '#ff0000';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(-6 * s, 4 * s, 6 * s, 0, Math.PI * 2);
+      ctx.arc(7 * s, 5 * s, 6 * s, 0, Math.PI * 2);
+      ctx.fill();
 
-        // Twin Bright Red Cherries
-        ctx.fillStyle = '#ff0000';
-        ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(-8, 5, 7.5, 0, Math.PI * 2);
-        ctx.arc(8, 7, 7.5, 0, Math.PI * 2);
-        ctx.fill();
+      // White Glint Highlights
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-8 * s, 2 * s, 1.8 * s, 0, Math.PI * 2);
+      ctx.arc(5 * s, 3 * s, 1.8 * s, 0, Math.PI * 2);
+      ctx.fill();
 
-        // White Glint Highlights
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(-10, 3, 2, 0, Math.PI * 2);
-        ctx.arc(6, 5, 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-      }
       ctx.restore();
     }
 
@@ -2879,6 +3152,10 @@ function applyTheme(theme) {
   if (theme === "pacman") {
     if (pacmanStrip) pacmanStrip.style.display = "block";
     if (pacmanBadge) pacmanBadge.style.display = "block";
+
+    if (sfx) {
+      setTimeout(() => { sfx.playPacmanIntro(); }, 120);
+    }
 
     if (spawnIcon) spawnIcon.className = "fa-solid fa-ghost";
     if (spawnText) spawnText.textContent = "WAKA!";
@@ -3980,21 +4257,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (simpsonsDonuts.length > 25) simpsonsDonuts.splice(0, 6);
       } else if (currentTheme === "pacman") {
         sfx.playPacmanWaka();
-        setTimeout(() => sfx.playPacmanGhostEat(), 80);
-        // Turbo Pac-Man Boost & Score Frenzy
-        pacmanSpeed = 7.5;
-        setTimeout(() => { pacmanSpeed = 3.6; }, 1200);
+        setTimeout(() => sfx.playPacmanGhostEat(), 100);
+        // Turbo Pac-Man Boost & Frightened Mode (Power Pellet effect)
+        if (pacmanActor) {
+          const originalSpeed = pacmanActor.speed;
+          pacmanActor.speed *= 2.0;
+          setTimeout(() => { if (pacmanActor) pacmanActor.speed = originalSpeed; }, 2000);
+        }
+        pacmanFrightenedTimer = 360;
         pacmanScore += 200;
         const scoreEl = getEl("pacScore");
         if (scoreEl) scoreEl.textContent = pacmanScore;
-        // Re-spawn bonus fruit
-        pacmanFruits.push({
-          x: width * 0.5 + (Math.random() - 0.5) * (width * 0.5),
-          y: height * 0.35 + (Math.random() - 0.5) * (height * 0.2),
-          type: 'cherry',
-          floatOffset: Math.random() * Math.PI
-        });
-        if (pacmanFruits.length > 6) pacmanFruits.shift();
+        if (pacmanFruit) pacmanFruit.active = true;
       }
     });
   }
@@ -4008,6 +4282,31 @@ document.addEventListener("DOMContentLoaded", () => {
       if (sfx.enabled) sfx.playTone(880);
     });
   }
+
+  // Telegram card: show live state + link when the official bot is configured
+  let telegramLive = false;
+  const baseApplyTheme = applyTheme;
+  applyTheme = function (theme) {
+    baseApplyTheme(theme);
+    if (!telegramLive) return;
+    const tgTag = getEl("tgBotTag");
+    const statusText = getEl("botsStatusText");
+    if (tgTag) tgTag.textContent = "ONLINE";
+    if (statusText) statusText.textContent = "TELEGRAM ONLINE";
+  };
+
+  fetch("/api/public-config")
+    .then((response) => (response.ok ? response.json() : null))
+    .then((config) => {
+      const telegram = config && config.telegram;
+      const link = getEl("tgBotLink");
+      if (!telegram || !telegram.enabled || !telegram.username || !link) return;
+      link.href = "https://t.me/" + encodeURIComponent(telegram.username);
+      link.hidden = false;
+      telegramLive = true;
+      applyTheme(currentTheme);
+    })
+    .catch(() => {});
 
   // Update ActivityStage on theme switch
   if (window.ActivityStage) window.ActivityStage.updateThemeLabels();

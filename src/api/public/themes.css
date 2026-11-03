@@ -374,6 +374,8 @@
     .whatsapp-card .bot-card-provider { color: #25d366; }
     .bot-status-tag { font-size: 0.65rem; padding: 2px 7px; text-transform: uppercase; }
     .bot-card-description { margin: 0; font-size: 0.78rem; opacity: 0.85; line-height: 1.45; }
+    .bot-open-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; font-size: 0.72rem; text-decoration: none; min-height: 36px; }
+    .bot-open-link[hidden] { display: none; }
     .bottom-credits { text-align: center; font-size: 0.75rem; margin-top: 1.25rem; opacity: 0.6; letter-spacing: 2px; }
     .site-footer { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12); text-align: center; font-size: 0.8rem; opacity: 0.85; }
     .footer-links { display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 0.6rem; flex-wrap: wrap; }
@@ -1954,23 +1956,23 @@ body.theme-simpsons .badge-card {
    ========================================================================== */
 body.theme-pacman {
   --color-canvas: #000000;
-  --color-text: #ffff00;
-  --color-surface-card: rgba(0, 0, 0, 0.78);
-  --color-media-surface: rgba(0, 8, 20, 0.85);
+  --color-text: #dedeff;
+  --color-surface-card: rgba(0, 0, 0, 0.92);
+  --color-media-surface: rgba(0, 0, 0, 0.92);
   --color-surface-control: #000000;
-  --color-border: #2121de;
-  --color-border-subtle: rgba(33, 33, 222, 0.3);
+  --color-border: #2121ff;
+  --color-border-subtle: rgba(33, 33, 255, 0.4);
   --color-accent: #ffff00;
-  --color-accent-glow: rgba(255, 255, 0, 0.5);
-  --color-badge-surface: rgba(33, 33, 222, 0.3);
+  --color-accent-glow: rgba(255, 255, 0, 0.6);
+  --color-badge-surface: rgba(33, 33, 255, 0.25);
   --color-badge-text: #ffff00;
   --color-focus: #ffff00;
   --font-body: 'Press Start 2P', monospace;
   --font-display: 'Press Start 2P', monospace;
-  --radius-card: 8px;
-  --radius-button: 0px;
-  --radius-input: 0px;
-  --radius-badge: 0px;
+  --radius-card: 6px;
+  --radius-button: 2px;
+  --radius-input: 2px;
+  --radius-badge: 2px;
   --motion-control: 0.15s ease;
   background: var(--color-canvas);
   color: var(--color-text);
@@ -1979,39 +1981,39 @@ body.theme-pacman {
 }
 
 body.theme-pacman .crt-overlay {
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
-              radial-gradient(circle at 50% 50%, rgba(33, 33, 222, 0.08) 0%, rgba(0, 0, 0, 0.7) 100%);
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+              radial-gradient(circle at 50% 50%, rgba(33, 33, 255, 0.05) 0%, rgba(0, 0, 0, 0.65) 100%);
   background-size: 100% 3px, 100% 100%;
-  opacity: 0.85;
+  opacity: 0.75;
 }
 
 body.theme-pacman .main-card {
   background: var(--color-surface-card);
-  border: 3px solid #2121de;
+  border: 4px solid #2121ff;
   border-radius: var(--radius-card);
-  box-shadow: 0 0 25px rgba(33, 33, 222, 0.6), inset 0 0 20px rgba(33, 33, 222, 0.25);
+  box-shadow: 0 0 20px rgba(33, 33, 255, 0.7), inset 0 0 15px rgba(33, 33, 255, 0.3);
   position: relative;
 }
 
 body.theme-pacman .main-card::before {
   content: '';
   position: absolute;
-  top: -6px; left: -6px; right: -6px; bottom: -6px;
-  border: 2px solid #2121de;
-  border-radius: 12px;
+  top: -7px; left: -7px; right: -7px; bottom: -7px;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.45;
 }
 
 /* Pac-Man Dots & Ghost Maze Strip */
 body.theme-pacman .pacman-header-strip {
-  height: 10px;
+  height: 12px;
   width: 100%;
   background: repeating-linear-gradient(90deg, 
     #ffb8ae 0px, #ffb8ae 6px, 
-    transparent 6px, transparent 18px);
-  border-top: 2px solid #2121de;
-  border-bottom: 2px solid #2121de;
+    transparent 6px, transparent 20px);
+  border-top: 2px solid #2121ff;
+  border-bottom: 2px solid #2121ff;
   margin-bottom: 1.25rem;
 }
 
@@ -2036,7 +2038,7 @@ body.theme-pacman .theme-btn {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.65rem;
   letter-spacing: 1px;
-  background: rgba(0, 0, 0, 0.76);
+  background: #000000;
   color: #ffff00;
   border: 2px solid #2121de;
   box-shadow: 3px 3px 0px #2121de;
@@ -2053,7 +2055,7 @@ body.theme-pacman .theme-btn:hover {
 }
 
 body.theme-pacman .theme-btn-accent {
-  background: rgba(255, 0, 0, 0.78);
+  background: #ff0000;
   color: #ffffff;
   border: 2px solid #ffffff;
   box-shadow: 3px 3px 0px #2121de;
@@ -2341,31 +2343,18 @@ body.theme-pacman .activity-status-text { color: #FFE600; font-family: 'Press St
 body.theme-topgear {
   --font-body: 'Montserrat', Arial, sans-serif;
 }
-body.theme-pacman {
-  --font-body: Arial, sans-serif;
-}
-body.theme-topgear .topgear-dash,
-body.theme-pacman .pacman-hud {
+body.theme-topgear .topgear-dash {
   font-family: var(--font-body);
   font-size: 0.78rem;
   line-height: 1.4;
 }
-body.theme-pacman .top-status .hud-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.68rem;
-  line-height: 1.6;
-}
 body.theme-topgear .input-box,
-body.theme-pacman .input-box,
-body.theme-pacman #subTitle,
-body.theme-topgear .activity-status-text,
-body.theme-pacman .activity-status-text {
+body.theme-topgear .activity-status-text {
   font-family: var(--font-body) !important;
   font-size: 0.85rem !important;
   line-height: 1.45 !important;
 }
-body.theme-topgear .badge-tag,
-body.theme-pacman .badge-tag {
+body.theme-topgear .badge-tag {
   font-family: var(--font-body);
   font-size: 0.72rem;
   line-height: 1.4;
