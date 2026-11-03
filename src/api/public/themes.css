@@ -1956,9 +1956,9 @@ body.theme-simpsons .badge-card {
    ========================================================================== */
 body.theme-pacman {
   --color-canvas: #000000;
-  --color-text: #dedeff;
-  --color-surface-card: rgba(0, 0, 0, 0.92);
-  --color-media-surface: rgba(0, 0, 0, 0.92);
+  --color-text: #ffffff;
+  --color-surface-card: rgba(4, 4, 18, 0.94);
+  --color-media-surface: rgba(4, 4, 18, 0.94);
   --color-surface-control: #000000;
   --color-border: #2121ff;
   --color-border-subtle: rgba(33, 33, 255, 0.4);
@@ -1967,12 +1967,12 @@ body.theme-pacman {
   --color-badge-surface: rgba(33, 33, 255, 0.25);
   --color-badge-text: #ffff00;
   --color-focus: #ffff00;
-  --font-body: 'Press Start 2P', monospace;
+  --font-body: 'Share Tech Mono', monospace;
   --font-display: 'Press Start 2P', monospace;
-  --radius-card: 6px;
-  --radius-button: 2px;
-  --radius-input: 2px;
-  --radius-badge: 2px;
+  --radius-card: 8px;
+  --radius-button: 3px;
+  --radius-input: 3px;
+  --radius-badge: 3px;
   --motion-control: 0.15s ease;
   background: var(--color-canvas);
   color: var(--color-text);
@@ -1982,36 +1982,35 @@ body.theme-pacman {
 
 body.theme-pacman .crt-overlay {
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-              radial-gradient(circle at 50% 50%, rgba(33, 33, 255, 0.05) 0%, rgba(0, 0, 0, 0.65) 100%);
+              radial-gradient(circle at 50% 50%, rgba(33, 33, 255, 0.04) 0%, rgba(0, 0, 0, 0.7) 100%);
   background-size: 100% 3px, 100% 100%;
-  opacity: 0.75;
+  opacity: 0.6;
 }
 
 body.theme-pacman .main-card {
   background: var(--color-surface-card);
-  border: 4px solid #2121ff;
+  border: 3px solid #2121ff;
   border-radius: var(--radius-card);
-  box-shadow: 0 0 20px rgba(33, 33, 255, 0.7), inset 0 0 15px rgba(33, 33, 255, 0.3);
+  box-shadow: 0 0 25px rgba(33, 33, 255, 0.6), inset 0 0 15px rgba(33, 33, 255, 0.2);
   position: relative;
 }
 
 body.theme-pacman .main-card::before {
   content: '';
   position: absolute;
-  top: -7px; left: -7px; right: -7px; bottom: -7px;
-  border: 2px solid #ffffff;
-  border-radius: 8px;
+  top: -5px; left: -5px; right: -5px; bottom: -5px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
   pointer-events: none;
-  opacity: 0.45;
 }
 
 /* Pac-Man Dots & Ghost Maze Strip */
 body.theme-pacman .pacman-header-strip {
-  height: 12px;
+  height: 10px;
   width: 100%;
   background: repeating-linear-gradient(90deg, 
-    #ffb8ae 0px, #ffb8ae 6px, 
-    transparent 6px, transparent 20px);
+    #ffb8ae 0px, #ffb8ae 5px, 
+    transparent 5px, transparent 18px);
   border-top: 2px solid #2121ff;
   border-bottom: 2px solid #2121ff;
   margin-bottom: 1.25rem;
@@ -2020,7 +2019,7 @@ body.theme-pacman .pacman-header-strip {
 body.theme-pacman .title-glow {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.85rem;
+  font-size: 1.6rem;
   letter-spacing: 2px;
   color: #ffff00;
   text-transform: uppercase;
@@ -2028,20 +2027,21 @@ body.theme-pacman .title-glow {
 }
 
 body.theme-pacman #subTitle {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
   color: #ffb8ae;
   letter-spacing: 1px;
 }
 
 body.theme-pacman .theme-btn {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
   letter-spacing: 1px;
   background: #000000;
   color: #ffff00;
-  border: 2px solid #2121de;
-  box-shadow: 3px 3px 0px #2121de;
+  border: 2px solid #2121ff;
+  box-shadow: 2px 2px 0px #2121ff;
   cursor: pointer;
   text-transform: uppercase;
   transition: all var(--motion-control);
@@ -2058,7 +2058,7 @@ body.theme-pacman .theme-btn-accent {
   background: #ff0000;
   color: #ffffff;
   border: 2px solid #ffffff;
-  box-shadow: 3px 3px 0px #2121de;
+  box-shadow: 2px 2px 0px #2121ff;
 }
 body.theme-pacman .theme-btn-accent:hover {
   background: #00ffff;
@@ -2069,11 +2069,11 @@ body.theme-pacman .theme-btn-accent:hover {
 
 body.theme-pacman .input-box {
   background: #000000;
-  border: 2px solid #2121de;
+  border: 2px solid #2121ff;
   color: #ffff00;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.72rem;
-  box-shadow: inset 0 0 10px rgba(33, 33, 222, 0.4);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.95rem;
+  box-shadow: inset 0 0 10px rgba(33, 33, 255, 0.4);
 }
 body.theme-pacman .input-box:focus {
   outline: none;
@@ -2085,17 +2085,17 @@ body.theme-pacman .badge-tag {
   background: var(--color-badge-surface);
   border: 1px solid var(--color-border);
   color: var(--color-badge-text);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
 }
 
 /* Pac-Man Animated Arcade HUD */
 .pacman-hud {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.62rem;
+  gap: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
 }
 
 .pacman-icon-mini {
@@ -2113,46 +2113,47 @@ body.theme-pacman .badge-tag {
 }
 
 .ghost-icon {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 /* Pac-Man Legal Page Arcade Styles */
 body.theme-pacman .legal-card {
-  background: rgba(0, 0, 0, 0.95);
-  border: 3px solid #2121de;
-  box-shadow: 0 0 35px rgba(33, 33, 222, 0.6);
+  background: rgba(4, 4, 18, 0.95);
+  border: 3px solid #2121ff;
+  box-shadow: 0 0 35px rgba(33, 33, 255, 0.6);
   color: #ffffff;
 }
 body.theme-pacman .legal-card h1 {
   font-family: 'Press Start 2P', monospace;
   font-size: 1.45rem;
   color: #ffff00;
-  text-shadow: 3px 3px 0px #2121de;
+  text-shadow: 3px 3px 0px #2121ff;
   letter-spacing: 2px;
 }
 body.theme-pacman .legal-card h2 {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 700;
+  font-size: 1.15rem;
   color: #00ffff;
   border-left: 4px solid #ffff00;
-  background: rgba(33, 33, 222, 0.2);
-  padding: 6px 10px;
+  background: rgba(33, 33, 255, 0.2);
+  padding: 6px 12px;
 }
 body.theme-pacman .legal-card p,
 body.theme-pacman .legal-card li {
-  color: #e0e0e0;
-  font-size: 0.82rem;
-  line-height: 1.8;
+  color: #dedede;
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 body.theme-pacman .legal-card code {
   background: #111;
   color: #ffff00;
-  border: 1px solid #2121de;
+  border: 1px solid #2121ff;
   padding: 2px 6px;
 }
-    body.theme-pacman .legal-box {
-  background: rgba(5, 5, 20, 0.9);
-  border: 2px solid #2121de;
+body.theme-pacman .legal-box {
+  background: rgba(5, 5, 25, 0.9);
+  border: 2px solid #2121ff;
   color: #ffffff;
 }
 body.theme-pacman .license-box {
